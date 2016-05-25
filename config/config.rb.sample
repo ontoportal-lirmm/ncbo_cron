@@ -46,6 +46,8 @@ NcboCron.config do |config|
   config.analytics_app_version                   = "1.0.0"
   config.analytics_start_date                    = "2013-10-01"
   config.analytics_filter_str                    = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
+
+  config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN"
 end
 
 Goo.use_cache = true
