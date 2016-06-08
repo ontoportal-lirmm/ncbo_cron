@@ -60,7 +60,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/sparql-client.git
-  revision: 190fa44c3b63907d11555f5c18a86493cb9722d0
+  revision: a0076dedc65d6620b88223c7f69dbe5c5ada3b56
   branch: staging
   specs:
     sparql-client (1.0.4.1)
@@ -163,7 +163,7 @@ GEM
     multipart-post (2.0.0)
     mysql2 (0.4.4)
     net-http-persistent (2.9.4)
-    oj (2.15.0)
+    oj (2.15.1)
     os (0.9.6)
     pony (1.11)
       mail (>= 2.0)
@@ -188,7 +188,7 @@ GEM
     rubyzip (1.2.0)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (4.34.0)
+    sequel (4.35.0)
     signet (0.7.2)
       addressable (~> 2.3)
       faraday (~> 0.9)
