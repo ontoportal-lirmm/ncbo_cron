@@ -46,6 +46,11 @@ NcboCron.config do |config|
   config.analytics_app_version                   = "1.0.0"
   config.analytics_start_date                    = "2013-10-01"
   config.analytics_filter_str                    = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
+
+  # this is a Base64.encode64 encoded personal access token
+  # you need to run Base64.decode64 on it before using it in your code
+  # this is a workaround because Github does not allow storing access tokens in a repo
+  config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN, encoded using Base64"
 end
 
 Goo.use_cache = true

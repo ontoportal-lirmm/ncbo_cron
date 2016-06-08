@@ -419,4 +419,4 @@ end
 # ontologies_report_path = File.join("logs", "ontologies-report.log")
 # ontologies_report_logger = Logger.new(ontologies_report_path)
 # NcboCron::Models::OntologiesReport.new(ontologies_report_logger).run
-# ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-mapping-counts true --ontologies-report '14 * * * *'
+# ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-mapping-counts true --disable-spam-deletion true --ontologies-report '14 * * * *'
