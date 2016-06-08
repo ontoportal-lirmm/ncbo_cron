@@ -68,4 +68,4 @@ end
 # query_warmer_path = File.join("logs", "warmq.log")
 # query_warmer_logger = Logger.new(query_warmer_path)
 # NcboCron::Models::QueryWarmer.new(query_warmer_logger).run
-# ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-ontology-analytics true --disable-mapping-counts true --disable-ontologies-report true --warm-long-queries '14 * * * *'
+# ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-ontology-analytics true --disable-mapping-counts true --disable-ontologies-report true --disable-spam-deletion true --warm-long-queries '14 * * * *'

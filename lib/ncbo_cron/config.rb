@@ -34,6 +34,8 @@ module NcboCron
     @settings.enable_ontology_analytics ||= true
     # enable ontologies report
     @settings.enable_ontologies_report ||= true
+    # enable SPAM deletion
+    @settings.enable_spam_deletion ||= true
     # UMLS auto-pull
     @settings.pull_umls_url ||= ""
     @settings.enable_pull_umls ||= false
@@ -57,6 +59,8 @@ module NcboCron
     @settings.cron_ontologies_report ||= "30 1 * * *"
     # Ontologies Report file location
     @settings.ontology_report_path = "../../reports/ontologies_report.json"
+    # 30 2 * * * - run daily at 2:30AM
+    @settings.cron_spam_deletion ||= "30 2 * * *"
 
     @settings.log_level ||= :info
     unless (@settings.log_path && File.exists?(@settings.log_path))

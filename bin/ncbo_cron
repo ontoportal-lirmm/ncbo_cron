@@ -102,6 +102,9 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--disable-ontologies-report", "disable ontologies report generation", "(default: #{options[:enable_ontologies_report]})") do |v|
     options[:enable_ontologies_report] = false
   end
+  opts.on("--disable-spam-deletion", "disable SPAM deletion", "(default: #{options[:enable_spam_deletion]})") do |v|
+    options[:enable_spam_deletion] = false
+  end
   opts.on("--pull-umls-url URL", "set UMLS pull location") do |v|
     options[:pull_umls_url] = v
   end
@@ -122,6 +125,9 @@ opt_parser = OptionParser.new do |opts|
   end
   opts.on("--ontologies-report SCHED", String, "cron schedule to run ontologies report generation", "(default: #{options[:cron_ontologies_report]})") do |c|
     options[:cron_ontologies_report] = c
+  end
+  opts.on("--spam-deletion SCHED", String, "cron schedule to run SPAM deletion", "(default: #{options[:cron_spam_deletion]})") do |c|
+    options[:cron_spam_deletion] = c
   end
 
   # Display the help screen, all programs are assumed to have this option.
@@ -357,6 +363,26 @@ runner.execute do |opts|
     end
   end
 
+  if options[:enable_spam_deletion]
+    spam_deletion_thread = Thread.new do
+      spam_deletion_options = options.dup
+      spam_deletion_options[:job_name] = "ncbo_cron_spam_deletion"
+      spam_deletion_options[:scheduler_type] = :cron
+      spam_deletion_options[:cron_schedule] = spam_deletion_options[:cron_spam_deletion]
+      logger.info "Setting up SPAM deletion job with #{spam_deletion_options[:cron_spam_deletion]}"; logger.flush
+      spam_deletion_log_path = File.join(log_path, "#{log_filename_noExt}-spam-deletion.log")
+      spam_deletion_logger = Logger.new(spam_deletion_log_path)
+      NcboCron::Scheduler.scheduled_locking_job(spam_deletion_options) do
+        logger.info "Starting SPAM deletion..."; logger.flush
+        logger.info "Logging SPAM deletion details to #{spam_deletion_log_path}"; logger.flush
+        t0 = Time.now
+        NcboCron::Models::SpamDeletion.new(spam_deletion_logger).run
+        logger.info "SPAM deletion job completed in #{Time.now - t0} sec."; logger.flush
+        logger.info "Finished SPAM deletion"; logger.flush
+      end
+    end
+  end
+
   # Print running child processes
   require 'sys/proctable'
   at_exit do
@@ -374,5 +400,6 @@ runner.execute do |opts|
   warmq_thread.join if warmq_thread
   analytics_thread.join if analytics_thread
   ontologies_report_thread.join if ontologies_report_thread
+  spam_deletion_thread.join if spam_deletion_thread
   mapping_counts_thread.join if mapping_counts_thread
 end
