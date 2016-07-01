@@ -80,6 +80,8 @@ begin
     config.annotator_redis_port    = 6379
     config.annotator_redis_prefix  = ""
     config.annotator_redis_alt_prefix  = "c2"
+    config.enable_recognizer_param = true
+    # This setting allows you to ask for other recognizer in URL params (if installed and class with "annotate_direct" created). Example: ?recognizer=alvis or mallet
 end
 rescue NameError
   puts "(CNFG) >> Annotator not available, cannot load config"
