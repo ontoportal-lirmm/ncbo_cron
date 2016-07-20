@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: dec1a7f5ee460b1d1d0bb99c2a457405fec4122b
+  revision: a5e1894d370e6bb82c177b5df7fd004e9c220473
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
@@ -171,7 +171,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (2.0.1)
+    rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
     rake (11.1.2)
@@ -222,6 +222,7 @@ DEPENDENCIES
   ontologies_linked_data!
   pony
   pry
+  rack (~> 1.0)
   rake
   redis
   sparql-client!
