@@ -50,8 +50,8 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: ad60b156bd7df4f5d2cf960b4ea528befcc8a3eb
-  branch: sifr_linked_data
+  revision: dec1a7f5ee460b1d1d0bb99c2a457405fec4122b
+  branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -137,12 +137,12 @@ GEM
       signet (~> 0.7)
     htmlentities (4.3.4)
     i18n (0.7.0)
-    json (1.8.3)
+    json (2.0.1)
     json_pure (1.8.3)
     jwt (1.5.4)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libxml-ruby (2.8.0)
+    libxml-ruby (2.9.0)
     little-plugger (1.1.4)
     logging (2.1.0)
       little-plugger (~> 1.1)
@@ -171,7 +171,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (1.6.4)
+    rack (2.0.1)
     rack-test (0.6.3)
       rack (>= 1.0)
     rake (11.1.2)
