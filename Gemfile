@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
+gem 'rack', '~> 1.0'
 gem 'pry'
 gem 'oj'
 gem 'multi_json'
@@ -22,7 +23,7 @@ gem 'cube-ruby', require: 'cube'
 # NCBO gems (can be from a local dev path or from rubygems/git)
 gem 'goo', github: 'ncbo/goo', branch: 'master'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
-gem 'ontologies_linked_data', github: 'sifrproject/ontologies_linked_data', branch: 'lirmm_linked_data'
+gem 'ontologies_linked_data', github: 'sifrproject/ontologies_linked_data', branch: 'agroportal'
 gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
 gem 'ncbo_resource_index', github: 'ncbo/resource_index'
 

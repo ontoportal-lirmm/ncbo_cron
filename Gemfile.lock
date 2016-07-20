@@ -50,8 +50,8 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: 22312a39b5793648810bdc5c7b43968bea4a282d
-  branch: lirmm_linked_data
+  revision: 90753a8770555b99de7786fba3a3b51879a5cab7
+  branch: agroportal
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -137,12 +137,12 @@ GEM
       signet (~> 0.7)
     htmlentities (4.3.4)
     i18n (0.7.0)
-    json (1.8.3)
+    json (2.0.1)
     json_pure (1.8.3)
     jwt (1.5.4)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libxml-ruby (2.8.0)
+    libxml-ruby (2.9.0)
     little-plugger (1.1.4)
     logging (2.1.0)
       little-plugger (~> 1.1)
@@ -174,7 +174,7 @@ GEM
     rack (1.6.4)
     rack-test (0.6.3)
       rack (>= 1.0)
-    rake (11.1.2)
+    rake (0.9.6)
     rdf (1.0.8)
       addressable (>= 2.2)
     redis (3.3.0)
@@ -222,6 +222,7 @@ DEPENDENCIES
   ontologies_linked_data!
   pony
   pry
+  rack (~> 1.0)
   rake
   redis
   sparql-client!
