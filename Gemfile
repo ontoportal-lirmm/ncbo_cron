@@ -27,5 +27,8 @@ gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
 gem 'ncbo_resource_index', github: 'ncbo/resource_index'
 
 # Testing
-gem 'email_spec', :group => :test
+group :test do
+	gem 'email_spec'
+  gem 'test-unit-minitest'
+end
 
