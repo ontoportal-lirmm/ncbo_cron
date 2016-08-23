@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: 10519e6cb5f8f6bd19f224e616eff293748fc3f3
+  revision: b7f30deaf230a535483032612436d2ee06ad512a
   branch: staging
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 1a9389c1d5f8c537ffdcd14333b300717d97af15
+  revision: 75d8535a3a770829f269934c5eacc131c6e6f895
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: dd7a4eb071815c25e67eb397ae96c76b96b9ffa4
+  revision: 94b5b3ea25cc49a9f6e1044f8fdae02f2a07593c
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -47,7 +47,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/resource_index.git
-  revision: cadb052f3b00993331b993ffcb1dc1b2aad11c42
+  revision: 4d3020aa4aad63f45b384359b47f4b17194c3092
   specs:
     ncbo_resource_index (0.0.1)
       elasticsearch
@@ -121,8 +121,8 @@ GEM
     faraday (0.9.2)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.14)
-    google-api-client (0.8.6)
-      activesupport (>= 3.2)
+    google-api-client (0.8.7)
+      activesupport (>= 3.2, < 5.0)
       addressable (~> 2.3)
       autoparse (~> 0.3)
       extlib (~> 0.9)
@@ -171,7 +171,7 @@ GEM
     mysql2 (0.4.4)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (2.17.1)
+    oj (2.17.3)
     os (0.9.6)
     pony (1.11)
       mail (>= 2.0)
