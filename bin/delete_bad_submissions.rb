@@ -60,8 +60,5 @@ LinkedData::Models::Ontology.all.each do |ont|
   end
 end
 
-bad_subs.each do |s|
-  logger.info("Deleting submission: #{s.id}")
-  s.delete
-end
+bad_subs.each {|s| logger.info("Deleting submission: #{s.id}"); s.delete}
 
