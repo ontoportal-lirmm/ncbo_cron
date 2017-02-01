@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: ecb6447221831217a6481ce619d4a0e3fb572e29
+  revision: ae825087780e783daa83ed045432e0cec5469817
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
@@ -141,7 +141,7 @@ GEM
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.7.0)
-    json (2.0.2)
+    json (2.0.3)
     json_pure (1.8.3)
     jwt (1.5.4)
     launchy (2.4.3)
