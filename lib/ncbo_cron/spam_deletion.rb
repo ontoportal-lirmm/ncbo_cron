@@ -48,12 +48,24 @@ module NcboCron
           reviews = LinkedData::Models::Review.where(creator: user.id).include(:body).all
           ontologies = LinkedData::Models::Ontology.where(administeredBy: user.id).include(:acronym).all
 
-          @logger.info("Deleting user #{user.username} artifacts:")
-          @logger.info("-----------------------------------------")
-          @logger.info("Projects: #{projects.map {|p| p.acronym}.join(", ")}")
-          @logger.info("Notes: #{notes.map {|n| n.subject}.join(", ")}")
-          @logger.info("Reviews: #{reviews.map {|r| r.body}.join(", ")}")
-          @logger.info("Ontologies: #{ontologies.map {|o| o.acronym}.join(", ")}")
+          @logger.info("User #{user.username} artifacts:")
+          @logger.info("--------------------------------")
+
+          pr = projects.map {|p| p.acronym}.join(", ")
+          pr = "none" if pr.empty?
+          @logger.info("Projects: #{pr}")
+
+          n = notes.map {|n| n.subject}.join(", ")
+          n = "none" if n.empty?
+          @logger.info("Notes: #{n}")
+
+          rv = reviews.map {|r| r.body}.join(", ")
+          rv = "none" if rv.empty?
+          @logger.info("Reviews: #{rv}")
+
+          ont = ontologies.map {|o| o.acronym}.join(", ")
+          ont = "none" if ont.empty?
+          @logger.info("Ontologies: #{ont}")
           @logger.flush
 
           delete_projects += projects
