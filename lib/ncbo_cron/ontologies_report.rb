@@ -144,9 +144,11 @@ module NcboCron
       end
 
       def generate_single_ontology_report(ont)
-        report = {problem: false, format: '', date_created: '', logFilePath: '', report_date_updated: nil}
+        report = {problem: false, format: '', date_created: '', administeredBy: '', logFilePath: '', report_date_updated: nil}
         ont.bring_remaining()
         ont.bring(:submissions)
+        ont.administeredBy.each { |u| u.bring(:username) }
+        report[:administeredBy] = ont.administeredBy.map { |u| u.bring(:username); u.username }.join(", ")
         submissions = ont.submissions
 
         # first see if is summary only and if it has submissions
