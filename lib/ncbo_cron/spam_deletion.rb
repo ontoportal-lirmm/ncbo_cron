@@ -66,6 +66,7 @@ module NcboCron
           ont = ontologies.map {|o| o.acronym}.join(", ")
           ont = "none" if ont.empty?
           @logger.info("Ontologies: #{ont}")
+          @logger.info("--------------------------------\n")
           @logger.flush
 
           delete_projects += projects
