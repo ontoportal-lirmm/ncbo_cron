@@ -230,6 +230,7 @@ module NcboCron
         logger.debug "Completed archiving submissions previous to #{sub.id.to_s}"
       end
 
+      # Add new ontology terms to the Annotator
       def process_annotator(logger, sub)
         parsed = sub.ready?(status: [:rdf, :rdf_labels])
 
