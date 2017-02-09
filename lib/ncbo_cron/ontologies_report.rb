@@ -144,9 +144,11 @@ module NcboCron
       end
 
       def generate_single_ontology_report(ont)
-        report = {problem: false, format: '', date_created: '', logFilePath: '', report_date_updated: nil}
+        report = {problem: false, format: '', date_created: '', administeredBy: '', logFilePath: '', report_date_updated: nil}
         ont.bring_remaining()
         ont.bring(:submissions)
+        ont.bring(administeredBy: :username)
+        report[:administeredBy] = ont.administeredBy.map { |u| u.username }.join(", ")
         submissions = ont.submissions
 
         # first see if is summary only and if it has submissions
@@ -297,7 +299,7 @@ module NcboCron
       end
 
       def ontology_report_date(report, date_str, tm=Time.new)
-        tm_str = tm.strftime("%m/%d/%Y %I:%M%p")
+        tm_str = tm.strftime("%m/%d/%Y, %I:%M %p")
         report[date_str.to_sym] = tm_str
       end
 

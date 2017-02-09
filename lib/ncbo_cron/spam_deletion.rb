@@ -38,6 +38,7 @@ module NcboCron
         delete_projects = []
         delete_notes = []
         delete_reviews = []
+        delete_ontologies = []
 
         usernames.uniq.each do |username|
           user = LinkedData::Models::User.find(username).include(:username).first
@@ -45,24 +46,53 @@ module NcboCron
           projects = LinkedData::Models::Project.where(creator: user.id).include(:acronym).all
           notes = LinkedData::Models::Note.where(creator: user.id).include(:subject).all
           reviews = LinkedData::Models::Review.where(creator: user.id).include(:body).all
-          @logger.info("Deleting user #{user.username} projects: #{projects.map {|p| p.acronym}.join(", ")} notes: #{notes.map {|n| n.subject}.join(", ")} and reviews: #{reviews.map {|r| r.body}.join(", ")}")
+          ontologies = LinkedData::Models::Ontology.where(administeredBy: user.id).include(:acronym).all
+
+          @logger.info("User #{user.username} artifacts:")
+          @logger.info("--------------------------------")
+
+          pr = projects.map {|p| p.acronym}.join(", ")
+          pr = "none" if pr.empty?
+          @logger.info("Projects: #{pr}")
+
+          n = notes.map {|n| n.subject}.join(", ")
+          n = "none" if n.empty?
+          @logger.info("Notes: #{n}")
+
+          rv = reviews.map {|r| r.body}.join(", ")
+          rv = "none" if rv.empty?
+          @logger.info("Reviews: #{rv}")
+
+          ont = ontologies.map {|o| o.acronym}.join(", ")
+          ont = "none" if ont.empty?
+          @logger.info("Ontologies: #{ont}")
+          @logger.info("--------------------------------\n")
           @logger.flush
+
           delete_projects += projects
           delete_notes += notes
           delete_reviews += reviews
+          delete_ontologies += ontologies
           delete_users << user
         end
 
-        if delete_users.length == 0 && delete_projects.length == 0 && delete_notes.length == 0 && delete_reviews.length == 0
-          @logger.info("No users/projects/notes/reviews found")
+        if delete_users.length == 0 &&
+            delete_projects.length == 0 &&
+            delete_notes.length == 0 &&
+            delete_reviews.length == 0 &&
+            delete_ontologies.length == 0
+          @logger.info("No users/projects/notes/reviews/ontologies found")
         else
-          @logger.info("Deleting #{delete_projects.length} projects")
-          @logger.info("Deleting #{delete_notes.length} notes")
-          @logger.info("Deleting #{delete_reviews.length} reviews")
-          @logger.info("Deleting #{delete_users.length} users")
+          @logger.info("Deleting #{delete_projects.length} projects...")
+          @logger.info("Deleting #{delete_notes.length} notes...")
+          @logger.info("Deleting #{delete_reviews.length} reviews...")
+          @logger.info("Deleting #{delete_ontologies.length} ontologies...")
+          @logger.info("Deleting #{delete_users.length} users...")
+
           delete_projects.each {|p| p.delete}
           delete_notes.each {|n| n.delete}
           delete_reviews.each {|r| r.delete}
+          delete_ontologies.each {|o| o.delete}
           delete_users.each {|u| u.delete}
         end
       end
