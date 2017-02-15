@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
 
+# CAREFUL, this is creating wrong slices URI. Do not use if not fixed.
+
 # Exit cleanly from an early interrupt
 Signal.trap("INT") { exit 1 }
 
