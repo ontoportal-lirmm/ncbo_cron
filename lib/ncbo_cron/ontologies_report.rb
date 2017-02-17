@@ -148,7 +148,20 @@ module NcboCron
         ont.bring_remaining()
         ont.bring(:submissions)
         ont.bring(administeredBy: :username)
-        report[:administeredBy] = ont.administeredBy.map { |u| u.username }.join(", ")
+        report[:administeredBy] = []
+
+        ont.administeredBy.each do |u|
+          username = nil
+
+          begin
+            username = u.username
+          rescue Exception => e
+            add_error_code(report, :errRunningReport, ["u.username", e.class, e.message])
+            username = u.id.split('/')[-1]
+          end
+          report[:administeredBy] << username
+        end
+
         submissions = ont.submissions
 
         # first see if is summary only and if it has submissions
