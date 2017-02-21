@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
+gem 'rack', '~> 1.0'
 gem 'pry'
 gem 'oj'
 gem 'multi_json'
@@ -20,9 +21,9 @@ gem 'google-api-client', '<0.9'
 gem 'cube-ruby', require: 'cube'
 
 # NCBO gems (can be from a local dev path or from rubygems/git)
-gem 'goo', github: 'ncbo/goo', branch: 'master'
+gem 'goo', github: 'sifrproject/goo', branch: 'sifr'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
-gem 'ontologies_linked_data', github: 'ncbo/ontologies_linked_data', branch: 'master'
+gem 'ontologies_linked_data', github: 'sifrproject/ontologies_linked_data', branch: 'sifr'
 gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
 gem 'ncbo_resource_index', github: 'ncbo/resource_index'
 

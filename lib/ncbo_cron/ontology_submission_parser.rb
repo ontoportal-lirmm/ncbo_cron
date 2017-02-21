@@ -13,17 +13,25 @@ module NcboCron
         :index_search => true,
         :run_metrics => true,
         :process_annotator => true,
-        :diff => true
+        :diff => true,
+        :params => nil
       }
 
       def initialize()
       end
 
+      # Add a submission in the queue
       def queue_submission(submission, actions={:all => true})
         redis = Redis.new(:host => NcboCron.settings.redis_host, :port => NcboCron.settings.redis_port)
-
         if (actions[:all])
-          actions = ACTIONS.dup
+          if !actions[:params].nil?
+            # Retrieve params added by the user
+            user_params = actions[:params].dup
+            actions = ACTIONS.dup
+            actions[:params] = user_params.dup
+          else
+            actions = ACTIONS.dup
+          end
         else
           actions.delete_if {|k, v| !ACTIONS.has_key?(k)}
         end
@@ -31,6 +39,7 @@ module NcboCron
         redis.hset(QUEUE_HOLDER, get_prefixed_id(submission.id), actionStr) unless actions.empty?
       end
 
+      # Process submissions waiting in the queue
       def process_queue_submissions(options = {})
         logger = options[:logger]
         logger ||= Kernel.const_defined?("LOGGER") ? Kernel.const_get("LOGGER") : Logger.new(STDOUT)
@@ -80,6 +89,7 @@ module NcboCron
         return "#{IDPREFIX}#{id}"
       end
 
+      # Zombie graphs are submission graphs from ontologies that have been deleted
       def zombie_classes_graphs
         query = "SELECT DISTINCT ?g WHERE { GRAPH ?g { ?s ?p ?o }}"
         class_graphs = []
@@ -99,7 +109,7 @@ module NcboCron
         return zombies
       end
 
-      def process_flush_classes(logger)
+      def process_flush_classes(logger, remove_zombie_graphs=false)
         onts = LinkedData::Models::Ontology.where.include(:acronym,:summaryOnly).all
         status_archived = LinkedData::Models::SubmissionStatus.find("ARCHIVED").first
         deleted = []
@@ -142,6 +152,12 @@ module NcboCron
 
         zombie_classes_graphs.each do |zg|
           logger.info("Zombie class graph #{zg}"); logger.flush
+          # Not deleting zombie graph by default
+          if !remove_zombie_graphs.nil? && remove_zombie_graphs == true
+            Goo.sparql_data_client.delete_graph(RDF::URI.new(zg))
+            logger.info "DELETED #{zg} graph"
+            deleted << zg
+          end
         end
 
         logger.info("finish process_flush_classes"); logger.flush
@@ -214,6 +230,7 @@ module NcboCron
         logger.debug "Completed archiving submissions previous to #{sub.id.to_s}"
       end
 
+      # Add new ontology terms to the Annotator
       def process_annotator(logger, sub)
         parsed = sub.ready?(status: [:rdf, :rdf_labels])
 
