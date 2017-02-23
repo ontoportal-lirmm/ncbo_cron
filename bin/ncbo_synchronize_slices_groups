@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+# CAREFUL, this is creating wrong slices URI. Do not use if not fixed.
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+
+# Configure the process for the current cron configuration.
+require_relative '../lib/ncbo_cron'
+config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
+abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
+require_relative '../config/config';
+
+
+puts "Synchronize Slices with existing groups... (creating slices when not existing or update ontologies)"
+
+LinkedData::Models::Slice.synchronize_groups_to_slices
+
