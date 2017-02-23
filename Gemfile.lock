@@ -94,7 +94,7 @@ GEM
       extlib (>= 0.9.15)
       multi_json (>= 1.0.0)
     bcrypt (3.1.11)
-    builder (3.2.2)
+    builder (3.2.3)
     coderay (1.1.1)
     cube-ruby (0.0.3)
     dante (0.2.0)
