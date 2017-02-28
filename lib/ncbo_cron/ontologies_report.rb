@@ -144,7 +144,7 @@ module NcboCron
       end
 
       def generate_single_ontology_report(ont)
-        report = {problem: false, format: '', date_created: '', administeredBy: '', logFilePath: '', report_date_updated: nil}
+        report = {problem: false, format: '', date_created: '', administeredBy: [], logFilePath: '', report_date_updated: nil}
         ont.bring_remaining()
         ont.bring(:submissions)
         ont.bring(administeredBy: :username)
