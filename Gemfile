@@ -24,7 +24,7 @@ gem 'cube-ruby', require: 'cube'
 gem 'goo', github: 'sifrproject/goo', branch: 'lirmm'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
 gem 'ontologies_linked_data', github: 'sifrproject/ontologies_linked_data', branch: 'lirmm'
-gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
+gem 'ncbo_annotator', github: 'sifrproject/ncbo_annotator', branch: 'lirmm'
 gem 'ncbo_resource_index', github: 'ncbo/resource_index'
 
 # Testing
