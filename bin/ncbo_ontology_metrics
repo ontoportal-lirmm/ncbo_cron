@@ -58,7 +58,7 @@ unless options[:ontologies]
   exit(1)
 end
 
-def generate_metrics_for_ontology(finished_ontologies, acronym, logger)
+def generate_metrics_for_ontology(finished_ontologies, acronym, logger, logger_override)
   begin
     ont = LinkedData::Models::Ontology.find(acronym).first
     if ont.nil?
@@ -70,7 +70,7 @@ def generate_metrics_for_ontology(finished_ontologies, acronym, logger)
     if sub.nil?
       raise "Cannot find latest submission with 'RDF' parsed status for ontology: #{acronym}"
     end
-    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, {process_rdf: false,
+    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, logger_override, sub.id.to_s, {process_rdf: false,
                                                                       index_search: false, index_commit: false,
                                                                       run_metrics: true, reasoning: false, diff: false})
     finished_ontologies << acronym
@@ -83,11 +83,13 @@ end
 
 begin
   logger = Logger.new(options[:logfile])
+  logger_override = true
   puts "Processing details are logged to #{options[:logfile]}"
   msg = ""
 
-  if (options[:all])
+  if options[:all]
     msg = "Generating metrics for all ontologies"
+    logger_override = false
   else
     msg = "Generating metrics for ontologies: #{options[:ontologies]}"
   end
@@ -101,13 +103,13 @@ begin
     logger.info("There is a total of #{options[:ontologies].length} ontolog#{options[:ontologies].length > 1 ? "ies" : "y"} to generate metrics for")
 
     options[:ontologies].each do |acronym|
-      generate_metrics_for_ontology(finished_ontologies, acronym, logger)
+      generate_metrics_for_ontology(finished_ontologies, acronym, logger, logger_override)
       remaining_ontologies -= 1
       logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
     end
   end
 
-  if (options[:all])
+  if options[:all]
     msg = "Completed generating metrics for all ontologies in #{(time/60).round(1)} minutes."
   else
     msg = "Completed generating metrics for ontologies: #{finished_ontologies} in #{(time/60).round(1)} minutes."

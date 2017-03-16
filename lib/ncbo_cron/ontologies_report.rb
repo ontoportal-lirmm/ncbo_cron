@@ -47,6 +47,7 @@ module NcboCron
           # ont_to_include = ["PHENOMEBLAST", "MYOBI", "NCBIVIRUSESTAX", "OntoOrpha", "PERTANIAN", "PHENOMEBLAST", "RTEST-LOINC", "SSACAL", "TEST", "UU", "VIRUSESTAX"]
           # ont_to_include = ["AERO", "SBO", "EHDAA", "CCO", "ONLIRA", "VT", "ZEA", "SMASH", "PLIO", "OGI", "CO", "NCIT", "GO"]
           # ont_to_include = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
+          # ont_to_include = ["FB-DV","GCC"]
         end
         ont_to_include
       end
@@ -266,7 +267,7 @@ module NcboCron
           cl = metrics.classes || 0
           prop = metrics.properties || 0
 
-          if cl + prop < 10
+          if cl.to_i + prop.to_i < 10
             add_error_code(report, :errIncorrectMetricsLatestSubmission)
           end
         end
@@ -322,7 +323,7 @@ module NcboCron
         classes_size = 10
         good_classes = Array.new
         paging = LinkedData::Models::Class.in(submission).include(:prefLabel, :synonym, metrics: :classes).page(page_num, page_size)
-        cls_count = submission.class_count(@logger)
+        cls_count = submission.class_count(@logger).to_i
         # prevent a COUNT SPARQL query if possible
         paging.page_count_set(cls_count) if cls_count > -1
 

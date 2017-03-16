@@ -11,6 +11,7 @@ module NcboCron
       ACTIONS = {
         :process_rdf => true,
         :index_search => true,
+        :index_properties => true,
         :run_metrics => true,
         :process_annotator => true,
         :diff => true
@@ -22,7 +23,7 @@ module NcboCron
       def queue_submission(submission, actions={:all => true})
         redis = Redis.new(:host => NcboCron.settings.redis_host, :port => NcboCron.settings.redis_port)
 
-        if (actions[:all])
+        if actions[:all]
           actions = ACTIONS.dup
         else
           actions.delete_if {|k, v| !ACTIONS.has_key?(k)}
@@ -44,7 +45,7 @@ module NcboCron
           redis.hdel(QUEUE_HOLDER, key)
           begin
             logger.info "Starting processing of #{realKey}"
-            process_submission(logger, realKey, actions)
+            process_submission(logger, true, realKey, actions)
             logger.info "Finished processing of #{realKey}"
           rescue Exception => e
             logger.debug "Exception processing #{realKey}"
@@ -77,7 +78,7 @@ module NcboCron
       end
 
       def get_prefixed_id(id)
-        return "#{IDPREFIX}#{id}"
+        "#{IDPREFIX}#{id}"
       end
 
       def zombie_classes_graphs
@@ -96,7 +97,7 @@ module NcboCron
         class_graphs.each do |g|
           zombies << g unless onts_set.include?(g.split("/")[0..-3].join("/"))
         end
-        return zombies
+        zombies
       end
 
       def process_flush_classes(logger)
@@ -146,22 +147,26 @@ module NcboCron
 
         logger.info("finish process_flush_classes"); logger.flush
 
-        return deleted
+        deleted
       end
 
-      def process_submission(logger, submissionId, actions=ACTIONS)
+      def process_submission(logger, logger_override, submission_id, actions=ACTIONS)
+        logger_override = true if logger_override.nil?
         t0 = Time.now
-        sub = LinkedData::Models::OntologySubmission.find(RDF::IRI.new(submissionId)).first
+        sub = LinkedData::Models::OntologySubmission.find(RDF::IRI.new(submission_id)).first
 
         if sub
           sub.bring_remaining
           sub.ontology.bring(:acronym)
-          log_path = sub.parsing_log_path
           FileUtils.mkdir_p(sub.data_folder) unless Dir.exists?(sub.data_folder)
 
-          logger.info "Logging parsing output to #{log_path}"
-          logger = Logger.new(log_path)
-          logger.debug "Starting parsing for #{submissionId}\n\n"
+          if logger_override
+            log_path = sub.parsing_log_path
+            logger.info "Logging parsing output to #{log_path}"
+            logger = Logger.new(log_path)
+          end
+
+          logger.debug "Starting parsing #{submission_id}\n\n"
 
           # Check to make sure the file has been downloaded
           if sub.pullLocation && (!sub.uploadFilePath || !File.exist?(sub.uploadFilePath))
@@ -174,7 +179,7 @@ module NcboCron
             logger.debug "Download complete"
           end
 
-          logger.debug "Processing submission #{submissionId}..."
+          logger.debug "Processing submission #{submission_id}..."
           sub.process_submission(logger, actions)
           logger.debug "Submission #{sub.id} processed successfully"
           parsed = sub.ready?(status: [:rdf, :rdf_labels])
@@ -182,13 +187,13 @@ module NcboCron
           if parsed
             archive_old_submissions(logger, sub) if actions[:process_rdf]
             process_annotator(logger, sub) if actions[:process_annotator]
-            logger.debug "Completed processing of #{submissionId} in #{(Time.now - t0).to_f.round(2)}s"
+            logger.debug "Completed processing of #{submission_id} in #{(Time.now - t0).to_f.round(2)}s"
           else
-            logger.error "Submission #{submissionId} parsing failed"
+            logger.error "Submission #{submission_id} parsing failed"
           end
           NcboCron::Models::OntologiesReport.new(logger).refresh_report([sub.ontology.acronym])
         else
-          logger.error "Submission #{submissionId} is not in the system. Processing cancelled..."
+          logger.error "Submission #{submission_id} is not in the system. Processing cancelled..."
         end
       end
 
