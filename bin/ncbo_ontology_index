@@ -48,11 +48,9 @@ opt_parser = OptionParser.new do |opts|
     options[:ontologies] = acronyms.split(",").map {|o| o.strip}
   end
 
-  #options[:dry_run] = false
-  #opts.on('-n', '--dryrun', 'Ontology index is not committed to SOLR.') do
-  #  puts 'This is a dry-run, the index will not be committed to SOLR.'
-  #  options[:dry_run] = true
-  #end
+  opts.on('-z', '--optimize [true/false]', 'Whether to optimize the index after the indexing completion. Default: true') do |optimize|
+    options[:optimize] = optimize
+  end
 
   options[:logfile] = STDOUT
   opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
@@ -79,6 +77,12 @@ unless options[:ontologies]
   exit(1)
 end
 options[:solr_core_url] = LinkedData.settings.search_server_url if (options[:solr_core_url].nil?)
+
+if options[:optimize].nil? || options[:optimize] != "false"
+  options[:optimize] = true
+else
+  options[:optimize] = false
+end
 
 def index_ontology(indexed_ontologies, acronym, logger, logger_override)
   begin
@@ -116,16 +120,15 @@ end
 
 abort("The Solr core URL you provided is invalid. Aborting...\n\n") unless valid_url?(options[:solr_core_url])
 
-if (options[:all] && options[:solr_core_url].downcase == LinkedData.settings.search_server_url.downcase)
+if options[:all] && options[:solr_core_url].downcase == LinkedData.settings.search_server_url.downcase
   puts "WARNING: You are about to clear the main core search index on #{options[:solr_core_url]}!!! This will affect ALL searches!!! Are you sure you mean to do this?"
-elsif (options[:all])
+elsif options[:all]
   puts "You are about to clear the index on #{options[:solr_core_url]} and kick off a lengthy re-indexing process. Are you sure?"
 end
 
-logger_override = true
+logger_override = options[:ontologies].length > 1 ? false : true
 
-if (options[:all])
-  logger_override = false
+if options[:all]
   puts "Type 'yes' to continue: "
   $stdout.flush
   confirm = $stdin.gets
@@ -137,7 +140,7 @@ begin
   puts "Processing details are logged to #{options[:logfile] == STDOUT ? "STDOUT" : options[:logfile]}"
   msg = ""
 
-  if (options[:all])
+  if options[:all]
     msg = "Processing index for all ontologies on #{options[:solr_core_url]}"
   else
     msg = "Processing index for ontologies: #{options[:ontologies]} on #{options[:solr_core_url]}"
@@ -155,7 +158,7 @@ begin
   time = Benchmark.realtime do
     logger.info("There is a total of #{options[:ontologies].length} ontolog#{options[:ontologies].length > 1 ? "ies" : "y"} to index")
 
-    if (options[:all])
+    if options[:all]
       logger.info("Clearing existing index on #{options[:solr_core_url]}")
       LinkedData::Models::Class.indexClear()
       LinkedData::Models::Class.indexCommit()
@@ -167,14 +170,17 @@ begin
       logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
     end
 
-    if options[:all]
+    if options[:optimize]
       logger.info("Optimizing index...")
+      logger.flush
+      t0 = Time.now
       LinkedData::Models::Class.indexOptimize()
-      logger.info("Completed optimizing index")
+      logger.info("Completed optimizing index in #{Time.now - t0} sec.")
+      logger.flush
     end
   end
 
-  if (options[:all])
+  if options[:all]
     msg = "Completed processing index for all ontologies on #{options[:solr_core_url]} in #{(time/60).round(1)} minutes."
   else
     msg = "Completed processing index for ontologies: #{indexed_ontologies} on #{options[:solr_core_url]} in #{(time/60).round(1)} minutes."

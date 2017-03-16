@@ -45,6 +45,10 @@ opt_parser = OptionParser.new do |opts|
     options[:ontologies] = acronyms.split(",").map {|o| o.strip}
   end
 
+  opts.on('-z', '--optimize [true/false]', 'Whether to optimize the property index after the indexing completion. Default: true') do |optimize|
+    options[:optimize] = optimize
+  end
+
   options[:logfile] = STDOUT
   opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
     options[:logfile] = filename
@@ -66,6 +70,11 @@ unless options[:ontologies]
 end
 
 options[:solr_core_url] = LinkedData.settings.property_search_server_url if (options[:solr_core_url].nil?)
+if options[:optimize].nil? || options[:optimize] != "false"
+  options[:optimize] = true
+else
+  options[:optimize] = false
+end
 
 def index_ontology_properties(indexed_ontologies, acronym, logger, logger_override)
   begin
@@ -106,10 +115,9 @@ elsif options[:all]
   puts "You are about to clear the property index on #{options[:solr_core_url]} and kick off a full re-indexing process. Are you sure?"
 end
 
-logger_override = true
+logger_override = options[:ontologies].length > 1 ? false : true
 
 if options[:all]
-  logger_override = false
   puts "Type 'yes' to continue: "
   $stdout.flush
   confirm = $stdin.gets
@@ -151,10 +159,13 @@ begin
       logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining to index properties of out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
     end
 
-    if options[:all]
+    if options[:optimize]
       logger.info("Optimizing property index...")
+      logger.flush
+      t0 = Time.now
       LinkedData::Models::Class.indexOptimize(nil, :property)
-      logger.info("Completed optimizing property index")
+      logger.info("Completed optimizing property index in #{Time.now - t0} sec.")
+      logger.flush
     end
   end
 
