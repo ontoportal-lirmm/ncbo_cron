@@ -80,7 +80,7 @@ unless options[:ontologies]
 end
 options[:solr_core_url] = LinkedData.settings.search_server_url if (options[:solr_core_url].nil?)
 
-def index_ontology(indexed_ontologies, acronym, logger)
+def index_ontology(indexed_ontologies, acronym, logger, logger_override)
   begin
     ont = LinkedData::Models::Ontology.find(acronym).first
 
@@ -98,7 +98,7 @@ def index_ontology(indexed_ontologies, acronym, logger)
     end
     # NOTE: process_submission controls all aspects of re-indexing, including
     # removal of the old index and committing a new index.  There is no 'dry-run' option.
-    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, {process_rdf: false, diff: false,
+    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, logger_override, sub.id.to_s, {process_rdf: false, diff: false,
                                                                                         index_search: true, index_commit: true,
                                                                                         run_metrics: false, reasoning: false})
     indexed_ontologies << acronym
@@ -122,7 +122,10 @@ elsif (options[:all])
   puts "You are about to clear the index on #{options[:solr_core_url]} and kick off a lengthy re-indexing process. Are you sure?"
 end
 
+logger_override = true
+
 if (options[:all])
+  logger_override = false
   puts "Type 'yes' to continue: "
   $stdout.flush
   confirm = $stdin.gets
@@ -131,7 +134,7 @@ end
 
 begin
   logger = Logger.new(options[:logfile])
-  puts "Processing details are logged to #{options[:logfile]}"
+  puts "Processing details are logged to #{options[:logfile] == STDOUT ? "STDOUT" : options[:logfile]}"
   msg = ""
 
   if (options[:all])
@@ -159,7 +162,7 @@ begin
     end
 
     options[:ontologies].each do |acronym|
-      index_ontology(indexed_ontologies, acronym, logger)
+      index_ontology(indexed_ontologies, acronym, logger, logger_override)
       remaining_ontologies -= 1
       logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
     end
