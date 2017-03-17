@@ -336,7 +336,7 @@ module NcboCron
             # some obscure error that happens intermittently
             @logger.error("Error during ontologies report paging - #{e.class}: #{e.message}")
             @logger.error("Sub: #{submission.id}")
-            throw e
+            raise e
           end
 
           break if page_classes.empty?
