@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 1011f7f51b23721a15d98208f668725a57257d05
+  revision: de5777a128d4e85ea26cd361037180682e246694
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: f7d7b41515a8736e0bea33c78ab0020a2c26804f
+  revision: 90992af8e5687144ba97b6461426fcc572ecc5f8
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -39,6 +39,7 @@ GIT
       multi_json
       ncbo_resource_index
       oj
+      omni_logger
       pony
       rack
       rack-test
@@ -151,6 +152,7 @@ GEM
       addressable (~> 2.3)
     libxml-ruby (3.0.0)
     little-plugger (1.1.4)
+    logger (1.2.8)
     logging (2.2.0)
       little-plugger (~> 1.1)
       multi_json (~> 1.10)
@@ -172,6 +174,8 @@ GEM
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (2.18.5)
+    omni_logger (0.1.4)
+      logger
     os (0.9.6)
     pony (1.11)
       mail (>= 2.0)
