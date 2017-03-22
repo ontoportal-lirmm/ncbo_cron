@@ -78,7 +78,6 @@ PATH
       mlanett-redis-lock
       multi_json
       ncbo_annotator
-      omni_logger
       ontologies_linked_data
       redis
       rufus-scheduler (~> 2.0.24)
@@ -152,7 +151,6 @@ GEM
       addressable (~> 2.3)
     libxml-ruby (3.0.0)
     little-plugger (1.1.4)
-    logger (1.2.8)
     logging (2.2.0)
       little-plugger (~> 1.1)
       multi_json (~> 1.10)
@@ -174,8 +172,6 @@ GEM
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (2.18.5)
-    omni_logger (0.1.4)
-      logger
     os (0.9.6)
     pony (1.11)
       mail (>= 2.0)
@@ -237,7 +233,6 @@ DEPENDENCIES
   ncbo_cron!
   ncbo_resource_index!
   oj
-  omni_logger
   ontologies_linked_data!
   pony
   pry
