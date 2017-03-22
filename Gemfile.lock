@@ -78,6 +78,7 @@ PATH
       mlanett-redis-lock
       multi_json
       ncbo_annotator
+      omni_logger
       ontologies_linked_data
       redis
       rufus-scheduler (~> 2.0.24)
