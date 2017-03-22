@@ -55,7 +55,6 @@ end
 
 begin
   logger = Logger.new(options[:logfile])
-  logger_override = true
   includes = LinkedData::Models::OntologySubmission.goo_attrs_to_load
   includes << :submissionStatus unless includes.include?(:submissionStatus)
   submissions_query = LinkedData::Models::OntologySubmission.where(submissionStatus: [code: "RDF"])
@@ -73,7 +72,6 @@ begin
 
   if options[:all]
     msg = "Generating metrics files for all ontologies\nTotal number of submissions: #{latest_submissions.length}"
-    logger_override = false
   else
     msg = "Generating metrics files for ontologies: #{options[:ontologies]}"
   end
@@ -94,7 +92,7 @@ begin
         unless metrics
           logger.info("No existing metrics found for submission #{sub.id.to_s}. Generating...")
           logger.flush
-          NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, logger_override, sub.id.to_s,
+          NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s,
                                                                             {process_rdf: false, diff: false,
                                                                              index_search: false, index_commit: false,
                                                                              run_metrics: true, reasoning: false})

@@ -84,7 +84,7 @@ else
   options[:optimize] = false
 end
 
-def index_ontology(indexed_ontologies, acronym, logger, logger_override)
+def index_ontology(indexed_ontologies, acronym, logger)
   begin
     ont = LinkedData::Models::Ontology.find(acronym).first
 
@@ -102,7 +102,7 @@ def index_ontology(indexed_ontologies, acronym, logger, logger_override)
     end
     # NOTE: process_submission controls all aspects of re-indexing, including
     # removal of the old index and committing a new index.  There is no 'dry-run' option.
-    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, logger_override, sub.id.to_s, {process_rdf: false, diff: false,
+    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, {process_rdf: false, diff: false,
                                                                                         index_search: true, index_commit: true,
                                                                                         run_metrics: false, reasoning: false})
     indexed_ontologies << acronym
@@ -125,8 +125,6 @@ if options[:all] && options[:solr_core_url].downcase == LinkedData.settings.sear
 elsif options[:all]
   puts "You are about to clear the index on #{options[:solr_core_url]} and kick off a lengthy re-indexing process. Are you sure?"
 end
-
-logger_override = options[:ontologies].length > 1 ? false : true
 
 if options[:all]
   puts "Type 'yes' to continue: "
@@ -165,7 +163,7 @@ begin
     end
 
     options[:ontologies].each do |acronym|
-      index_ontology(indexed_ontologies, acronym, logger, logger_override)
+      index_ontology(indexed_ontologies, acronym, logger)
       remaining_ontologies -= 1
       logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
     end
