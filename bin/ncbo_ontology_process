@@ -65,10 +65,7 @@ end
 #
 # MAIN
 #
-logger_override = true
-
 if options[:all]
-  logger_override = false
   puts "About to perform the following tasks on ALL ontologies: #{options[:tasks]}"
   puts "Type 'yes' to continue: "
   $stdout.flush
@@ -98,7 +95,7 @@ options[:ontologies].each do |acronym|
       next
     end
 
-    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, logger_override, sub.id.to_s, options[:tasks])
+    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, options[:tasks])
   rescue Exception => e
     msg = "Failed, exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
     logger.error(msg)

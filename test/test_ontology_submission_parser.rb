@@ -75,13 +75,13 @@ class TestOntologySubmissionParser < TestCase
     o2_sub2.bring(:submissionStatus)
 
     options_o1 = {
-      :dummy_action => true, :process_rdf => true, :index_search => true, :diff => true,
+      :dummy_action => true, :process_rdf => true, :index_search => true, :index_properties => true, :diff => true,
       :dummy_metrics => false, :run_metrics => false, :process_annotator => false,
       :another_dummy_action => false, :all => false
     }
 
     options_o2 = {
-      dummy_action: false, process_rdf: true, index_search: false, :diff => true,
+      dummy_action: false, process_rdf: true, index_search: false, index_properties: false, :diff => true,
       dummy_metrics: true, run_metrics: false, process_annotator: true,
       another_dummy_action: true, all: false
     }
@@ -112,7 +112,7 @@ class TestOntologySubmissionParser < TestCase
     o2_sub2_statusCodes = LinkedData::Models::SubmissionStatus.get_status_codes(o2_sub2.submissionStatus)
 
     assert_equal [], ["ARCHIVED"] - o1_sub1_statusCodes
-    assert_equal [], ["UPLOADED", "RDF", "RDF_LABELS", "INDEXED", "DIFF"] - o1_sub2_statusCodes
+    assert_equal [], ["UPLOADED", "RDF", "RDF_LABELS", "INDEXED", "INDEXED_PROPERTIES", "DIFF"] - o1_sub2_statusCodes
     assert_equal [], ["ARCHIVED"] - o2_sub1_statusCodes
     assert_equal [], ["UPLOADED", "RDF", "RDF_LABELS", "ANNOTATOR", "DIFF"] - o2_sub2_statusCodes
 

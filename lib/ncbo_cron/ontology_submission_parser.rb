@@ -1,4 +1,5 @@
 require 'multi_json'
+require_relative 'utils/multi_logger'
 
 module NcboCron
   module Models
@@ -45,7 +46,7 @@ module NcboCron
           redis.hdel(QUEUE_HOLDER, key)
           begin
             logger.info "Starting processing of #{realKey}"
-            process_submission(logger, true, realKey, actions)
+            process_submission(logger, realKey, actions)
             logger.info "Finished processing of #{realKey}"
           rescue Exception => e
             logger.debug "Exception processing #{realKey}"
@@ -150,8 +151,8 @@ module NcboCron
         deleted
       end
 
-      def process_submission(logger, logger_override, submission_id, actions=ACTIONS)
-        logger_override = true if logger_override.nil?
+      def process_submission(logger, submission_id, actions=ACTIONS)
+        multi_logger = MultiLogger.new(loggers: logger)
         t0 = Time.now
         sub = LinkedData::Models::OntologySubmission.find(RDF::IRI.new(submission_id)).first
 
@@ -159,41 +160,38 @@ module NcboCron
           sub.bring_remaining
           sub.ontology.bring(:acronym)
           FileUtils.mkdir_p(sub.data_folder) unless Dir.exists?(sub.data_folder)
-
-          if logger_override
-            log_path = sub.parsing_log_path
-            logger.info "Logging parsing output to #{log_path}"
-            logger = Logger.new(log_path)
-          end
-
-          logger.debug "Starting parsing #{submission_id}\n\n"
+          log_path = sub.parsing_log_path
+          logger.info "Logging parsing output to #{log_path}"
+          logger1 = Logger.new(log_path)
+          multi_logger.add_logger(logger1)
+          multi_logger.debug "Starting parsing #{submission_id}\n\n"
 
           # Check to make sure the file has been downloaded
           if sub.pullLocation && (!sub.uploadFilePath || !File.exist?(sub.uploadFilePath))
-            logger.debug "Pull location found, but no file in the upload file path. Retrying download."
+            multi_logger.debug "Pull location found, but no file in the upload file path. Retrying download."
             file, filename = sub.download_ontology_file
             file_location = sub.class.copy_file_repository(sub.ontology.acronym, sub.submissionId, file, filename)
             file_location = "../" + file_location if file_location.start_with?(".") # relative path fix
             sub.uploadFilePath = File.expand_path(file_location, __FILE__)
             sub.save
-            logger.debug "Download complete"
+            multi_logger.debug "Download complete"
           end
 
-          logger.debug "Processing submission #{submission_id}..."
-          sub.process_submission(logger, actions)
-          logger.debug "Submission #{sub.id} processed successfully"
+          multi_logger.debug "Processing submission #{submission_id}..."
+          sub.process_submission(multi_logger, actions)
+          multi_logger.debug "Submission #{sub.id} processed successfully"
           parsed = sub.ready?(status: [:rdf, :rdf_labels])
 
           if parsed
-            archive_old_submissions(logger, sub) if actions[:process_rdf]
-            process_annotator(logger, sub) if actions[:process_annotator]
-            logger.debug "Completed processing of #{submission_id} in #{(Time.now - t0).to_f.round(2)}s"
+            archive_old_submissions(multi_logger, sub) if actions[:process_rdf]
+            process_annotator(multi_logger, sub) if actions[:process_annotator]
+            multi_logger.debug "Completed processing of #{submission_id} in #{(Time.now - t0).to_f.round(2)}s"
           else
-            logger.error "Submission #{submission_id} parsing failed"
+            multi_logger.error "Submission #{submission_id} parsing failed"
           end
-          NcboCron::Models::OntologiesReport.new(logger).refresh_report([sub.ontology.acronym])
+          NcboCron::Models::OntologiesReport.new(multi_logger).refresh_report([sub.ontology.acronym])
         else
-          logger.error "Submission #{submission_id} is not in the system. Processing cancelled..."
+          multi_logger.error "Submission #{submission_id} is not in the system. Processing cancelled..."
         end
       end
 
