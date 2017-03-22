@@ -97,7 +97,6 @@ def index_ontology_properties(indexed_ontologies, acronym, logger)
     indexed_ontologies << acronym
   rescue Exception => e
     msg = "Exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
-    puts msg
     logger.error(msg)
   end
 end
