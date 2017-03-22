@@ -1,5 +1,4 @@
 require 'multi_json'
-require_relative 'utils/multi_logger'
 
 module NcboCron
   module Models
@@ -152,7 +151,7 @@ module NcboCron
       end
 
       def process_submission(logger, submission_id, actions=ACTIONS)
-        multi_logger = MultiLogger.new(loggers: logger)
+        multi_logger = LinkedData::Utils::MultiLogger.new(loggers: logger)
         t0 = Time.now
         sub = LinkedData::Models::OntologySubmission.find(RDF::IRI.new(submission_id)).first
 

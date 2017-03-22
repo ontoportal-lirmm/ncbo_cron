@@ -23,5 +23,4 @@ Gem::Specification.new do |gem|
   gem.add_dependency("rufus-scheduler", "~> 2.0.24")
   gem.add_dependency("dante")
   gem.add_dependency("google-api-client")
-  gem.add_dependency("omni_logger")
 end

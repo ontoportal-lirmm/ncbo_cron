@@ -11,7 +11,6 @@ gem 'minitest', '< 5.0'
 gem 'pony'
 gem 'sys-proctable'
 gem 'google-api-client', '<0.9'
-gem 'omni_logger'
 
 # JIRA
 # gem 'jira-ruby'
