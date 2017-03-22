@@ -27,6 +27,7 @@ class TestOntologySubmissionParser < TestCase
 
   def self.after_suite
     @@redis.del NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER
+    LinkedData::SampleData::Ontology.delete_ontologies_and_submissions
   end
 
   def test_queue_submission
