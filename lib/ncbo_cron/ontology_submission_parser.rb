@@ -176,9 +176,7 @@ module NcboCron
             multi_logger.debug "Download complete"
           end
 
-          multi_logger.debug "Processing submission #{submission_id}..."
           sub.process_submission(multi_logger, actions)
-          multi_logger.debug "Submission #{sub.id} processed successfully"
           parsed = sub.ready?(status: [:rdf, :rdf_labels])
 
           if parsed
