@@ -44,9 +44,7 @@ module NcboCron
           key = process_data[:redis_key]
           redis.hdel(QUEUE_HOLDER, key)
           begin
-            logger.info "Starting processing of #{realKey}"
             process_submission(logger, realKey, actions)
-            logger.info "Finished processing of #{realKey}"
           rescue Exception => e
             logger.debug "Exception processing #{realKey}"
             logger.error(e.message + "\n" + e.backtrace.join("\n\t"))
@@ -163,7 +161,7 @@ module NcboCron
           logger.info "Logging parsing output to #{log_path}"
           logger1 = Logger.new(log_path)
           multi_logger.add_logger(logger1)
-          multi_logger.debug "Starting parsing #{submission_id}\n\n"
+          multi_logger.info "Starting to process #{submission_id}"
 
           # Check to make sure the file has been downloaded
           if sub.pullLocation && (!sub.uploadFilePath || !File.exist?(sub.uploadFilePath))
