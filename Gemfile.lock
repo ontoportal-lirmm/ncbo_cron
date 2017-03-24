@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: fc53fafa658b585a8b93ad992c1e0f9fd26d3d55
+  revision: c88dc0730f811910c41bec0048666e4808e70ebf
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
@@ -239,4 +239,4 @@ DEPENDENCIES
   sys-proctable
 
 BUNDLED WITH
-   1.14.3
+   1.14.6
