@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: a66f03c2885c04f2b263deb676126b852feef415
+  revision: f7e41e70d0cb747d27de76a2ed9171240f8540ac
   branch: agroportal
   specs:
     ontologies_linked_data (0.0.1)
@@ -239,4 +239,4 @@ DEPENDENCIES
   sys-proctable
 
 BUNDLED WITH
-   1.14.3
+   1.14.6
