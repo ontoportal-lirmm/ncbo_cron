@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 331df4f117d41b2619566baa4d424e0fb5290594
+  revision: 8fe71bb78fcac22e27c888bc8554b4da1a608cba
   branch: agroportal
   specs:
     ncbo_annotator (0.0.1)
