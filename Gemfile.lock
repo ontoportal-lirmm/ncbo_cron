@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 6e6783f0d6dfd5e01d4716730b1c205d6f2d373e
+  revision: aea7c5fd0d9901e6bca5c4a1b40c8a79f07336ca
   branch: sifr
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: 615dbe1d23bc6f5853d218d97df085fc8665b76c
+  revision: 893eaa5770227cd143e947c16d1ca7dc59d2223e
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
