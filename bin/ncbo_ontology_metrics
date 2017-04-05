@@ -39,8 +39,8 @@ opt_parser = OptionParser.new do |opts|
     options[:ontologies] = acronyms.split(",").map {|o| o.strip}
   end
 
-  options[:logfile] = "logs/metrics.log"
-  opts.on( '-l', '--logfile FILE', "Write log to FILE (default is 'logs/metrics.log')" ) do |filename|
+  options[:logfile] = STDOUT
+  opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
     options[:logfile] = filename
   end
 
@@ -83,10 +83,10 @@ end
 
 begin
   logger = Logger.new(options[:logfile])
-  puts "Processing details are logged to #{options[:logfile]}"
+  puts "Processing details are logged to #{options[:logfile] == STDOUT ? "STDOUT" : options[:logfile]}"
   msg = ""
 
-  if (options[:all])
+  if options[:all]
     msg = "Generating metrics for all ontologies"
   else
     msg = "Generating metrics for ontologies: #{options[:ontologies]}"
@@ -107,7 +107,7 @@ begin
     end
   end
 
-  if (options[:all])
+  if options[:all]
     msg = "Completed generating metrics for all ontologies in #{(time/60).round(1)} minutes."
   else
     msg = "Completed generating metrics for ontologies: #{finished_ontologies} in #{(time/60).round(1)} minutes."
