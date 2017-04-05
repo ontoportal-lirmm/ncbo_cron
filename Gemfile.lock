@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 286af92b57f4d12f7f510fd6abcabb6cf245f9f1
+  revision: 45483935dfd5d9c527a6d709876ea2dd1a212537
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -119,7 +119,7 @@ GEM
     ethon (0.10.1)
       ffi (>= 1.3.0)
     extlib (0.9.16)
-    faraday (0.11.0)
+    faraday (0.12.0.1)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.18)
     google-api-client (0.8.7)
@@ -202,14 +202,14 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (4.44.0)
+    sequel (4.45.0)
     signet (0.7.3)
       addressable (~> 2.3)
       faraday (~> 0.9)
       jwt (~> 1.5)
       multi_json (~> 1.10)
     slop (3.6.0)
-    sys-proctable (1.1.3)
+    sys-proctable (1.1.4)
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
