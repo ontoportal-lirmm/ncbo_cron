@@ -26,16 +26,13 @@ require 'optparse'
 
 options = {all: false}
 opt_parser = OptionParser.new do |opts|
-  # Set a banner, displayed at the top of the help screen.
-  #opts.banner = "Usage: ncbo_ontology_index [options]"
-
-  opts.on('-c', '--solr-core-url URL', 'Optional URL of the Solr core to be used for indexing. Ex: http://localhost:8983/solr/core1') do |url|
+  opts.on('-c', '--solr-core-url URL', 'Optional URL of the Solr core to be used for property indexing. Ex: http://localhost:8983/solr/prop_search_core1') do |url|
     options[:solr_core_url] = url
   end
 
   options[:ontologies] = []
-  opts.on('-a', '--all-ontologies', 'Index all ontologies (this or -o option required).') do
-    options[:solr_core_url] = NcboCron.settings.search_index_all_url if (options[:solr_core_url].nil?)
+  opts.on('-a', '--all-ontologies', 'Index all ontologies properties (this or -o option required).') do
+    options[:solr_core_url] = NcboCron.settings.property_search_index_all_url if (options[:solr_core_url].nil?)
 
     LinkedData::Models::Ontology.all.each  do |ont|
       ont.bring(:acronym)
@@ -44,11 +41,11 @@ opt_parser = OptionParser.new do |opts|
     options[:all] = true
   end
 
-  opts.on('-o', '--ontologies ACRONYM1,ACRONYM2,ACRONYM3', 'Comma-separated list of ontologies to index (this or -a option required).') do |acronyms|
+  opts.on('-o', '--ontologies ACRONYM1,ACRONYM2,ACRONYM3', 'Comma-separated list of ontologies whose properties to index (this or -a option required).') do |acronyms|
     options[:ontologies] = acronyms.split(",").map {|o| o.strip}
   end
 
-  opts.on('-z', '--optimize [true/false]', 'Whether to optimize the index after the indexing completion. Default: true') do |optimize|
+  opts.on('-z', '--optimize [true/false]', 'Whether to optimize the property index after the indexing completion. Default: true') do |optimize|
     options[:optimize] = optimize
   end
 
@@ -56,11 +53,6 @@ opt_parser = OptionParser.new do |opts|
   opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
     options[:logfile] = filename
   end
-
-  #options[:verbose] = false
-  #opts.on( '-v', '--verbose', 'Output more information' ) do
-  #  options[:verbose] = true
-  #end
 
   # Display the help screen, all programs are assumed to have this option.
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -76,15 +68,15 @@ unless options[:ontologies]
   puts opt_parser.help
   exit(1)
 end
-options[:solr_core_url] = LinkedData.settings.search_server_url if (options[:solr_core_url].nil?)
 
+options[:solr_core_url] = LinkedData.settings.property_search_server_url if (options[:solr_core_url].nil?)
 if options[:optimize].nil? || options[:optimize] != "false"
   options[:optimize] = true
 else
   options[:optimize] = false
 end
 
-def index_ontology(indexed_ontologies, acronym, logger)
+def index_ontology_properties(indexed_ontologies, acronym, logger)
   begin
     ont = LinkedData::Models::Ontology.find(acronym).first
 
@@ -100,13 +92,11 @@ def index_ontology(indexed_ontologies, acronym, logger)
     if sub.nil?
       raise "Cannot find latest submission with 'RDF' parsed status for ontology: #{acronym}"
     end
-    # NOTE: process_submission controls all aspects of re-indexing, including
-    # removal of the old index and committing a new index.  There is no 'dry-run' option.
-    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, {index_search: true})
+
+    NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, {index_properties: true})
     indexed_ontologies << acronym
   rescue Exception => e
     msg = "Exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
-    puts msg
     logger.error(msg)
   end
 end
@@ -118,10 +108,10 @@ end
 
 abort("The Solr core URL you provided is invalid. Aborting...\n\n") unless valid_url?(options[:solr_core_url])
 
-if options[:all] && options[:solr_core_url].downcase == LinkedData.settings.search_server_url.downcase
-  puts "WARNING: You are about to clear the main core search index on #{options[:solr_core_url]}!!! This will affect ALL searches!!! Are you sure you mean to do this?"
+if options[:all] && options[:solr_core_url].downcase == LinkedData.settings.property_search_server_url.downcase
+  puts "WARNING: You are about to clear the main core property search index on #{options[:solr_core_url]}!!! This will affect ALL property searches!!! Are you sure you mean to do this?"
 elsif options[:all]
-  puts "You are about to clear the index on #{options[:solr_core_url]} and kick off a lengthy re-indexing process. Are you sure?"
+  puts "You are about to clear the property index on #{options[:solr_core_url]} and kick off a full re-indexing process. Are you sure?"
 end
 
 if options[:all]
@@ -137,54 +127,54 @@ begin
   msg = ""
 
   if options[:all]
-    msg = "Processing index for all ontologies on #{options[:solr_core_url]}"
+    msg = "Processing property index for all ontologies on #{options[:solr_core_url]}"
   else
-    msg = "Processing index for ontologies: #{options[:ontologies]} on #{options[:solr_core_url]}"
+    msg = "Processing property index for ontologies: #{options[:ontologies]} on #{options[:solr_core_url]}"
   end
   puts msg
   logger.info(msg)
 
   Goo.configure do |conf|
-    conf.add_search_backend(:main, service: options[:solr_core_url])
+    conf.add_search_backend(:property, service: options[:solr_core_url])
   end
 
   indexed_ontologies = []
   remaining_ontologies = options[:ontologies].length
 
   time = Benchmark.realtime do
-    logger.info("There is a total of #{options[:ontologies].length} ontolog#{options[:ontologies].length > 1 ? "ies" : "y"} to index")
+    logger.info("There is a total of #{options[:ontologies].length} ontolog#{options[:ontologies].length > 1 ? "ies" : "y"} to index the properties of")
 
     if options[:all]
-      logger.info("Clearing existing index on #{options[:solr_core_url]}")
-      LinkedData::Models::Class.indexClear()
-      LinkedData::Models::Class.indexCommit()
+      logger.info("Clearing existing property index on #{options[:solr_core_url]}")
+      LinkedData::Models::Class.indexClear(:property)
+      LinkedData::Models::Class.indexCommit(nil, :property)
     end
 
     options[:ontologies].each do |acronym|
-      index_ontology(indexed_ontologies, acronym, logger)
+      index_ontology_properties(indexed_ontologies, acronym, logger)
       remaining_ontologies -= 1
-      logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
+      logger.info("There is a total of #{remaining_ontologies} ontolog#{remaining_ontologies > 1 ? "ies" : "y"} remaining to index properties of out of #{options[:ontologies].length} ontologies") if (remaining_ontologies > 0)
     end
 
     if options[:optimize]
-      logger.info("Optimizing index...")
+      logger.info("Optimizing property index...")
       logger.flush
       t0 = Time.now
-      LinkedData::Models::Class.indexOptimize()
-      logger.info("Completed optimizing index in #{Time.now - t0} sec.")
+      LinkedData::Models::Class.indexOptimize(nil, :property)
+      logger.info("Completed optimizing property index in #{Time.now - t0} sec.")
       logger.flush
     end
   end
 
   if options[:all]
-    msg = "Completed processing index for all ontologies on #{options[:solr_core_url]} in #{(time/60).round(1)} minutes."
+    msg = "Completed processing property index for all ontologies on #{options[:solr_core_url]} in #{(time/60).round(1)} minutes."
   else
-    msg = "Completed processing index for ontologies: #{indexed_ontologies} on #{options[:solr_core_url]} in #{(time/60).round(1)} minutes."
+    msg = "Completed processing property index for ontologies: #{indexed_ontologies} on #{options[:solr_core_url]} in #{(time/60).round(1)} minutes."
   end
   puts msg
   logger.info(msg)
 rescue Exception => e
-  msg = "Failed indexing with exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
+  msg = "Failed property indexing with exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
   logger.error(msg)
   puts msg
   exit(1)

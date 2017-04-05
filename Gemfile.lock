@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: ce2a5766e9c987951e226fad05e5d1c5bc171573
-  branch: master
+  revision: de90d22ec992dd8dea3ec97f6c9c69906de1ecc0
+  branch: staging
   specs:
     goo (0.0.2)
       addressable (= 2.3.5)
@@ -16,8 +16,8 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: c69a44de6a92828d5fa674f33cba4f8f29c1902e
-  branch: master
+  revision: 492af1d56aef151a592012f0bd74abc97d0b72a3
+  branch: staging
   specs:
     ncbo_annotator (0.0.1)
       goo
@@ -27,8 +27,8 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 9fb051182d58295e05ab31bb450b386eddeae29d
-  branch: master
+  revision: 61ec3f1ccec89f544b9cc777666c3dde840ed282
+  branch: staging
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -39,6 +39,7 @@ GIT
       multi_json
       ncbo_resource_index
       oj
+      omni_logger
       pony
       rack
       rack-test
@@ -118,9 +119,9 @@ GEM
     ethon (0.10.1)
       ffi (>= 1.3.0)
     extlib (0.9.16)
-    faraday (0.11.0)
+    faraday (0.12.0.1)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.17)
+    ffi (1.9.18)
     google-api-client (0.8.7)
       activesupport (>= 3.2, < 5.0)
       addressable (~> 2.3)
@@ -151,7 +152,8 @@ GEM
       addressable (~> 2.3)
     libxml-ruby (3.0.0)
     little-plugger (1.1.4)
-    logging (2.1.0)
+    logger (1.2.8)
+    logging (2.2.0)
       little-plugger (~> 1.1)
       multi_json (~> 1.10)
     macaddr (1.7.1)
@@ -171,7 +173,9 @@ GEM
     mysql2 (0.4.5)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (2.18.1)
+    oj (2.18.5)
+    omni_logger (0.1.4)
+      logger
     os (0.9.6)
     pony (1.11)
       mail (>= 2.0)
@@ -198,21 +202,21 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (4.43.0)
+    sequel (4.45.0)
     signet (0.7.3)
       addressable (~> 2.3)
       faraday (~> 0.9)
       jwt (~> 1.5)
       multi_json (~> 1.10)
     slop (3.6.0)
-    sys-proctable (1.1.3)
+    sys-proctable (1.1.4)
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
     thread_safe (0.3.6)
     typhoeus (1.1.2)
       ethon (>= 0.9.0)
-    tzinfo (0.3.52)
+    tzinfo (0.3.53)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.2)
