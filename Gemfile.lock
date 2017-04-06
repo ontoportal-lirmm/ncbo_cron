@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: e2da87c6ecaa76c5dd782d9cf466835102125a13
+  revision: 492af1d56aef151a592012f0bd74abc97d0b72a3
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -102,7 +102,7 @@ GEM
     coderay (1.1.1)
     cube-ruby (0.0.3)
     dante (0.2.0)
-    domain_name (0.5.20170223)
+    domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
     elasticsearch (5.0.3)
       elasticsearch-api (= 5.0.3)
