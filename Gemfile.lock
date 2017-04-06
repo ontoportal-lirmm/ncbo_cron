@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: c0aff9ddf6d0eb013325201713304c21b9e3a3c2
+  revision: e56196acd2438f26ec79a48ceeee683f3516516b
   branch: sifr
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: 7a70327357a819d0b8b434955cbe1fb717413d21
+  revision: 72665ac80e68c5feb611e4d8850b7a127c21061a
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
@@ -98,7 +98,7 @@ GEM
     coderay (1.1.1)
     cube-ruby (0.0.3)
     dante (0.2.0)
-    domain_name (0.5.20170223)
+    domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
     elasticsearch (1.0.17)
       elasticsearch-api (= 1.0.17)
