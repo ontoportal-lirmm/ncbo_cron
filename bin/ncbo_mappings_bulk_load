@@ -73,10 +73,12 @@ if options[:loadfile]
       sleep 0.4
     rescue => e
       logger.error("MAPPING BETWEEN: #{mapping[:classes].to_s} HAS FAILED. Message: #{e.message.to_s}")
+      mappings_failed.push(mapping[:classes].to_s)
       if e.class.to_s != "ArgumentError"
+        # If unexpected error: retry
         #system "bprestart" => could generate error because not run by a user with enough permissions
         # add the mappings to the error array (removed if manage to add the mapping after)
-        mappings_failed.push(mapping[:classes].to_s)
+        logger.info(e.backtrace)
         logger.info("sleeping for 40s...")
         sleep 40
         retry
