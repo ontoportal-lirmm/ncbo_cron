@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 48a984a87fa78f7071cd7012175fb2d4ade43f59
+  revision: f1e5eab333e3f6a3201be77ff561dade441b7547
   branch: agroportal
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: 42b1fb7875b5dd795445fb2e1fb695b8b599fa84
+  revision: 23f7730eaacc4d385b9a20ea5fd46183151ec435
   branch: agroportal
   specs:
     ontologies_linked_data (0.0.1)
@@ -98,7 +98,7 @@ GEM
     coderay (1.1.1)
     cube-ruby (0.0.3)
     dante (0.2.0)
-    domain_name (0.5.20170223)
+    domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
     elasticsearch (1.0.17)
       elasticsearch-api (= 1.0.17)
