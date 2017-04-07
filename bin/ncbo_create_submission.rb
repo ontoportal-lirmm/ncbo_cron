@@ -59,6 +59,10 @@ else
 
   sub = ont.latest_submission(status: :any)
 
+  puts sub.inspect.to_s
+  puts ont.inspect.to_s
+
+
   pull = NcboCron::Models::OntologyPull.new
   pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
                          add_to_pull=false)
