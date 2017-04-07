@@ -35,7 +35,7 @@ else
 
   puts 'Looking for user '+ username
   user = LinkedData::Models::User.find(username).first
-  user.pretty_print_inspect
+  puts user.inspect.to_s
 
   if ont.nil?
     ont = LinkedData::Models::Ontology.new
