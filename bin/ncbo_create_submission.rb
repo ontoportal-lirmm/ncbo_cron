@@ -51,19 +51,16 @@ else
 
     if ont.valid?
       ont.save
-
-      sub = ont.latest_submission(status: :any)
-
-      pull = NcboCron::Models::OntologyPull.new
-      pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
-                             add_to_pull=false)
     else
       puts "#{ont.errors}"
     end
-  else
-    puts "Ontology already exists, see #{ont.id}"
-    puts "To add a new submission, POST to: /ontologies/#{acronym}/submission"
-    puts "To modify the resource, use PATCH."
   end
+
+
+  sub = ont.latest_submission(status: :any)
+
+  pull = NcboCron::Models::OntologyPull.new
+  pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
+                         add_to_pull=false)
 
 end
