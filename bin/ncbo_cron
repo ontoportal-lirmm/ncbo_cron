@@ -108,6 +108,9 @@ opt_parser = OptionParser.new do |opts|
   opts.on("-c", "--pull-cron SCHED", String, "cron schedule for ontology pull", "(default: #{options[:pull_schedule]})") do |c|
     options[:pull_schedule] = c
   end
+  opts.on("-cl", "--pull-long-cron SCHED", String, "cron schedule for ontology less frequent pull", "(default: #{options[:pull_schedule_long]})") do |c|
+    options[:pull_schedule_long] = c
+  end
   opts.on("-f", "--flush-old-graphs SCHED", String, "cron schedule to delete class graphs of archive submissions", "(default: #{options[:cron_flush]})") do |c|
     options[:cron_flush] = c
   end
@@ -243,8 +246,19 @@ runner.execute do |opts|
         logger.info "Starting ncbo pull"; logger.flush
         logger.info "Logging pull details to #{pull_log_path}"; logger.flush
         puller = NcboCron::Models::OntologyPull.new
-        pulled_onts = puller.do_remote_ontology_pull(logger: pull_logger,
-         enable_pull_umls: options[:enable_pull_umls])
+        pulled_onts = puller.do_remote_ontology_pull(false, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls])
+        logger.info "Finished ncbo pull"; logger.flush
+        logger.info "Pull summary:\n#{pulled_onts.map {|o| o.id.to_s}}"
+      end
+      long_pull_options = options.dup
+      long_pull_options[:job_name] = "ncbo_cron_pull_long_thread"
+      long_pull_options[:scheduler_type] = :cron
+      long_pull_options[:cron_schedule] = long_pull_options[:pull_schedule_long]
+      NcboCron::Scheduler.scheduled_locking_job(long_pull_options) do
+        logger.info "Starting ncbo pull"; logger.flush
+        logger.info "Logging pull details to #{pull_log_path}"; logger.flush
+        puller = NcboCron::Models::OntologyPull.new
+        pulled_onts = puller.do_remote_ontology_pull(true, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls])
         logger.info "Finished ncbo pull"; logger.flush
         logger.info "Pull summary:\n#{pulled_onts.map {|o| o.id.to_s}}"
       end
