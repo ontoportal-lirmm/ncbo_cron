@@ -37,15 +37,15 @@ else
     ont.administeredBy = [ user ]
     ont.name = acronym
   else
-        echo "Ontology already exists, see #{ont.id}"
-        echo "To add a new submission, POST to: /ontologies/#{params['acronym']}/submission"
-        echo "To modify the resource, use PATCH."
+        print "Ontology already exists, see #{ont.id}"
+        print "To add a new submission, POST to: /ontologies/#{params['acronym']}/submission"
+        print "To modify the resource, use PATCH."
   end
 
   # ontology name must be unique
   ont_names = LinkedData::Models::Ontology.where.include(:name).to_a.map { |o| o.name }
   if ont_names.include?(ont.name)
-    echo "Ontology name is already in use by another ontology."
+    print "Ontology name is already in use by another ontology."
   end
 
   if ont.valid?
