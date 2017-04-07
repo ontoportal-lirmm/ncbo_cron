@@ -29,7 +29,6 @@ else
   acronym=ARGV.pop
 
 
-
   # ontology acronym must be unique
   ont = LinkedData::Models::Ontology.find(acronym.upcase).first
 
@@ -40,13 +39,13 @@ else
   if ont.nil?
     ont = LinkedData::Models::Ontology.new
     ont.acronym = acronym.upcase
-    ont.administeredBy = [ user ]
+    ont.administeredBy = [user]
     ont.name = acronym
 
     # ontology name must be unique
     ont_names = LinkedData::Models::Ontology.where.include(:name).to_a.map { |o| o.name }
     if ont_names.include?(ont.name)
-      puts "Ontology name is already in use by another ontology."
+      puts 'Ontology name is already in use by another ontology.'
     end
 
     if ont.valid?
@@ -64,7 +63,25 @@ else
 
 
   pull = NcboCron::Models::OntologyPull.new
-  pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
-                         add_to_pull=false)
+
+  new_sub = LinkedData::Models::OntologySubmission.new
+  submission_id = ont.next_submission_id
+  file_location = LinkedData::Models::OntologySubmission.copy_file_repository(ont.acronym, submission_id, path, path.split("/")[-1])
+
+  new_sub.uploadFilePath = file_location
+  new_sub.submissionStatus = nil
+  new_sub.creationDate = nil
+  new_sub.released = DateTime.now
+  new_sub.missingImports = nil
+  new_sub.metrics = nil
+
+  if new_sub.valid?
+    new_sub.save
+    submission_queue = NcboCron::Models::OntologySubmissionParser.new
+    submission_queue.queue_submission(new_sub, {all: true})
+    logger.info("Created a new submission (#{submission_id}) for ontology #{ont.acronym}")
+  else
+    puts "Unable to create a new submission: #{new_sub.errors}"
+  end
 
 end
