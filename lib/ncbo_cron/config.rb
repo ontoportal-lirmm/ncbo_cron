@@ -48,6 +48,7 @@ module NcboCron
     @settings.pull_schedule ||= "00 18 * * *"
     # run weekly on monday at 11 a.m. (23:00)
     @settings.pull_schedule_long ||= "00 23 * * 1"
+    @settings.pull_long_ontologies ||= []
     # Delete class graphs of archive submissions.
     # 00 22 * * 2 - run once per week on tuesday at 10 a.m. (22:00)
     @settings.cron_flush ||= "00 22 * * 2"

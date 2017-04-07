@@ -37,6 +37,11 @@ module NcboCron
             end
             last.bring(:pullLocation) if last.bring?(:pullLocation)
             next if last.pullLocation.nil?
+            if isLong == true
+              next if !options[:pull_long_ontologies].include?(ont.acronym)
+            else
+              next if options[:pull_long_ontologies].include?(ont.acronym)
+            end
             last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
             if (last.hasOntologyLanguage.umls? && umls_download_url)
