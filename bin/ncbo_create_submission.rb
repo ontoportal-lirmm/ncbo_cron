@@ -61,19 +61,20 @@ else
   puts sub.inspect.to_s
   puts ont.inspect.to_s
 
-
-  pull = NcboCron::Models::OntologyPull.new
-
   new_sub = LinkedData::Models::OntologySubmission.new
   submission_id = ont.next_submission_id
   file_location = LinkedData::Models::OntologySubmission.copy_file_repository(ont.acronym, submission_id, path, path.split("/")[-1])
 
+  new_sub.submissionId = submission_id
   new_sub.uploadFilePath = file_location
   new_sub.submissionStatus = nil
   new_sub.creationDate = nil
   new_sub.released = DateTime.now
   new_sub.missingImports = nil
   new_sub.metrics = nil
+  new_sub.hasOntologyLanguage='OWL'
+  new_sub.ontology=ont
+  new_sub.contact = [  ]
 
   if new_sub.valid?
     new_sub.save
