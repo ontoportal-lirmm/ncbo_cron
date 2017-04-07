@@ -26,10 +26,12 @@ else
 
   acronym=ARGV.pop
   path=ARGV.pop
-  user = ARGV.pop
+  username = ARGV.pop
 
   # ontology acronym must be unique
   ont = LinkedData::Models::Ontology.find(acronym.upcase).first
+
+  user = LinkedData::Models::User.find(username).first
 
   if ont.nil?
     ont = LinkedData::Models::Ontology.new
