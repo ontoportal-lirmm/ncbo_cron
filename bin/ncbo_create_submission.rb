@@ -24,9 +24,11 @@ if ARGV.length < 2
   puts "Syntax: ./ncbo_create_submission ACRONYM /path/to/ontology administratorUserName"
 else
 
-  acronym=ARGV.pop
-  path=ARGV.pop
   username = ARGV.pop
+  path=ARGV.pop
+  acronym=ARGV.pop
+
+
 
   # ontology acronym must be unique
   ont = LinkedData::Models::Ontology.find(acronym.upcase).first
