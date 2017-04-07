@@ -44,7 +44,7 @@ else
     ont.name = acronym
   else
     puts "Ontology already exists, see #{ont.id}"
-    puts "To add a new submission, POST to: /ontologies/#{params['acronym']}/submission"
+    puts "To add a new submission, POST to: /ontologies/#{acronym}/submission"
     puts "To modify the resource, use PATCH."
   end
 
