@@ -51,7 +51,7 @@ else
   if ont.valid?
     ont.save
   else
-    echo "#{ont.errors}"
+    print "#{ont.errors}"
   end
 
   sub = ont.latest_submission(status: :any)
