@@ -72,7 +72,7 @@ else
   new_sub.released = DateTime.now
   new_sub.missingImports = nil
   new_sub.metrics = nil
-  new_sub.hasOntologyLanguage = OntologyFormat.find('OWL').first
+  new_sub.hasOntologyLanguage = LinkedData::Models::OntologyFormat.find('OWL').first
   new_sub.ontology=ont
   new_sub.contact = [  ]
 
