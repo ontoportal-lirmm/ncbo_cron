@@ -31,6 +31,7 @@ module NcboCron
       seconds_between = options[:seconds_between]
       scheduler_type  = options[:scheduler_type] || :every
       cron_schedule   = options[:cron_schedule]
+      cron_schedule_long = options[:cron_schedule_long]
 
       if scheduler_type == :every
         # Minutes/seconds string prep

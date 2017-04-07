@@ -13,7 +13,7 @@ module NcboCron
       def initialize()
       end
 
-      def do_remote_ontology_pull(options = {})
+      def do_remote_ontology_pull(isLong, options = {})
         logger = options[:logger] || Logger.new($stdout)
         logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}"
         logger.flush

@@ -116,6 +116,8 @@ begin
     config.cron_schedule                            = "30 */4 * * *"
     # Pull schedule: run daily at 6 a.m. (18:00)
     config.pull_schedule                            = "00 18 * * *"
+    # Pull long schedule for ontology that are pulled less frequently: run weekly on monday at 11 a.m. (23:00)
+    config.pull_schedule_long                       = "00 23 * * 1"
     # Delete class graphs of archive submissions: run twice per week on tuesday and friday at 10 a.m. (22:00)
     config.cron_flush                               = "00 22 * * 2,5"
     # Remove graphs from deleted ontologies when flushing class graphs
