@@ -29,11 +29,11 @@ else
   user = ARGV.pop
 
   # ontology acronym must be unique
-  ont = LinkedData::Models::Ontology.find(acronym).first
+  ont = LinkedData::Models::Ontology.find(acronym.upcase).first
 
   if ont.nil?
     ont = LinkedData::Models::Ontology.new
-    ont.acronym = acronym
+    ont.acronym = acronym.upcase
     ont.administeredBy = [ user ]
     ont.name = acronym
   else
