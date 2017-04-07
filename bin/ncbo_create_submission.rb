@@ -31,6 +31,7 @@ else
   # ontology acronym must be unique
   ont = LinkedData::Models::Ontology.find(acronym.upcase).first
 
+  puts 'Looking for user '+ username
   user = LinkedData::Models::User.find(username).first
   user.pretty_print_inspect
 
@@ -40,21 +41,21 @@ else
     ont.administeredBy = [ user ]
     ont.name = acronym
   else
-        print "Ontology already exists, see #{ont.id}"
-        print "To add a new submission, POST to: /ontologies/#{params['acronym']}/submission"
-        print "To modify the resource, use PATCH."
+    puts "Ontology already exists, see #{ont.id}"
+    puts "To add a new submission, POST to: /ontologies/#{params['acronym']}/submission"
+    puts "To modify the resource, use PATCH."
   end
 
   # ontology name must be unique
   ont_names = LinkedData::Models::Ontology.where.include(:name).to_a.map { |o| o.name }
   if ont_names.include?(ont.name)
-    print "Ontology name is already in use by another ontology."
+    puts "Ontology name is already in use by another ontology."
   end
 
   if ont.valid?
     ont.save
   else
-    print "#{ont.errors}"
+    puts "#{ont.errors}"
   end
 
   sub = ont.latest_submission(status: :any)
