@@ -42,27 +42,28 @@ else
     ont.acronym = acronym.upcase
     ont.administeredBy = [ user ]
     ont.name = acronym
+
+    # ontology name must be unique
+    ont_names = LinkedData::Models::Ontology.where.include(:name).to_a.map { |o| o.name }
+    if ont_names.include?(ont.name)
+      puts "Ontology name is already in use by another ontology."
+    end
+
+    if ont.valid?
+      ont.save
+
+      sub = ont.latest_submission(status: :any)
+
+      pull = NcboCron::Models::OntologyPull.new
+      pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
+                             add_to_pull=false)
+    else
+      puts "#{ont.errors}"
+    end
   else
     puts "Ontology already exists, see #{ont.id}"
     puts "To add a new submission, POST to: /ontologies/#{acronym}/submission"
     puts "To modify the resource, use PATCH."
   end
 
-  # ontology name must be unique
-  ont_names = LinkedData::Models::Ontology.where.include(:name).to_a.map { |o| o.name }
-  if ont_names.include?(ont.name)
-    puts "Ontology name is already in use by another ontology."
-  end
-
-  if ont.valid?
-    ont.save
-  else
-    puts "#{ont.errors}"
-  end
-
-  sub = ont.latest_submission(status: :any)
-
-  pull = NcboCron::Models::OntologyPull.new
-  pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
-                         add_to_pull=false)
 end
