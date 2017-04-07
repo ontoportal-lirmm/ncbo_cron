@@ -32,6 +32,7 @@ else
   ont = LinkedData::Models::Ontology.find(acronym.upcase).first
 
   user = LinkedData::Models::User.find(username).first
+  user.pretty_print_inspect
 
   if ont.nil?
     ont = LinkedData::Models::Ontology.new
