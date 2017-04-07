@@ -29,10 +29,10 @@ else
   user = ARGV.pop
 
   # ontology acronym must be unique
-  ont = Ontology.find(acronym).first
+  ont = LinkedData::Models::Ontology.find(acronym).first
 
   if ont.nil?
-    ont = Ontology.new
+    ont = LinkedData::Models::Ontology.new
     ont.acronym = acronym
     ont.administeredBy = [ user ]
     ont.name = acronym
@@ -43,7 +43,7 @@ else
   end
 
   # ontology name must be unique
-  ont_names = Ontology.where.include(:name).to_a.map { |o| o.name }
+  ont_names = LinkedData::Models::Ontology.where.include(:name).to_a.map { |o| o.name }
   if ont_names.include?(ont.name)
     echo "Ontology name is already in use by another ontology."
   end
