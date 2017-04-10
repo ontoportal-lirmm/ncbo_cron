@@ -12,6 +12,8 @@ config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__)
 abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
 require_relative '../config/config'
 
+binding.pry
+
 platform = "local"
 if LinkedData.settings.goo_host.include? "stage"
   platform = "stage"
@@ -80,7 +82,7 @@ else
     new_sub.save
     submission_queue = NcboCron::Models::OntologySubmissionParser.new
     submission_queue.queue_submission(new_sub, {all: true})
-    logger.info("Created a new submission (#{submission_id}) for ontology #{ont.acronym}")
+    puts "Created a new submission (#{submission_id}) for ontology #{ont.acronym}"
   else
     puts "Unable to create a new submission: #{new_sub.errors}"
   end
