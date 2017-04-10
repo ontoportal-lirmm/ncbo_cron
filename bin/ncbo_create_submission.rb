@@ -6,6 +6,11 @@ Signal.trap("INT") { exit 1 }
 # Setup the bundled gems in our environment
 require 'bundler/setup'
 
+require 'pry'
+require 'pry-nav'
+require 'pry-stack_explorer'
+
+
 # Configure the process for the current cron configuration.
 require_relative '../lib/ncbo_cron'
 config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
