@@ -105,6 +105,9 @@ else
   contact = LinkedData::Models::Contact.new
   contact.name = 'God'
   contact.email = 'god@universe.org'
+  if contact.valid?
+    contact.save
+  end
   new_sub.contact = contact
 
   if new_sub.valid?
