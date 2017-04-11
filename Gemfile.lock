@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: e56196acd2438f26ec79a48ceeee683f3516516b
+  revision: fa64ef0482017c32d30c60bb1bc370d90501a3c3
   branch: sifr
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: 72665ac80e68c5feb611e4d8850b7a127c21061a
+  revision: b19922d6d39d2d288d6c5d97cdfcea3c0fd7d95f
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
@@ -141,7 +141,7 @@ GEM
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     i18n (0.7.0)
-    json (2.0.3)
+    json (2.0.4)
     json_pure (1.8.3)
     jwt (1.5.4)
     launchy (2.4.3)
@@ -211,7 +211,7 @@ GEM
       thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.2)
+    unf_ext (0.0.7.3)
     uuid (2.3.8)
       macaddr (~> 1.0)
 
