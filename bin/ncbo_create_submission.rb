@@ -64,8 +64,8 @@ else
 
   sub = ont.latest_submission(status: :any)
 
-  puts sub.inspect.to_s
-  puts ont.inspect.to_s
+  # puts sub.inspect.to_s
+  # puts ont.inspect.to_s
 
   #  pull = NcboCron::Models::OntologyPull.new
   # #
@@ -105,8 +105,11 @@ else
   contact = LinkedData::Models::Contact.new
   contact.name = 'God'
   contact.email = 'god@universe.org'
+  contact.bring_remaining
   if contact.valid?
     contact.save
+  else
+    puts "Unable to create contact: #{contact.errors}"
   end
   new_sub.contact = contact
 
