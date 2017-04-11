@@ -110,7 +110,7 @@ else
   else
     puts "Unable to create contact: #{contact.errors}"
   end
-  new_sub.contact = contact
+  new_sub.contact = [contact]
 
   if new_sub.valid?
     new_sub.save
