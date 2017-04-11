@@ -86,16 +86,7 @@ else
 
   new_sub.submissionId = submission_id
   new_sub.uploadFilePath = file_location
-  new_sub.submissionStatus = nil
-  #     [
-  #     LinkedData::Models::SubmissionStatus.find('RDF').first,
-  #     LinkedData::Models::SubmissionStatus.find('OBSOLETE').first,
-  #     LinkedData::Models::SubmissionStatus.find('METRICS').first,
-  #     LinkedData::Models::SubmissionStatus.find('RDF_LABELS').first,
-  #     LinkedData::Models::SubmissionStatus.find('UPLOADED').first,
-  #     LinkedData::Models::SubmissionStatus.find('ANNOTATOR').first,
-  #     LinkedData::Models::SubmissionStatus.find('INDEXED').first
-  # ]
+  new_sub.submissionStatus = [ ]
   new_sub.creationDate = nil
   new_sub.released = DateTime.now
   new_sub.missingImports = nil
