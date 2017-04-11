@@ -67,45 +67,53 @@ else
   puts sub.inspect.to_s
   puts ont.inspect.to_s
 
-   pull = NcboCron::Models::OntologyPull.new
-  #
-   pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
-                          add_to_pull=true)
+  #  pull = NcboCron::Models::OntologyPull.new
+  # #
+  #  pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
+  #                         add_to_pull=true)
 
-  # new_sub = LinkedData::Models::OntologySubmission.new
-  # submission_id = ont.next_submission_id
-  # file_location = LinkedData::Models::OntologySubmission.copy_file_repository(ont.acronym, submission_id, path, path.split("/")[-1])
-  #
-  #
-  # unless sub.nil?
-  #   sub.bring_remaining
-  #   sub.loaded_attributes.each do |attr|
-  #     new_sub.send("#{attr}=", sub.send(attr))
-  #   end
-  # end
-  #
-  #
-  # new_sub.submissionId = submission_id
-  # new_sub.uploadFilePath = file_location
-  # new_sub.submissionStatus = nil
-  # new_sub.creationDate = nil
-  # new_sub.released = DateTime.now
-  # new_sub.missingImports = nil
-  # new_sub.metrics = nil
-  # new_sub.hasOntologyLanguage = LinkedData::Models::OntologyFormat.find('OWL').first
-  # new_sub.ontology=ont
-  # contact = LinkedData::Models::Contact.new
-  # contact.name = 'God'
-  # contact.email = 'god@universe.org'
-  # new_sub.contact = contact
-  #
-  # if new_sub.valid?
-  #   new_sub.save
-  #   submission_queue = NcboCron::Models::OntologySubmissionParser.new
-  #   submission_queue.queue_submission(new_sub, {all: true})
-  #   puts "Created a new submission (#{submission_id}) for ontology #{ont.acronym}"
-  # else
-  #   puts "Unable to create a new submission: #{new_sub.errors}"
-  # end
+  new_sub = LinkedData::Models::OntologySubmission.new
+  submission_id = ont.next_submission_id
+  file_location = LinkedData::Models::OntologySubmission.copy_file_repository(ont.acronym, submission_id, path, path.split("/")[-1])
+
+
+  unless sub.nil?
+    sub.bring_remaining
+    sub.loaded_attributes.each do |attr|
+      new_sub.send("#{attr}=", sub.send(attr))
+    end
+  end
+
+
+  new_sub.submissionId = submission_id
+  new_sub.uploadFilePath = file_location
+  new_sub.submissionStatus = [
+      LinkedData::Models::SubmissionStatus.find('RDF').first,
+      LinkedData::Models::SubmissionStatus.find('OBSOLETE').first,
+      LinkedData::Models::SubmissionStatus.find('METRICS').first,
+      LinkedData::Models::SubmissionStatus.find('RDF_LABELS').first,
+      LinkedData::Models::SubmissionStatus.find('UPLOADED').first,
+      LinkedData::Models::SubmissionStatus.find('ANNOTATOR').first,
+      LinkedData::Models::SubmissionStatus.find('INDEXED').first
+  ]
+  new_sub.creationDate = nil
+  new_sub.released = DateTime.now
+  new_sub.missingImports = nil
+  new_sub.metrics = nil
+  new_sub.hasOntologyLanguage = LinkedData::Models::OntologyFormat.find('OWL').first
+  new_sub.ontology=ont
+  contact = LinkedData::Models::Contact.new
+  contact.name = 'God'
+  contact.email = 'god@universe.org'
+  new_sub.contact = contact
+
+  if new_sub.valid?
+    new_sub.save
+    submission_queue = NcboCron::Models::OntologySubmissionParser.new
+    submission_queue.queue_submission(new_sub, {all: true})
+    puts "Created a new submission (#{submission_id}) for ontology #{ont.acronym}"
+  else
+    puts "Unable to create a new submission: #{new_sub.errors}"
+  end
 
 end
