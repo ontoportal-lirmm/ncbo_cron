@@ -3,7 +3,8 @@ LinkedData.config do |config|
   config.cube_host = "localhost"
   config.goo_host = "localhost"
   config.goo_port = 8080
-  config.search_server_url = "http://localhost:8983/solr/core1"
+  config.search_server_url = "http://localhost:8983/solr/term_search_core1"
+  config.property_search_server_url = "http://localhost:8983/solr/prop_search_core1"
   config.repository_folder = "./test/data/ontology_files/repo"
   config.http_redis_host = "localhost"
   config.http_redis_port = 6379
@@ -33,7 +34,8 @@ end
 NcboCron.config do |config|
   config.redis_host  ||= "localhost"
   config.redis_port  ||= 6379
-  config.search_index_all_url = "http://localhost:8983/solr/core2"
+  config.search_index_all_url = "http://localhost:8983/solr/term_search_core2"
+  config.property_search_index_all_url = "http://localhost:8983/solr/prop_search_core2"
 
   # Ontologies Report config
   config.ontology_report_path = "./test/reports/ontologies_report.json"
