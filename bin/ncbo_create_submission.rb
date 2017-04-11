@@ -17,7 +17,6 @@ config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__)
 abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
 require_relative '../config/config'
 
-binding.pry
 
 platform = "local"
 if LinkedData.settings.goo_host.include? "stage"
@@ -68,10 +67,10 @@ else
   puts sub.inspect.to_s
   puts ont.inspect.to_s
 
-  pull = NcboCron::Models::OntologyPull.new
-
-  pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
-                         add_to_pull=false)
+   pull = NcboCron::Models::OntologyPull.new
+  #
+   pull.create_submission(ont,sub,path,path.split("/")[-1],logger=nil,
+                          add_to_pull=true)
 
   # new_sub = LinkedData::Models::OntologySubmission.new
   # submission_id = ont.next_submission_id
@@ -95,7 +94,10 @@ else
   # new_sub.metrics = nil
   # new_sub.hasOntologyLanguage = LinkedData::Models::OntologyFormat.find('OWL').first
   # new_sub.ontology=ont
-  # new_sub.contact = []
+  # contact = LinkedData::Models::Contact.new
+  # contact.name = 'God'
+  # contact.email = 'god@universe.org'
+  # new_sub.contact = contact
   #
   # if new_sub.valid?
   #   new_sub.save
