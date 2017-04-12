@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: 7f1b081ffc8c37eed240c2dbd5255ec4821d5191
+  revision: f9454b16d0123c21969a5554d76e7c15ed9881d3
   branch: master
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: b37cfe1d651f838dec1f0dddaadd5217c1831bca
+  revision: 4a97901d4ed3db9173426544e4e679a4903a1360
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 0a02d50ea791b5110df3b90b6799b62c860086a0
+  revision: c37c5c4959d110a275a0c91eee1e29b1a553ba26
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -48,10 +48,10 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/resource_index.git
-  revision: e8965cb03dbaa45123cbea6389654c79a50d078e
+  revision: 76c3b3fe94e7670a4f4a1d0fc715445138ee0f14
   specs:
     ncbo_resource_index (0.0.1)
-      elasticsearch
+      elasticsearch (= 2.0.0)
       mysql2
       pony
       ref
@@ -104,12 +104,12 @@ GEM
     dante (0.2.0)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
-    elasticsearch (5.0.4)
-      elasticsearch-api (= 5.0.4)
-      elasticsearch-transport (= 5.0.4)
-    elasticsearch-api (5.0.4)
+    elasticsearch (2.0.0)
+      elasticsearch-api (= 2.0.0)
+      elasticsearch-transport (= 2.0.0)
+    elasticsearch-api (2.0.0)
       multi_json
-    elasticsearch-transport (5.0.4)
+    elasticsearch-transport (2.0.0)
       faraday
       multi_json
     email_spec (2.1.0)
@@ -153,7 +153,7 @@ GEM
     libxml-ruby (3.0.0)
     little-plugger (1.1.4)
     logger (1.2.8)
-    logging (2.2.1)
+    logging (2.2.2)
       little-plugger (~> 1.1)
       multi_json (~> 1.10)
     macaddr (1.7.1)
