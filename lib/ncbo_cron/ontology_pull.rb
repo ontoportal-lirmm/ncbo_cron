@@ -15,7 +15,7 @@ module NcboCron
 
       def do_remote_ontology_pull(isLong = false, options = {})
         logger = options[:logger] || Logger.new($stdout)
-        logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}"
+        logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}. Is long: #{isLong}"
         logger.flush
         ontologies = LinkedData::Models::Ontology.where.include(:acronym).all
         ont_to_include = []
