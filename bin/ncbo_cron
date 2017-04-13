@@ -233,8 +233,8 @@ runner.execute do |opts|
 
   if options[:enable_pull]
     pull_thread = Thread.new do
-      logger.debug "Setting up pull cron job"; logger.flush
       pull_options = options.dup
+      logger.info "Setting up pull cron job: #{pull_options[:pull_schedule]}"; logger.flush
       pull_options.delete(:minutes_between)
       pull_options.delete(:seconds_between)
       pull_options[:job_name] = "ncbo_cron_pull_thread"
@@ -246,21 +246,27 @@ runner.execute do |opts|
         logger.info "Starting ncbo pull"; logger.flush
         logger.info "Logging pull details to #{pull_log_path}"; logger.flush
         puller = NcboCron::Models::OntologyPull.new
-        pulled_onts = puller.do_remote_ontology_pull(false, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls], pull_long_ontologies: long_pull_options[:pull_long_ontologies])
+        pulled_onts = puller.do_remote_ontology_pull(false, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls], pull_long_ontologies: pull_options[:pull_long_ontologies])
         logger.info "Finished ncbo pull"; logger.flush
         logger.info "Pull summary:\n#{pulled_onts.map {|o| o.id.to_s}}"
       end
+    end
+
+    long_pull_thread = Thread.new do
       long_pull_options = options.dup
+      logger.info "Setting up pull long cron job: #{long_pull_options[:pull_schedule_long]}"; logger.flush
       long_pull_options[:job_name] = "ncbo_cron_pull_long_thread"
       long_pull_options[:scheduler_type] = :cron
       long_pull_options[:cron_schedule] = long_pull_options[:pull_schedule_long]
+      pull_log_path = File.join(log_path, "#{log_filename_noExt}-long-pull.log")
+      pull_logger = Logger.new(pull_log_path)
       NcboCron::Scheduler.scheduled_locking_job(long_pull_options) do
-        logger.info "Starting ncbo pull"; logger.flush
+        logger.info "Starting ncbo long pull"; logger.flush
         logger.info "Logging pull details to #{pull_log_path}"; logger.flush
-        puller = NcboCron::Models::OntologyPull.new
-        pulled_onts = puller.do_remote_ontology_pull(true, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls], pull_long_ontologies: long_pull_options[:pull_long_ontologies])
+        long_puller = NcboCron::Models::OntologyPull.new
+        pulled_long_onts = long_puller.do_remote_ontology_pull(true, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls], pull_long_ontologies: long_pull_options[:pull_long_ontologies])
         logger.info "Finished ncbo pull"; logger.flush
-        logger.info "Pull summary:\n#{pulled_onts.map {|o| o.id.to_s}}"
+        logger.info "Pull summary:\n#{pulled_long_onts.map {|o| o.id.to_s}}"
       end
     end
   end
@@ -387,6 +393,7 @@ runner.execute do |opts|
   # Need to join here to avoid dropping out of the process
   parsing_thread.join if parsing_thread
   pull_thread.join if pull_thread
+  long_pull_thread.join if long_pull_thread
   flush_thread.join if flush_thread
   warmq_thread.join if warmq_thread
   analytics_thread.join if analytics_thread
