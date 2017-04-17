@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 1ec5425b36e7c3a934f5a983aeb983eded8d5b04
+  revision: e01cfaca2d7756219ee0843c9c7261c4af6c32fb
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: aa0f5d06e8d26110e4b7b22f468a3bf24697de32
+  revision: 8f8bb2b9d7a139a87521dab0303ff808e134767d
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -48,10 +48,10 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/resource_index.git
-  revision: e8965cb03dbaa45123cbea6389654c79a50d078e
+  revision: 87f34062d236c87ea4ba7e0035a1e0726ac83abb
   specs:
     ncbo_resource_index (0.0.1)
-      elasticsearch
+      elasticsearch (= 2.0.0)
       mysql2
       pony
       ref
@@ -104,12 +104,12 @@ GEM
     dante (0.2.0)
     domain_name (0.5.20170404)
       unf (>= 0.0.5, < 1.0.0)
-    elasticsearch (5.0.4)
-      elasticsearch-api (= 5.0.4)
-      elasticsearch-transport (= 5.0.4)
-    elasticsearch-api (5.0.4)
+    elasticsearch (2.0.0)
+      elasticsearch-api (= 2.0.0)
+      elasticsearch-transport (= 2.0.0)
+    elasticsearch-api (2.0.0)
       multi_json
-    elasticsearch-transport (5.0.4)
+    elasticsearch-transport (2.0.0)
       faraday
       multi_json
     email_spec (2.1.0)
@@ -153,7 +153,7 @@ GEM
     libxml-ruby (3.0.0)
     little-plugger (1.1.4)
     logger (1.2.8)
-    logging (2.2.1)
+    logging (2.2.2)
       little-plugger (~> 1.1)
       multi_json (~> 1.10)
     macaddr (1.7.1)
