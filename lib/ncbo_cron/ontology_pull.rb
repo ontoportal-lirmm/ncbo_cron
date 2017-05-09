@@ -40,7 +40,9 @@ module NcboCron
             if isLong == true && !options[:pull_long_ontologies].nil?
               next if !options[:pull_long_ontologies].include?(ont.acronym)
             else
-              next if options[:pull_long_ontologies].include?(ont.acronym)
+              if !options[:pull_long_ontologies].nil?
+                next if options[:pull_long_ontologies].include?(ont.acronym)
+              end
             end
             last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
