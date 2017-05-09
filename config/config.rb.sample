@@ -7,7 +7,8 @@ begin
     config.repository_folder  = "/srv/ncbo/repository"
     config.goo_host           = "localhost"
     config.goo_port           = 8081
-    config.search_server_url  = "http://localhost:8082/solr/core1"
+    config.search_server_url = "http://localhost:8082/solr/term_search_core1"
+    config.property_search_server_url = "http://localhost:8082/solr/prop_search_core1"
     config.rest_url_prefix    = "http://data.#{$SITE_URL}/"
     config.replace_url_prefix = true
     config.id_url_prefix      = "http://data.bioontology.org/"
@@ -33,8 +34,6 @@ begin
     config.enable_http_cache  = true
     config.goo_redis_host     = "localhost"
     config.goo_redis_port     = 6382
-
-    Goo.use_cache             = true
 
     # Email notifications
     config.enable_notifications   = true
@@ -111,6 +110,8 @@ begin
   NcboCron.config do |config|
     config.redis_host                = Annotator.settings.annotator_redis_host
     config.redis_port                = Annotator.settings.annotator_redis_port
+    config.search_index_all_url      = "http://localhost:8082/solr/term_search_core2"
+    config.property_search_index_all_url = "http://localhost:8082/solr/prop_search_core2"
     
     # Schedules: run every 4 hours, starting at 00:30
     config.cron_schedule                            = "30 */4 * * *"
@@ -145,8 +146,15 @@ begin
     config.analytics_start_date                     = "2015-11-13"
     # To filter connexions coming from Stanford
     config.analytics_filter_str                     = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
+
+    # this is a Base64.encode64 encoded personal access token
+    # you need to run Base64.decode64 on it before using it in your code
+    # this is a workaround because Github does not allow storing access tokens in a repo
+    config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN, encoded using Base64"
   end
 rescue NameError
   #binding.pry
   puts "(CNFG) >> NcboCron not available, cannot load config"
 end
+
+Goo.use_cache = true

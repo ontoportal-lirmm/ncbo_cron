@@ -47,6 +47,7 @@ module NcboCron
           # ont_to_include = ["PHENOMEBLAST", "MYOBI", "NCBIVIRUSESTAX", "OntoOrpha", "PERTANIAN", "PHENOMEBLAST", "RTEST-LOINC", "SSACAL", "TEST", "UU", "VIRUSESTAX"]
           # ont_to_include = ["AERO", "SBO", "EHDAA", "CCO", "ONLIRA", "VT", "ZEA", "SMASH", "PLIO", "OGI", "CO", "NCIT", "GO"]
           # ont_to_include = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
+          # ont_to_include = ["FB-DV","GCC"]
         end
         ont_to_include
       end
@@ -144,9 +145,38 @@ module NcboCron
       end
 
       def generate_single_ontology_report(ont)
-        report = {problem: false, format: '', date_created: '', logFilePath: '', report_date_updated: nil}
+        report = {problem: false, format: '', date_created: '', administeredBy: [], logFilePath: '', report_date_updated: nil}
         ont.bring_remaining()
         ont.bring(:submissions)
+        ont.bring(administeredBy: :username)
+        report[:administeredBy] = []
+        admin_by = nil
+
+        begin
+          admin_by = ont.administeredBy
+        rescue
+          sleep(3)
+          ont.bring(administeredBy: :username)
+          begin
+            admin_by = ont.administeredBy
+          rescue Exception => e
+            admin_by = []
+            add_error_code(report, :errRunningReport, ["ont.administeredBy", e.class, e.message])
+          end
+        end
+
+        admin_by.each do |u|
+          username = nil
+
+          begin
+            username = u.username
+          rescue Exception => e
+            add_error_code(report, :errRunningReport, ["u.username", e.class, e.message])
+            username = u.id.split('/')[-1]
+          end
+          report[:administeredBy] << username
+        end
+
         submissions = ont.submissions
 
         # first see if is summary only and if it has submissions
@@ -251,28 +281,28 @@ module NcboCron
           cl = metrics.classes || 0
           prop = metrics.properties || 0
 
-          if cl + prop < 10
+          if cl.to_i + prop.to_i < 10
             add_error_code(report, :errIncorrectMetricsLatestSubmission)
           end
         end
 
         # check if classes exist
-        good_classes = good_classes(sub)
+        gc = good_classes(sub, report)
 
-        if good_classes.empty?
+        if gc.empty?
           add_error_code(report, :errNoClassesLatestSubmission)
         else
           delim = " | "
-          search_text = good_classes.join(delim)
+          search_text = gc.join(delim)
 
           # check for Annotator calls
           ann = Annotator::Models::NcboAnnotator.new(@logger)
           ann_response = ann.annotate(search_text, { ontologies: [ont.acronym] })
 
-          if ann_response.length < good_classes.length
+          if ann_response.length < gc.length
             ann_search_terms = []
 
-            good_classes.each do |cls|
+            gc.each do |cls|
               ann_response_term = ann.annotate(cls, { ontologies: [ont.acronym] })
               ann_search_terms << (ann_response_term.empty? ? "<span class='missing_term'>#{cls}</span>" : cls)
             end
@@ -282,10 +312,10 @@ module NcboCron
           # check for Search calls
           search_resp = LinkedData::Models::Class.search(solr_escape(search_text), search_query_params(ont.acronym))
 
-          if search_resp["response"]["numFound"] < good_classes.length
+          if search_resp["response"]["numFound"] < gc.length
             search_search_terms = []
 
-            good_classes.each do |cls|
+            gc.each do |cls|
               search_response_term = LinkedData::Models::Class.search(solr_escape(cls), search_query_params(ont.acronym))
               search_search_terms << (search_response_term["response"]["numFound"] > 0 ? cls : "<span class='missing_term'>#{cls}</span>")
             end
@@ -297,17 +327,17 @@ module NcboCron
       end
 
       def ontology_report_date(report, date_str, tm=Time.new)
-        tm_str = tm.strftime("%m/%d/%Y %I:%M%p")
+        tm_str = tm.strftime("%m/%d/%Y, %I:%M %p")
         report[date_str.to_sym] = tm_str
       end
 
-      def good_classes(submission)
+      def good_classes(submission, report)
         page_num = 1
         page_size = 1000
         classes_size = 10
         good_classes = Array.new
         paging = LinkedData::Models::Class.in(submission).include(:prefLabel, :synonym, metrics: :classes).page(page_num, page_size)
-        cls_count = submission.class_count(@logger)
+        cls_count = submission.class_count(@logger).to_i
         # prevent a COUNT SPARQL query if possible
         paging.page_count_set(cls_count) if cls_count > -1
 
@@ -318,9 +348,10 @@ module NcboCron
             page_classes = paging.page(page_num, page_size).all
           rescue Exception =>  e
             # some obscure error that happens intermittently
-            @logger.error("Error during ontologies report paging - #{e.class}: #{e.message}")
+            @logger.error("Error during ontologies report paging - #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
             @logger.error("Sub: #{submission.id}")
-            throw e
+            add_error_code(report, :errRunningReport, ["good_classes", e.class, e.message])
+            page_classes = []
           end
 
           break if page_classes.empty?
@@ -419,4 +450,4 @@ end
 # ontologies_report_path = File.join("logs", "ontologies-report.log")
 # ontologies_report_logger = Logger.new(ontologies_report_path)
 # NcboCron::Models::OntologiesReport.new(ontologies_report_logger).run
-# ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-mapping-counts true --ontologies-report '14 * * * *'
+# ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-mapping-counts true --disable-spam-deletion true --ontologies-report '14 * * * *'
