@@ -110,6 +110,7 @@ begin
   NcboCron.config do |config|
     config.redis_host                = Annotator.settings.annotator_redis_host
     config.redis_port                = Annotator.settings.annotator_redis_port
+    # If no URL has been specified when reindexing ontologies, use the following
     config.search_index_all_url      = "http://localhost:8082/solr/term_search_core2"
     config.property_search_index_all_url = "http://localhost:8082/solr/prop_search_core2"
     
