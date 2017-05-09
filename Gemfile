@@ -3,7 +3,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'rack', '~> 1.0'
 gem 'pry'
 gem 'oj'
 gem 'multi_json'
