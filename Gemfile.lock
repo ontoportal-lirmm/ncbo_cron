@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: c961b79218cfd754d7dbf5d71fa2f7d499420494
+  revision: 973bc8de1845b2d4e89f32d8b33fe4b35ce07662
   branch: lirmm
   specs:
     ontologies_linked_data (0.0.1)
@@ -170,10 +170,10 @@ GEM
       redis
     multi_json (1.12.1)
     multipart-post (2.0.0)
-    mysql2 (0.4.5)
+    mysql2 (0.4.6)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.0.4)
+    oj (3.0.6)
     omni_logger (0.1.4)
       logger
     os (0.9.6)
@@ -183,7 +183,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (2.0.1)
+    rack (2.0.2)
     rack-test (0.6.3)
       rack (>= 1.0)
     rake (12.0.0)
