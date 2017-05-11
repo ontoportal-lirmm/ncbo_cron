@@ -11,6 +11,7 @@ module NcboCron
       ACTIONS = {
         :process_rdf => true,
         :index_search => true,
+        :index_properties => true,
         :run_metrics => true,
         :process_annotator => true,
         :diff => true,
@@ -23,7 +24,7 @@ module NcboCron
       # Add a submission in the queue
       def queue_submission(submission, actions={:all => true})
         redis = Redis.new(:host => NcboCron.settings.redis_host, :port => NcboCron.settings.redis_port)
-        if (actions[:all])
+        if actions[:all]
           if !actions[:params].nil?
             # Retrieve params added by the user
             user_params = actions[:params].dup
@@ -52,9 +53,7 @@ module NcboCron
           key = process_data[:redis_key]
           redis.hdel(QUEUE_HOLDER, key)
           begin
-            logger.info "Starting processing of #{realKey}"
             process_submission(logger, realKey, actions)
-            logger.info "Finished processing of #{realKey}"
           rescue Exception => e
             logger.debug "Exception processing #{realKey}"
             logger.error(e.message + "\n" + e.backtrace.join("\n\t"))
@@ -86,7 +85,7 @@ module NcboCron
       end
 
       def get_prefixed_id(id)
-        return "#{IDPREFIX}#{id}"
+        "#{IDPREFIX}#{id}"
       end
 
       # Zombie graphs are submission graphs from ontologies that have been deleted
@@ -106,7 +105,7 @@ module NcboCron
         class_graphs.each do |g|
           zombies << g unless onts_set.include?(g.split("/")[0..-3].join("/"))
         end
-        return zombies
+        zombies
       end
 
       def process_flush_classes(logger, remove_zombie_graphs=false)
@@ -162,49 +161,48 @@ module NcboCron
 
         logger.info("finish process_flush_classes"); logger.flush
 
-        return deleted
+        deleted
       end
 
-      def process_submission(logger, submissionId, actions=ACTIONS)
+      def process_submission(logger, submission_id, actions=ACTIONS)
+        multi_logger = LinkedData::Utils::MultiLogger.new(loggers: logger)
         t0 = Time.now
-        sub = LinkedData::Models::OntologySubmission.find(RDF::IRI.new(submissionId)).first
+        sub = LinkedData::Models::OntologySubmission.find(RDF::IRI.new(submission_id)).first
 
         if sub
           sub.bring_remaining
           sub.ontology.bring(:acronym)
-          log_path = sub.parsing_log_path
           FileUtils.mkdir_p(sub.data_folder) unless Dir.exists?(sub.data_folder)
-
+          log_path = sub.parsing_log_path
           logger.info "Logging parsing output to #{log_path}"
-          logger = Logger.new(log_path)
-          logger.debug "Starting parsing for #{submissionId}\n\n"
+          logger1 = Logger.new(log_path)
+          multi_logger.add_logger(logger1)
+          multi_logger.info "Starting to process #{submission_id}"
 
           # Check to make sure the file has been downloaded
           if sub.pullLocation && (!sub.uploadFilePath || !File.exist?(sub.uploadFilePath))
-            logger.debug "Pull location found, but no file in the upload file path. Retrying download."
+            multi_logger.debug "Pull location found, but no file in the upload file path. Retrying download."
             file, filename = sub.download_ontology_file
             file_location = sub.class.copy_file_repository(sub.ontology.acronym, sub.submissionId, file, filename)
             file_location = "../" + file_location if file_location.start_with?(".") # relative path fix
             sub.uploadFilePath = File.expand_path(file_location, __FILE__)
             sub.save
-            logger.debug "Download complete"
+            multi_logger.debug "Download complete"
           end
 
-          logger.debug "Processing submission #{submissionId}..."
-          sub.process_submission(logger, actions)
-          logger.debug "Submission #{sub.id} processed successfully"
+          sub.process_submission(multi_logger, actions)
           parsed = sub.ready?(status: [:rdf, :rdf_labels])
 
           if parsed
-            archive_old_submissions(logger, sub) if actions[:process_rdf]
-            process_annotator(logger, sub) if actions[:process_annotator]
-            logger.debug "Completed processing of #{submissionId} in #{(Time.now - t0).to_f.round(2)}s"
+            archive_old_submissions(multi_logger, sub) if actions[:process_rdf]
+            process_annotator(multi_logger, sub) if actions[:process_annotator]
+            multi_logger.debug "Completed processing of #{submission_id} in #{(Time.now - t0).to_f.round(2)}s"
           else
-            logger.error "Submission #{submissionId} parsing failed"
+            multi_logger.error "Submission #{submission_id} parsing failed"
           end
-          NcboCron::Models::OntologiesReport.new(logger).refresh_report([sub.ontology.acronym])
+          NcboCron::Models::OntologiesReport.new(multi_logger).refresh_report([sub.ontology.acronym])
         else
-          logger.error "Submission #{submissionId} is not in the system. Processing cancelled..."
+          multi_logger.error "Submission #{submission_id} is not in the system. Processing cancelled..."
         end
       end
 
