@@ -65,7 +65,7 @@ end
 #
 # MAIN
 #
-if (options[:all])
+if options[:all]
   puts "About to perform the following tasks on ALL ontologies: #{options[:tasks]}"
   puts "Type 'yes' to continue: "
   $stdout.flush
@@ -99,9 +99,6 @@ options[:ontologies].each do |acronym|
   rescue Exception => e
     msg = "Failed, exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
     logger.error(msg)
-    puts msg
-    print e.backtrace.join("\n")
-    exit(1)
   end
 end
 

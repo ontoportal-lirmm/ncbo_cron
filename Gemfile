@@ -3,7 +3,6 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'rake'
-gem 'rack', '~> 1.0'
 gem 'pry'
 gem 'oj'
 gem 'multi_json'
@@ -28,5 +27,8 @@ gem 'ncbo_annotator', github: 'sifrproject/ncbo_annotator', branch: 'agroportal'
 gem 'ncbo_resource_index', github: 'ncbo/resource_index'
 
 # Testing
-gem 'email_spec', :group => :test
+group :test do
+	gem 'email_spec'
+  gem 'test-unit-minitest'
+end
 

@@ -40,7 +40,9 @@ module NcboCron
             if isLong == true && !options[:pull_long_ontologies].nil?
               next if !options[:pull_long_ontologies].include?(ont.acronym)
             else
-              next if options[:pull_long_ontologies].include?(ont.acronym)
+              if !options[:pull_long_ontologies].nil?
+                next if options[:pull_long_ontologies].include?(ont.acronym)
+              end
             end
             last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
@@ -142,4 +144,4 @@ end
 # ontologies_pull_logger = Logger.new(ontologies_pull_log_path)
 # pull = NcboCron::Models::OntologyPull.new
 # pull.do_remote_ontology_pull({logger: ontologies_pull_logger, enable_pull_umls: false})
-# ./bin/ncbo_cron --disable-processing true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-ontologies-report true --disable-mapping-counts true --pull-cron '22 * * * *'
+# ./bin/ncbo_cron --disable-processing true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-ontologies-report true --disable-mapping-counts true --disable-spam-deletion true --pull-cron '22 * * * *'
