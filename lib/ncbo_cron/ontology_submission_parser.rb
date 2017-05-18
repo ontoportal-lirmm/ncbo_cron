@@ -151,7 +151,7 @@ module NcboCron
 
         zombie_classes_graphs.each do |zg|
           logger.info("Zombie class graph #{zg}"); logger.flush
-          # Not deleting zombie graph by default
+          # Not deleting zombie graph by default. Enable it with config.remove_zombie_graphs = true
           if !remove_zombie_graphs.nil? && remove_zombie_graphs == true
             Goo.sparql_data_client.delete_graph(RDF::URI.new(zg))
             logger.info "DELETED #{zg} graph"
