@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/goo.git
-  revision: 5e4a7ea5ed09ca64952356ddf5b46c75c9a9db6f
+  revision: b970e755a6051b6719fabb1bf76dc31d39fd1348
   branch: sifr
   specs:
     goo (0.0.2)
@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 19916023967ce985a98e82de9b5a76cc5633ef58
+  revision: 3bdc165cd1c0312571410bdbd7079ec58c43435c
   branch: sifr
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: bdaa830d6ba5129748ac6cf7442e59acec480e2d
+  revision: d71ec6a989be0a658c6ea87aa383362aa53f6b9c
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
@@ -183,7 +183,7 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.8.1)
       slop (~> 3.4)
-    rack (2.0.2)
+    rack (2.0.3)
     rack-test (0.6.3)
       rack (>= 1.0)
     rake (12.0.0)
