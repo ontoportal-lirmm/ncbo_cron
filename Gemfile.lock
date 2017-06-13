@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/goo.git
-  revision: b970e755a6051b6719fabb1bf76dc31d39fd1348
+  revision: 025d3f9ef5697736202cbe4c35029c0c58fea16f
   branch: sifr
   specs:
     goo (0.0.2)
@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 3bdc165cd1c0312571410bdbd7079ec58c43435c
+  revision: 081b1eaa53a90b88394d0e613a83f4fc03c2d0e7
   branch: sifr
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: d71ec6a989be0a658c6ea87aa383362aa53f6b9c
+  revision: bf28db1a4b3ab6132b4ab73238a4e1f67f917188
   branch: sifr
   specs:
     ontologies_linked_data (0.0.1)
