@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 99041589b7734817c8842dd68c33b10a0002614b
+  revision: b79bf51acf3aceafdd80579fa338b8734ce45818
   branch: lirmm
   specs:
     ncbo_annotator (0.0.1)
