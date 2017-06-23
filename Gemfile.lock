@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ncbo_annotator.git
-  revision: 8973e15c09995ea1f9411e40eb90420fc4704ccd
+  revision: 11ea4da958dc8cd0448a0b39c68697d5b52881b2
   branch: agroportal
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: git://github.com/sifrproject/ontologies_linked_data.git
-  revision: 95b88c3f9ef7f2ce0ecf137c4906ee652d13c895
+  revision: a438999eda6b72773f3745657d1773d64d89ec46
   branch: agroportal
   specs:
     ontologies_linked_data (0.0.1)
