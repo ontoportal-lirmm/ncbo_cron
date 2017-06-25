@@ -20,7 +20,7 @@ gem 'google-api-client', '<0.9'
 gem 'cube-ruby', require: 'cube'
 
 # NCBO gems (can be from a local dev path or from rubygems/git)
-gem 'goo', github: 'sifrproject/goo', branch: 'agroportal'
+gem 'goo', github: 'sifrproject/goo', branch: 'agroportal_debug'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
 gem 'ontologies_linked_data', github: 'sifrproject/ontologies_linked_data', branch: 'agroportal'
 gem 'ncbo_annotator', github: 'sifrproject/ncbo_annotator', branch: 'agroportal'
