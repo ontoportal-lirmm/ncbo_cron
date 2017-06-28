@@ -277,6 +277,7 @@ runner.execute do |opts|
     end
   end
 
+  # Flush old graphs. Remove zombie graphs if config.remove_zombie_graphs = true
   if options[:enable_flush]
     flush_thread = Thread.new do
       flush_options = options.dup

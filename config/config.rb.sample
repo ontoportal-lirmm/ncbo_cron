@@ -113,6 +113,9 @@ begin
     # If no URL has been specified when reindexing ontologies, use the following
     config.search_index_all_url      = "http://localhost:8082/solr/term_search_core2"
     config.property_search_index_all_url = "http://localhost:8082/solr/prop_search_core2"
+
+    # Minutes between every process new ontologies check
+    config.minutes_between    = 3
     
     # Schedules: run every 4 hours, starting at 00:30
     config.cron_schedule                            = "30 */4 * * *"
