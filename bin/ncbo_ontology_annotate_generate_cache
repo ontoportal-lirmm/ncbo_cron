@@ -86,12 +86,13 @@ elsif (options[:remove_cache])
   puts "You are about to clear the alternate Annotator cache repository and kick off a lengthy re-population process. Are you sure?"
 end
 
+=begin
 if (options[:remove_cache])
   puts "Type 'yes' to continue: "
   $stdout.flush
   confirm = $stdin.gets
   abort("Aborting...\n\n") unless (confirm.strip == 'yes')
-end
+=end
 
 puts "Processing details are logged to #{options[:logfile]}"
 msg = ""
