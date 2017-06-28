@@ -67,9 +67,9 @@ end
 #
 if options[:all]
   puts "About to perform the following tasks on ALL ontologies: #{options[:tasks]}"
-  puts "Type 'yes' to continue: "
-  $stdout.flush
-  confirm = $stdin.gets
+  #puts "Type 'yes' to continue: "
+  #$stdout.flush
+  #confirm = $stdin.gets
   abort("Aborting...\n") unless (confirm.strip == 'yes')
 else
   puts "Processing the following tasks: #{options[:tasks]} on ontologies: #{options[:ontologies]}"
