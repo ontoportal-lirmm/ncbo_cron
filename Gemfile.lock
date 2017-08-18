@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: 635972d07fafda13c1c4d5751429c0303fff70e7
+  revision: 054ea37df26c0952a216e3ae725e9f10b55c316a
   branch: staging
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 356df908cd2f1291efb14b56c83253d799beb5af
+  revision: dac5f70a7885db6862090b5d384fc84aea4bd9d0
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -210,7 +210,7 @@ GEM
       jwt (~> 1.5)
       multi_json (~> 1.10)
     slop (3.6.0)
-    sys-proctable (1.1.5-universal-aix5)
+    sys-proctable (1.1.5)
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
