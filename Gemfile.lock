@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: 8ee5804f8e1f18f109dedde4dc9cb2040d41d60a
+  revision: e7fd1aca9d4d99f0789ce69fc074a804b346f774
   branch: master
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: d1948c6de371779a2de57f89a84d34189dad84e5
+  revision: 108866ff0a0e78316141e0eb6c99cf8c50cf81df
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: ff5920539091bf325870933f70f587026d9ba715
+  revision: 0852e6050c18893b00adeda267d7b1cd574c5904
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -48,7 +48,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/resource_index.git
-  revision: 3f48307daad953f3fc297fab328c9b00beadb70a
+  revision: f1c3c0736ce4879444e1bcb432d8b8cb54904a65
   specs:
     ncbo_resource_index (0.0.1)
       elasticsearch (= 2.0.0)
@@ -210,7 +210,7 @@ GEM
       jwt (~> 1.5)
       multi_json (~> 1.10)
     slop (3.6.0)
-    sys-proctable (1.1.5-universal-aix-5)
+    sys-proctable (1.1.5-universal-aix5)
     sys-proctable (1.1.5-universal-darwin)
       ffi
     systemu (2.6.5)
@@ -251,4 +251,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   1.15.3
+   1.15.4
