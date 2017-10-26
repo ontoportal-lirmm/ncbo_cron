@@ -105,6 +105,9 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--disable-spam-deletion", "disable SPAM deletion", "(default: #{options[:enable_spam_deletion]})") do |v|
     options[:enable_spam_deletion] = false
   end
+  opts.on("--disable-obofoundry_sync", "disable OBO Foundry synchronization report", "(default: #{options[:enable_obofoundry_sync]})") do |v|
+    options[:enable_obofoundry_sync] = false
+  end
   opts.on("--pull-umls-url URL", "set UMLS pull location") do |v|
     options[:pull_umls_url] = v
   end
@@ -128,6 +131,9 @@ opt_parser = OptionParser.new do |opts|
   end
   opts.on("--spam-deletion SCHED", String, "cron schedule to run SPAM deletion", "(default: #{options[:cron_spam_deletion]})") do |c|
     options[:cron_spam_deletion] = c
+  end
+  opts.on("--obofoundry_sync SCHED", String, "cron schedule to run OBO Foundry synchronization report", "(default: #{options[:cron_obofoundry_sync]})") do |c|
+    options[:cron_obofoundry_sync] = c
   end
 
   # Display the help screen, all programs are assumed to have this option.
@@ -381,6 +387,23 @@ runner.execute do |opts|
         logger.info "Finished SPAM deletion"; logger.flush
       end
     end
+  end  
+
+  if options[:enable_obofoundry_sync]
+    obofoundry_sync_thread = Thread.new do
+      obofoundry_sync_options = options.dup
+      obofoundry_sync_options[:job_name] = "ncbo_cron_obofoundry_sync"
+      obofoundry_sync_options[:scheduler_type] = :cron
+      obofoundry_sync_options[:cron_schedule] = obofoundry_sync_options[:cron_obofoundry_sync]
+      logger.info "Setting up OBO Foundry synchronization report job with #{obofoundry_sync_options[:cron_obofoundry_sync]}"; logger.flush
+      NcboCron::Scheduler.scheduled_locking_job(obofoundry_sync_options) do
+        logger.info "Start generating OBO Foundry synchronization report..."; logger.flush
+        t0 = Time.now
+        NcboCron::Models::OBOFoundrySync.new.run
+        logger.info "OBO Foundry synchronization report job completed in #{Time.now - t0} sec."; logger.flush
+        logger.info "Finished generating OBO Foundry synchronization report"; logger.flush
+      end
+    end
   end
 
   # Print running child processes
@@ -402,4 +425,5 @@ runner.execute do |opts|
   ontologies_report_thread.join if ontologies_report_thread
   spam_deletion_thread.join if spam_deletion_thread
   mapping_counts_thread.join if mapping_counts_thread
+  obofoundry_sync_thread.join if obofoundry_sync_thread
 end

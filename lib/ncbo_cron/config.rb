@@ -39,6 +39,7 @@ module NcboCron
     # UMLS auto-pull
     @settings.pull_umls_url ||= ""
     @settings.enable_pull_umls ||= false
+    @settings.enable_obofoundry_sync ||= true
 
     # Schedulues
     @settings.cron_schedule ||= "30 */4 * * *"
@@ -61,6 +62,9 @@ module NcboCron
     @settings.ontology_report_path = "../../reports/ontologies_report.json"
     # 30 2 * * * - run daily at 2:30AM
     @settings.cron_spam_deletion ||= "30 2 * * *"
+    # OBOFoundry synchronization report schedule
+    # 0 8 * * 1,2,3,4,5 - run daily Monday through Friday at 8:00AM
+    @settings.cron_obofoundry_sync ||= "0 8 * * 1,2,3,4,5"
 
     @settings.log_level ||= :info
     unless (@settings.log_path && File.exists?(@settings.log_path))
