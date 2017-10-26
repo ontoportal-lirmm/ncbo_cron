@@ -53,7 +53,6 @@ NcboCron.config do |config|
   # you need to run Base64.decode64 on it before using it in your code
   # this is a workaround because Github does not allow storing access tokens in a repo
   config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN, encoded using Base64"
-  config.versions_file_path = "/home/ontoportal/virtual_appliance/deployment/versions"
 end
 
 Goo.use_cache = true
