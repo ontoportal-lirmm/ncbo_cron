@@ -11,13 +11,11 @@ module NcboCron
     class UpdateManager
       class UpdateManagerError < StandardError; end
 
-      # BP_UPDATECHECK_URL = lambda { |uid, local_version| "http://updatecheck.bioontology.org/latestversion?uid=#{uid}&version=#{local_version}" }
-      BP_UPDATECHECK_URL = lambda { |uid, local_version| "http://localhost:9393/admin/latestversion?uid=#{uid}&version=#{local_version}" }
-
+      BP_UPDATECHECK_URL = lambda { |iid, local_version| "#{NcboCron.settings.update_check_endpoint_url}?iid=#{iid}&version=#{local_version}" }
       REDIS_INSTANCE_ID_KEY = "ontoportal.instance.id"
       REDIS_UPDATE_INFO_KEY = "ontoportal.update.info"
 
-      def initialize(logger=nil, report_path='')
+      def initialize(logger=nil)
         @logger = nil
 
         if logger.nil?
@@ -35,6 +33,12 @@ module NcboCron
         check_for_update
       end
 
+      def update_info
+        r = redis
+        info = r.get(REDIS_UPDATE_INFO_KEY)
+        info.nil? ? Hash.new : Marshal.load(info)
+      end
+
       def check_for_update
         lv = local_version
         id = iid
@@ -42,8 +46,12 @@ module NcboCron
         begin
           response_raw = RestClient.get(BP_UPDATECHECK_URL.call(id, lv))
           response = JSON.parse(response_raw)
+          rh = eval(response)
+          rh[:current_version] = lv
+          d = DateTime.now
+          rh[:date_checked] = d.strftime
           r = redis
-          r.set(REDIS_UPDATE_INFO_KEY, response)
+          r.set(REDIS_UPDATE_INFO_KEY, Marshal.dump(rh))
         rescue Exception => e
           @logger.error("Unable to check for update - #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
         end
@@ -54,8 +62,8 @@ module NcboCron
         inst_id = r.get(REDIS_INSTANCE_ID_KEY)
 
         if inst_id.nil?
-          r.set(REDIS_INSTANCE_ID_KEY, SecureRandom.uuid)
-          inst_id = r.get(REDIS_INSTANCE_ID_KEY)
+          inst_id = SecureRandom.uuid
+          r.set(REDIS_INSTANCE_ID_KEY, inst_id)
         end
         inst_id
       end
@@ -72,13 +80,13 @@ module NcboCron
   end
 end
 
-require 'ontologies_linked_data'
-require 'goo'
-require 'ncbo_annotator'
-require 'ncbo_cron/config'
-require_relative '../../config/config'
-
-update_manager_path = File.join("logs", "update-manager.log")
-update_manager_logger = Logger.new(update_manager_path)
-NcboCron::Models::UpdateManager.new(update_manager_logger).run
+# require 'ontologies_linked_data'
+# require 'goo'
+# require 'ncbo_annotator'
+# require 'ncbo_cron/config'
+# require_relative '../../config/config'
+#
+# update_manager_path = File.join("logs", "update-manager.log")
+# update_manager_logger = Logger.new(update_manager_path)
+# NcboCron::Models::UpdateManager.new(update_manager_logger).run
 
