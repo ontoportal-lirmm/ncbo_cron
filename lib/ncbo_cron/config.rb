@@ -36,6 +36,8 @@ module NcboCron
     @settings.enable_ontologies_report ||= true
     # enable SPAM deletion
     @settings.enable_spam_deletion ||= true
+    # enable update check (vor VMs)
+    @settings.enable_update_check ||= true
     # UMLS auto-pull
     @settings.pull_umls_url ||= ""
     @settings.enable_pull_umls ||= false
@@ -65,6 +67,8 @@ module NcboCron
     # OBOFoundry synchronization report schedule
     # 0 8 * * 1,2,3,4,5 - run daily Monday through Friday at 8:00AM
     @settings.cron_obofoundry_sync ||= "0 8 * * 1,2,3,4,5"
+    # 00 3 * * * - run daily at 3:00AM
+    @settings.cron_update_check ||= "00 3 * * *"
 
     @settings.log_level ||= :info
     unless (@settings.log_path && File.exists?(@settings.log_path))
