@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: b0b391f441fea34bb4b57deedd01ae78dd26cce3
+  revision: ba731d740565f14bcb9b45346bf3927a2039791f
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -175,7 +175,7 @@ GEM
     mysql2 (0.4.9)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.3.8)
+    oj (3.3.9)
     omni_logger (0.1.4)
       logger
     os (0.9.6)
