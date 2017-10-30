@@ -16,8 +16,8 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: f0a627e2e452ea6b86ea58562b9287d6a779ad01
-  branch: master
+  revision: f8c35b1f23e7ebef8118b584c36bf4ed9bc5bac0
+  branch: staging
   specs:
     ncbo_annotator (0.0.1)
       goo
@@ -48,7 +48,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/resource_index.git
-  revision: 7bf1e21c619bac49dff4479fa79783aa370e06bb
+  revision: 9d1f0a4e2f2816990a1f80ee576c73a08e34e754
   specs:
     ncbo_resource_index (0.0.1)
       elasticsearch (= 2.0.0)
