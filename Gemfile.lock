@@ -48,7 +48,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/resource_index.git
-  revision: f1c3c0736ce4879444e1bcb432d8b8cb54904a65
+  revision: 9d1f0a4e2f2816990a1f80ee576c73a08e34e754
   specs:
     ncbo_resource_index (0.0.1)
       elasticsearch (= 2.0.0)
@@ -160,13 +160,14 @@ GEM
       multi_json (~> 1.10)
     macaddr (1.7.1)
       systemu (~> 2.6.2)
-    mail (2.6.6)
-      mime-types (>= 1.16, < 4)
+    mail (2.7.0)
+      mini_mime (>= 0.1.1)
     memoist (0.16.0)
     method_source (0.9.0)
     mime-types (3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
+    mini_mime (0.1.4)
     minitest (4.7.5)
     mlanett-redis-lock (0.2.7)
       redis
@@ -175,7 +176,7 @@ GEM
     mysql2 (0.4.9)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.3.8)
+    oj (3.3.9)
     omni_logger (0.1.4)
       logger
     os (0.9.6)
@@ -205,7 +206,7 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.1.0)
+    sequel (5.2.0)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -253,4 +254,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   1.15.3
+   1.15.4
