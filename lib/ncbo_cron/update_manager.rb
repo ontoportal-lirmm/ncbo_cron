@@ -34,9 +34,18 @@ module NcboCron
       end
 
       def update_info
-        r = redis
-        info = r.get(REDIS_UPDATE_INFO_KEY)
-        info.nil? ? Hash.new : Marshal.load(info)
+        update_check_enabled = NcboCron.settings.enable_update_check
+        info = {update_check_enabled: update_check_enabled}
+
+        if update_check_enabled
+          r = redis
+          info_raw = r.get(REDIS_UPDATE_INFO_KEY)
+          check_for_update if info_raw.nil?
+          info_raw = r.get(REDIS_UPDATE_INFO_KEY)
+          info_marshalled = Marshal.load(info_raw)
+          info.merge!(info_marshalled) unless info_marshalled.nil?
+        end
+        info
       end
 
       def check_for_update
