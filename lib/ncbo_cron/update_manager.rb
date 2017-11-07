@@ -43,27 +43,50 @@ module NcboCron
           check_for_update if info_raw.nil?
           info_raw = r.get(REDIS_UPDATE_INFO_KEY)
           info_marshalled = Marshal.load(info_raw)
+
+          # last update check resulted in an error. Recheck!
+          if info_marshalled.key?(:error)
+            check_for_update
+            info_raw = r.get(REDIS_UPDATE_INFO_KEY)
+            info_marshalled = Marshal.load(info_raw)
+          end
+
           info.merge!(info_marshalled) unless info_marshalled.nil?
         end
         info
       end
 
       def check_for_update
-        lv = local_version
-        id = iid
+        rh = {}
 
         begin
+          id = iid
+          lv = local_version
           response_raw = RestClient.get(BP_UPDATECHECK_URL.call(id, lv))
           response = JSON.parse(response_raw)
-          rh = eval(response)
+          # check whether json came as Hash or String
+          rh = response.class == String ? eval(response) : response
+          # check for booleans expressed as strings in json
+          rh.each { |key, v| rh[key] = true if v.to_s.downcase == "true"; rh[key] = false if v.to_s.downcase == "false"}
           rh[:current_version] = lv
-          d = DateTime.now
-          rh[:date_checked] = d.strftime
-          r = redis
-          r.set(REDIS_UPDATE_INFO_KEY, Marshal.dump(rh))
+          tm = DateTime.now
+          tm_str = tm.strftime("%m/%d/%Y, %I:%M %p")
+          rh[:date_checked] = tm_str
         rescue Exception => e
+          if e.class == RestClient::NotFound
+            msg = "Unable to connect to the update server"
+          elsif e.class == Errno::EACCES
+            msg = "Unable to retrieve the current version number"
+          else
+            msg = "Unable to check for update - #{e.class}: #{e.message}"
+          end
+
+          rh[:error] = msg
           @logger.error("Unable to check for update - #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}")
         end
+
+        r = redis
+        r.set(REDIS_UPDATE_INFO_KEY, Marshal.dump(rh))
       end
 
       def iid
