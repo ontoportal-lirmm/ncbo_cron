@@ -12,6 +12,7 @@ gem 'pony'
 gem 'sys-proctable'
 gem 'google-api-client', '<0.9'
 gem 'parseconfig'
+gem 'mail', '2.6.6'
 
 # JIRA
 # gem 'jira-ruby'

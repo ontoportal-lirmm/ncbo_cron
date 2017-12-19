@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+
+# Configure the process for the current cron configuration.
+require_relative '../lib/ncbo_cron'
+config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
+abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
+require_relative '../config/config'
+
+require 'uri'
+require 'benchmark'
+require 'optparse'
+
+options = {}
+opt_parser = OptionParser.new do |opts|
+  options[:logfile] = STDOUT
+  opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
+    options[:logfile] = filename
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
+end
+
+# Parse the command-line. The 'parse' method simply parses ARGV, while the 'parse!' method parses ARGV and removes
+# any options found there, as well as any parameters for the options.
+opt_parser.parse!
+
+logger = Logger.new(options[:logfile])
+
+begin
+  puts "Update check details are logged to #{options[:logfile] == STDOUT ? "STDOUT" : options[:logfile]}"
+  update_mgr = NcboCron::Models::UpdateManager.new(logger)
+  update_mgr.check_for_update
+  update_info = update_mgr.update_info
+
+  if update_info[:current_version] == update_info[:update_version]
+    puts "No update available"
+  else
+    puts "Update available. See details below:"
+    puts update_info
+  end
+rescue Exception => e
+  msg = "Failed update check - #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
+  logger.error(msg)
+  puts msg
+  exit(1)
+end
