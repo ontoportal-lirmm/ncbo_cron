@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: 054ea37df26c0952a216e3ae725e9f10b55c316a
+  revision: 37c4065bd544f2fc7da772d698a00bc5b5f8e2ad
   branch: staging
   specs:
     goo (0.0.2)
@@ -134,7 +134,7 @@ GEM
       multi_json (~> 1.10)
       retriable (~> 1.4)
       signet (~> 0.6)
-    googleauth (0.6.1)
+    googleauth (0.6.2)
       faraday (~> 0.12)
       jwt (>= 1.4, < 3.0)
       logging (~> 2.0)
@@ -172,7 +172,7 @@ GEM
       redis
     multi_json (1.12.2)
     multipart-post (2.0.0)
-    mysql2 (0.4.9)
+    mysql2 (0.4.10)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (3.3.9)
@@ -182,13 +182,13 @@ GEM
     parseconfig (1.0.8)
     pony (1.11)
       mail (>= 2.0)
-    pry (0.11.2)
+    pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     rack (2.0.3)
     rack-test (0.8.2)
       rack (>= 1.0, < 3)
-    rake (12.2.1)
+    rake (12.3.0)
     rdf (1.0.8)
       addressable (>= 2.2)
     redis (4.0.1)
@@ -198,14 +198,14 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     retriable (1.4.1)
-    rsolr (2.0.2)
+    rsolr (2.1.0)
       builder (>= 2.1.2)
-      faraday
+      faraday (>= 0.9.0)
     ruby-xxHash (0.4.0.1)
     rubyzip (1.2.1)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.2.0)
+    sequel (5.3.0)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
