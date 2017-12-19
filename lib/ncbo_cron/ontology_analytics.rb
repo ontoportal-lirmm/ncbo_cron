@@ -25,6 +25,7 @@ module NcboCron
         start_year = Date.parse(NcboCron.settings.analytics_start_date).year || 2013
         ont_acronyms = LinkedData::Models::Ontology.where.include(:acronym).all.map {|o| o.acronym}
         # ont_acronyms = ["NCIT", "ONTOMA", "CMPO", "AEO", "SNOMEDCT"]
+        filter_str = (NcboCron.settings.analytics_filter_str.ni? || NcboCron.settings.analytics_filter_str.empty?) ? "" : ";#{NcboCron.settings.analytics_filter_str}"
 
         ont_acronyms.each do |acronym|
           max_results = 10000
@@ -39,7 +40,7 @@ module NcboCron
               'end-date'    => Date.today.to_s,
               'dimensions'  => 'ga:pagePath,ga:year,ga:month',
               'metrics'     => 'ga:pageviews',
-              'filters'     => "ga:pagePath=~^(\\/ontologies\\/#{acronym})(\\/?\\?{0}|\\/?\\?{1}.*)$;#{NcboCron.settings.analytics_filter_str}",
+              'filters'     => "ga:pagePath=~^(\\/ontologies\\/#{acronym})(\\/?\\?{0}|\\/?\\?{1}.*)$#{filter_str}",
               'start-index' => start_index,
               'max-results' => max_results
             })
