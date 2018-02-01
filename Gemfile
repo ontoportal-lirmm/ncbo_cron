@@ -13,6 +13,8 @@ gem 'sys-proctable'
 gem 'google-api-client', '<0.9'
 gem 'parseconfig'
 gem 'mail', '2.6.6'
+gem 'rest-client'
+gem 'multi_json'
 
 # JIRA
 # gem 'jira-ruby'
