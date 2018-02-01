@@ -25,7 +25,7 @@ module NcboCron
         start_year = Date.parse(NcboCron.settings.analytics_start_date).year || 2013
         ont_acronyms = LinkedData::Models::Ontology.where.include(:acronym).all.map {|o| o.acronym}
         # ont_acronyms = ["NCIT", "ONTOMA", "CMPO", "AEO", "SNOMEDCT"]
-        filter_str = (NcboCron.settings.analytics_filter_str.ni? || NcboCron.settings.analytics_filter_str.empty?) ? "" : ";#{NcboCron.settings.analytics_filter_str}"
+        filter_str = (NcboCron.settings.analytics_filter_str.nil? || NcboCron.settings.analytics_filter_str.empty?) ? "" : ";#{NcboCron.settings.analytics_filter_str}"
 
         ont_acronyms.each do |acronym|
           max_results = 10000
@@ -112,25 +112,9 @@ end
 
 # require 'ontologies_linked_data'
 # require 'goo'
-# require 'ncbo_cron'
-# LinkedData.config do |config|
-#   config.goo_host = "localhost"
-#   config.goo_port = 8080
-# end
-# NcboCron.config do |config|
-#   config.redis_host = "localhost"
-#   config.redis_port = 6379
-#
-#   # Google Analytics config
-#   config.analytics_service_account_email_address = "123456789999-sikipho0wk8q0atflrmw62dj4kpwoj3c@developer.gserviceaccount.com"
-#   config.analytics_path_to_key_file              = "config/bioportal-analytics.p12"
-#   config.analytics_profile_id                    = "ga:1234567"
-#   config.analytics_app_name                      = "BioPortal"
-#   config.analytics_app_version                   = "1.0.0"
-#   config.analytics_start_date                    = "2013-10-01"
-#   config.analytics_filter_str                    = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
-# end
-#
+# require 'ncbo_annotator'
+# require 'ncbo_cron/config'
+# require_relative '../../config/config'
 # ontology_analytics_log_path = File.join("logs", "ontology-analytics.log")
 # ontology_analytics_logger = Logger.new(ontology_analytics_log_path)
 # NcboCron::Models::OntologyAnalytics.new(ontology_analytics_logger).run
