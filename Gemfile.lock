@@ -1,7 +1,7 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: 5e7c8f42ed2598bab36152d98a254657c6c0c311
-  branch: master
+  revision: 377c200fa119c212cf90744385354d088179ea31
+  branch: staging
   specs:
     goo (0.0.2)
       addressable (= 2.3.5)
@@ -27,8 +27,8 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 1146741a5f84421a2880545258080625b72d719b
-  branch: master
+  revision: cca6f01a22d879b3ff8204ba6a2b1b03e4d3f720
+  branch: staging
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -86,12 +86,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (4.0.13)
-      i18n (~> 0.6, >= 0.6.9)
-      minitest (~> 4.2)
-      multi_json (~> 1.3)
-      thread_safe (~> 0.1)
-      tzinfo (~> 0.3.37)
+    activesupport (3.2.22.5)
+      i18n (~> 0.6, >= 0.6.4)
+      multi_json (~> 1.0)
     addressable (2.3.5)
     autoparse (0.3.3)
       addressable (>= 2.3.1)
@@ -120,9 +117,9 @@ GEM
     ethon (0.11.0)
       ffi (>= 1.3.0)
     extlib (0.9.16)
-    faraday (0.13.1)
+    faraday (0.14.0)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.18)
+    ffi (1.9.21)
     google-api-client (0.8.7)
       activesupport (>= 3.2, < 5.0)
       addressable (~> 2.3)
@@ -145,14 +142,14 @@ GEM
     htmlentities (4.3.4)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
-    i18n (0.9.1)
+    i18n (0.9.3)
       concurrent-ruby (~> 1.0)
     json (2.1.0)
     json_pure (2.1.0)
     jwt (2.1.0)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libxml-ruby (3.0.0)
+    libxml-ruby (3.1.0)
     little-plugger (1.1.4)
     logger (1.2.8)
     logging (2.2.2)
@@ -170,22 +167,22 @@ GEM
     minitest (4.7.5)
     mlanett-redis-lock (0.2.7)
       redis
-    multi_json (1.12.2)
+    multi_json (1.13.1)
     multipart-post (2.0.0)
     mysql2 (0.4.10)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.3.9)
+    oj (3.4.0)
     omni_logger (0.1.4)
       logger
     os (0.9.6)
     parseconfig (1.0.8)
-    pony (1.11)
+    pony (1.12)
       mail (>= 2.0)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    rack (2.0.3)
+    rack (2.0.4)
     rack-test (0.8.2)
       rack (>= 1.0, < 3)
     rake (12.3.0)
@@ -205,13 +202,13 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.3.0)
+    sequel (5.5.0)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    sys-proctable (1.1.5-universal-aix-5)
+    sys-proctable (1.1.5-universal-aix5)
     sys-proctable (1.1.5-universal-darwin)
       ffi
     systemu (2.6.5)
@@ -220,10 +217,11 @@ GEM
     thread_safe (0.3.6)
     typhoeus (1.3.0)
       ethon (>= 0.9.0)
-    tzinfo (0.3.53)
+    tzinfo (1.2.5)
+      thread_safe (~> 0.1)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.4)
+    unf_ext (0.0.7.5)
     uuid (2.3.8)
       macaddr (~> 1.0)
 
@@ -254,4 +252,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   1.15.4
+   1.16.0
