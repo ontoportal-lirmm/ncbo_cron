@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 3a779c95112bf7b1744cf5e71dae1d35a7ee9a00
+  revision: 9bc30a49f6be823f70123fea7b0f6b53bbb4ccf5
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -122,7 +122,7 @@ GEM
     extlib (0.9.16)
     faraday (0.14.0)
       multipart-post (>= 1.2, < 3)
-    ffi (1.9.23)
+    ffi (1.9.21)
     google-api-client (0.8.7)
       activesupport (>= 3.2, < 5.0)
       addressable (~> 2.3)
@@ -172,7 +172,7 @@ GEM
       redis
     multi_json (1.13.1)
     multipart-post (2.0.0)
-    mysql2 (0.4.10)
+    mysql2 (0.5.0)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (3.5.0)
@@ -233,6 +233,7 @@ PLATFORMS
 DEPENDENCIES
   cube-ruby
   email_spec
+  ffi (< 1.9.22)
   goo!
   google-api-client (< 0.9)
   mail (= 2.6.6)
