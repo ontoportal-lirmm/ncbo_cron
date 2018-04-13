@@ -16,9 +16,14 @@ require 'optparse'
 options = {}
 opt_parser = OptionParser.new do |opts|
   options[:logfile] = STDOUT
+  options[:cache_clear] = false
 
   opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
     options[:logfile] = filename
+  end
+
+  opts.on('-c', '--clear [true/false]', 'Whether to clear Goo/HTTP caches after SPAM deletion. Default: false') do |cl|
+    options[:cache_clear] = cl
   end
 
   # Display the help screen, all programs are assumed to have this option.
@@ -28,7 +33,16 @@ opt_parser = OptionParser.new do |opts|
   end
 end
 
+def redis_goo
+  Redis.new(host: LinkedData.settings.goo_redis_host, port: LinkedData.settings.goo_redis_port, timeout: 30)
+end
+
+def redis_http
+  Redis.new(host: LinkedData.settings.http_redis_host, port: LinkedData.settings.http_redis_port, timeout: 30)
+end
+
 opt_parser.parse!
+options[:cache_clear] = true if options[:cache_clear] == "true"
 
 begin
   logger = Logger.new(options[:logfile])
@@ -37,6 +51,15 @@ begin
   msg = "Completed removing SPAM"
   puts msg
   logger.info(msg)
+
+  if options[:cache_clear] == true
+    msg = "Clearing Goo/HTTP caches..."
+    logger.info(msg)
+    redis_goo.flushdb
+    redis_http.flushdb
+    msg = "Completed clearing Goo/HTTP caches"
+    logger.info(msg)
+  end
 rescue Exception => e
   msg = "Failed SPAM removal with exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
   logger.error(msg)
