@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 9bc30a49f6be823f70123fea7b0f6b53bbb4ccf5
+  revision: 3065a79046ef304ad23d6ead5159b997f947fb9f
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 8b407a0f504d6df06fff9a73a8e9a8f1616504ff
+  revision: 927df48c3e7d5714e6dfaf2bc8dea824f973d947
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -172,7 +172,7 @@ GEM
       redis
     multi_json (1.13.1)
     multipart-post (2.0.0)
-    mysql2 (0.5.0)
+    mysql2 (0.5.1)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (3.5.0)
@@ -186,9 +186,9 @@ GEM
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
     rack (2.0.4)
-    rack-test (0.8.3)
+    rack-test (1.0.0)
       rack (>= 1.0, < 3)
-    rake (12.3.0)
+    rake (12.3.1)
     rdf (1.0.8)
       addressable (>= 2.2)
     redis (4.0.1)
@@ -205,7 +205,7 @@ GEM
     rubyzip (1.2.1)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.6.0)
+    sequel (5.7.1)
     signet (0.8.1)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -219,7 +219,7 @@ GEM
     thread_safe (0.3.6)
     typhoeus (1.3.0)
       ethon (>= 0.9.0)
-    tzinfo (0.3.53)
+    tzinfo (0.3.54)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.5)
