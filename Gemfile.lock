@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 3065a79046ef304ad23d6ead5159b997f947fb9f
+  revision: cfd3c6c93ecc85e9be2da81239f3ee3e3ad1d269
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 927df48c3e7d5714e6dfaf2bc8dea824f973d947
+  revision: 1282a06b84cbd42a297230e0f1dd34da61349d1e
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -185,7 +185,7 @@ GEM
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    rack (2.0.4)
+    rack (2.0.5)
     rack-test (1.0.0)
       rack (>= 1.0, < 3)
     rake (12.3.1)
