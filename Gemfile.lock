@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 128db679109327a0eefb02c6009cb6efbf29b213
+  revision: 6beee95632bf35a9690d9df8bb389a96f3c35ced
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -229,6 +229,7 @@ GEM
 PLATFORMS
   ruby
   x86_64-darwin-16
+  x86_64-darwin-17
 
 DEPENDENCIES
   cube-ruby
@@ -255,4 +256,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   1.16.0
+   1.16.1
