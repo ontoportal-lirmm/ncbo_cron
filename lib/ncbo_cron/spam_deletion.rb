@@ -39,14 +39,17 @@ module NcboCron
         delete_notes = []
         delete_reviews = []
         delete_ontologies = []
+        delete_prov_classes = []
 
         usernames.uniq.each do |username|
           user = LinkedData::Models::User.find(username).include(:username).first
           next if user.nil?
+
           projects = LinkedData::Models::Project.where(creator: user.id).include(:acronym).all
           notes = LinkedData::Models::Note.where(creator: user.id).include(:subject).all
           reviews = LinkedData::Models::Review.where(creator: user.id).include(:body).all
           ontologies = LinkedData::Models::Ontology.where(administeredBy: user.id).include(:acronym).all
+          prov_classes = LinkedData::Models::ProvisionalClass.where(creator: user.id).include(:label).all
 
           @logger.info("User #{user.username} artifacts:")
           @logger.info("--------------------------------")
@@ -66,37 +69,44 @@ module NcboCron
           ont = ontologies.map {|o| o.acronym}.join(", ")
           ont = "none" if ont.empty?
           @logger.info("Ontologies: #{ont}")
+
+          pc = prov_classes.map {|p| p.label}.join(", ")
+          pc = "none" if pc.empty?
+          @logger.info("Provisional Classes: #{pc}")
           @logger.info("--------------------------------\n")
           @logger.flush
 
-          delete_projects += projects
-          delete_notes += notes
-          delete_reviews += reviews
-          delete_ontologies += ontologies
+          delete_projects.concat projects
+          delete_notes.concat notes
+          delete_reviews.concat reviews
+          delete_ontologies.concat ontologies
           delete_users << user
+          delete_prov_classes.concat prov_classes
         end
 
         if delete_users.length == 0 &&
             delete_projects.length == 0 &&
             delete_notes.length == 0 &&
             delete_reviews.length == 0 &&
-            delete_ontologies.length == 0
-          @logger.info("No users/projects/notes/reviews/ontologies found")
+            delete_ontologies.length == 0 &&
+            delete_prov_classes.length == 0
+          @logger.info("No users/projects/notes/reviews/ontologies/provisional classes found")
         else
           @logger.info("Deleting #{delete_projects.length} projects...")
           @logger.info("Deleting #{delete_notes.length} notes...")
           @logger.info("Deleting #{delete_reviews.length} reviews...")
           @logger.info("Deleting #{delete_ontologies.length} ontologies...")
+          @logger.info("Deleting #{delete_prov_classes.length} provisional classes...")
           @logger.info("Deleting #{delete_users.length} users...")
 
           delete_projects.each {|p| p.delete}
           delete_notes.each {|n| n.delete}
           delete_reviews.each {|r| r.delete}
           delete_ontologies.each {|o| o.delete}
+          delete_prov_classes.each {|pc| pc.delete}
           delete_users.each {|u| u.delete}
         end
       end
-
     end
   end
 end
