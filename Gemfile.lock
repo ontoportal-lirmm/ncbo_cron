@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ncbo/goo.git
-  revision: d27959e8e095af2e33e6983ee837085ade3c333a
+  revision: c77bf21e54049bd8669fead2332fe46c447808ce
   branch: master
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 22859d142222a268d00012163d601bb22783ffa4
+  revision: 275ddca623235eeb51f5637a4e351c4e8e7353f4
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: dfc644727c9ffce4fbd3d1e0a8611db6ad4ded02
+  revision: a4afdb489d8dbb15deaa1aa9caa3463dbb04ef4b
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -170,7 +170,7 @@ GEM
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.7.6)
+    oj (3.7.7)
     omni_logger (0.1.4)
       logger
     os (1.0.0)
