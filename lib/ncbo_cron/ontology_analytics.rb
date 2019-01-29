@@ -1,6 +1,6 @@
 require 'logger'
-require 'google/api_client'
-require 'google/api_client/auth/installed_app'
+require 'google/apis/analytics_v3'
+require 'google/api_client/auth/key_utils'
 
 module NcboCron
   module Models
@@ -20,7 +20,6 @@ module NcboCron
 
       def fetch_ontology_analytics
         google_client = authenticate_google
-        api_method = google_client.discovered_api('analytics', 'v3').data.ga.get
         aggregated_results = Hash.new
         start_year = Date.parse(NcboCron.settings.analytics_start_date).year || 2013
         ont_acronyms = LinkedData::Models::Ontology.where.include(:acronym).all.map {|o| o.acronym}
@@ -34,22 +33,24 @@ module NcboCron
           results = nil
 
           loop do
-            results = google_client.execute(:api_method => api_method, :parameters => {
-              'ids'         => NcboCron.settings.analytics_profile_id,
-              'start-date'  => NcboCron.settings.analytics_start_date,
-              'end-date'    => Date.today.to_s,
-              'dimensions'  => 'ga:pagePath,ga:year,ga:month',
-              'metrics'     => 'ga:pageviews',
-              'filters'     => "ga:pagePath=~^(\\/ontologies\\/#{acronym})(\\/?\\?{0}|\\/?\\?{1}.*)$#{filter_str}",
-              'start-index' => start_index,
-              'max-results' => max_results
-            })
+            results = google_client.get_ga_data(
+              ids          = NcboCron.settings.analytics_profile_id,
+              start_date   = NcboCron.settings.analytics_start_date,
+              end_date     = Date.today.to_s,
+              metrics      = 'ga:pageviews',
+              {
+                dimensions:  'ga:pagePath,ga:year,ga:month',
+                filters:     "ga:pagePath=~^(\\/ontologies\\/#{acronym})(\\/?\\?{0}|\\/?\\?{1}.*)$#{filter_str}",
+                start_index: start_index,
+                max_results: max_results
+              }
+            )
             start_index += max_results
-            num_results = results.data.rows.length
+            num_results = results.rows.length
             @logger.info "Acronym: #{acronym}, Results: #{num_results}, Start Index: #{start_index}"
             @logger.flush
 
-            results.data.rows.each do |row|
+            results.rows.each do |row|
               if (aggregated_results.has_key?(acronym))
                 # year
                 if (aggregated_results[acronym].has_key?(row[1].to_i))
@@ -90,22 +91,19 @@ module NcboCron
       end
 
       def authenticate_google
-        client = Google::APIClient.new(
-          :application_name => NcboCron.settings.analytics_app_name,
-          :application_version => NcboCron.settings.analytics_app_version
-        )
-        key = Google::APIClient::KeyUtils.load_from_pkcs12(NcboCron.settings.analytics_path_to_key_file, 'notasecret')
+        Google::Apis::ClientOptions.default.application_name = NcboCron.settings.analytics_app_name
+        Google::Apis::ClientOptions.default.application_version = NcboCron.settings.analytics_app_version
+        client = Google::Apis::AnalyticsV3::AnalyticsService.new
+        key = Google::APIClient::KeyUtils::load_from_pkcs12(NcboCron.settings.analytics_path_to_key_file, 'notasecret')
         client.authorization = Signet::OAuth2::Client.new(
-          :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
-          :audience => 'https://accounts.google.com/o/oauth2/token',
-          :scope => 'https://www.googleapis.com/auth/analytics.readonly',
-          :issuer => NcboCron.settings.analytics_service_account_email_address,
-          :signing_key => key
-        )
-        client.authorization.fetch_access_token!
+            :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
+            :audience             => 'https://accounts.google.com/o/oauth2/token',
+            :scope                => 'https://www.googleapis.com/auth/analytics.readonly',
+            :issuer               => NcboCron.settings.analytics_service_account_email_address,
+            :signing_key          => key
+        ).tap { |auth| auth.fetch_access_token! }
         client
       end
-
     end
   end
 end
