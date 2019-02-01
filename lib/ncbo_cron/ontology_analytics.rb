@@ -45,17 +45,18 @@ module NcboCron
                 max_results: max_results
               }
             )
+            results.rows ||= []
             start_index += max_results
             num_results = results.rows.length
             @logger.info "Acronym: #{acronym}, Results: #{num_results}, Start Index: #{start_index}"
             @logger.flush
 
             results.rows.each do |row|
-              if (aggregated_results.has_key?(acronym))
+              if aggregated_results.has_key?(acronym)
                 # year
-                if (aggregated_results[acronym].has_key?(row[1].to_i))
+                if aggregated_results[acronym].has_key?(row[1].to_i)
                   # month
-                  if (aggregated_results[acronym][row[1].to_i].has_key?(row[2].to_i))
+                  if aggregated_results[acronym][row[1].to_i].has_key?(row[2].to_i)
                     aggregated_results[acronym][row[1].to_i][row[2].to_i] += row[3].to_i
                   else
                     aggregated_results[acronym][row[1].to_i][row[2].to_i] = row[3].to_i
@@ -71,7 +72,7 @@ module NcboCron
               end
             end
 
-            if (num_results < max_results)
+            if num_results < max_results
               # fill up non existent years
               (start_year..Date.today.year).each do |y|
                 aggregated_results[acronym] = Hash.new if aggregated_results[acronym].nil?
