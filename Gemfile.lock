@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 171eb5b12a745e3a615cf4a114a50b8ad1d9a68b
+  revision: ed5ab1e6ac9b06c57f66acf4bcc6424f74e63b6a
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -172,7 +172,7 @@ GEM
       logger
     os (1.0.0)
     parseconfig (1.0.8)
-    pony (1.12)
+    pony (1.13)
       mail (>= 2.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
