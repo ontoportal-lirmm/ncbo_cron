@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: d0a6fa5a800ed8a80143f8a4865358179aa4e890
+  revision: 7b47e6dc02a1ae8d79f5ffbf6aa2e1523cbbdb25
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 97c6a11d7bddad0c80c7bd9ebd4edebe26cb7533
+  revision: 548e7b1e4fb8c85b1b43a329110b50a003e6f690
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -129,7 +129,7 @@ GEM
       mime-types (>= 1.6)
       representable (~> 3.0)
       retriable (>= 2.0, < 4.0)
-    googleauth (0.8.0)
+    googleauth (0.8.1)
       faraday (~> 0.12)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -167,7 +167,7 @@ GEM
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.7.10)
+    oj (3.7.11)
     omni_logger (0.1.4)
       logger
     os (1.0.0)
