@@ -106,7 +106,7 @@ module NcboCron
         if new_released.nil?
           new_sub.released = DateTime.now
         else
-          new_sub.released = new_released
+          new_sub.released = DateTime.parse(new_released)
         end
         new_sub.submissionStatus = nil
         new_sub.creationDate = nil
