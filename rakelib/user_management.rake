@@ -14,7 +14,7 @@ namespace :user do
   task :adminify, [:username] do |t, args|
     username = args.username
     user = LinkedData::Models::User.find(username).first
-    abort("FAILED: user #{args.username} does not exist") if user.nil?
+    abort("FAILED: The user #{args.username} does not exist") if user.nil?
     user.bring_remaining
     user.valid?
     # Get an instance of the administrator role
@@ -31,7 +31,7 @@ namespace :user do
     user.save
   end
 
-  desc "Remove all role but LIBRARIAN from the user"
+  desc "Reset all roles to LIBRARIAN for the user"
   task :resetroles, [:username] do |t, args|
     username = args.username
     user = LinkedData::Models::User.find(username).first
@@ -58,10 +58,10 @@ namespace :user do
     user.password = newpassword
     user.valid?
     user.save
-    puts "password for user #{username} is reset to #{newpassword}"
+    puts "password for the user #{username} is reset to #{newpassword}"
   end
 
-  desc "Create new user"
+  desc "Create a new user"
   task :create, [:username, :email, :password ] do |t, args|
     args.with_defaults(:password => nil)
     password = args.password
@@ -69,7 +69,7 @@ namespace :user do
       password = SecureRandom.base64(15)
     end
     checkuser = LinkedData::Models::User.find(args.username).first
-    abort("FAILED: user #{args.username} does not exist") unless checkuser.nil?
+    abort("FAILED: The user #{args.username} already exists") unless checkuser.nil?
     user = LinkedData::Models::User.new
     role = LinkedData::Models::Users::Role.find("LIBRARIAN").first.bring_remaining
     user.username = args.username
@@ -87,14 +87,14 @@ namespace :user do
     desc "get APIKEY for the user"
     task :get, [:username] do |t, args|
       user = LinkedData::Models::User.find(args.username).first
-      abort("FAILED: user #{args.username} does not exist") if user.nil?
+      abort("FAILED: The user #{args.username} does not exist") if user.nil?
       user.bring_remaining
       puts user.apikey
     end
     desc "reset APIKEY for the user"
     task :reset, [:username] do |t, args|
       user = LinkedData::Models::User.find(args.username).first
-      abort("FAILED: user #{args.username} does not exist") if user.nil?
+      abort("FAILED: The user #{args.username} does not exist") if user.nil?
       user.bring_remaining
       puts user.apikey
     end
