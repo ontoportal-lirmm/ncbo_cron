@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ncbo_annotator.git
-  revision: 69cb9fb8b1a5584d74f1299eb700169634a68fca
+  revision: f0f05a2403ae5f9fea2e8fa4c8321aa3db3d1cec
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: git://github.com/ncbo/ontologies_linked_data.git
-  revision: 29b7c423b5b0b4a9292cab37a82666da9f767b8b
+  revision: 0991d0a4091b9941ccb5b5af29e6219e7238cfb4
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -129,7 +129,7 @@ GEM
       mime-types (>= 1.6)
       representable (~> 3.0)
       retriable (>= 2.0, < 4.0)
-    googleauth (0.8.0)
+    googleauth (0.8.1)
       faraday (~> 0.12)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -158,32 +158,32 @@ GEM
     method_source (0.9.2)
     mime-types (3.2.2)
       mime-types-data (~> 3.2015)
-    mime-types-data (3.2018.0812)
+    mime-types-data (3.2019.0331)
     minitest (4.7.5)
     mlanett-redis-lock (0.2.7)
       redis
     multi_json (1.13.1)
-    multipart-post (2.0.0)
+    multipart-post (2.1.1)
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.7.10)
+    oj (3.7.12)
     omni_logger (0.1.4)
       logger
-    os (1.0.0)
+    os (1.0.1)
     parseconfig (1.0.8)
-    pony (1.13)
+    pony (1.13.1)
       mail (>= 2.0)
     pry (0.12.2)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    rack (2.0.6)
+    rack (2.0.7)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rake (12.3.2)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.1.0)
+    redis (4.1.1)
     ref (2.0.0)
     representable (3.0.4)
       declarative (< 0.1.0)
@@ -201,7 +201,7 @@ GEM
     rubyzip (1.2.2)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.18.0)
+    sequel (5.20.0)
     signet (0.11.0)
       addressable (~> 2.3)
       faraday (~> 0.9)
@@ -219,7 +219,7 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.7.5)
+    unf_ext (0.0.7.6)
     uuid (2.3.9)
       macaddr (~> 1.0)
 
