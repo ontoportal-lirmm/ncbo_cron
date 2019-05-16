@@ -24,8 +24,8 @@ umls_files_path = "/srv/ncbo/share/scratch/umls2rdf/output"
 umls_files = Dir.glob(File.join(umls_files_path, "*.ttl"))
 
 # UMLS Release Details.  Update this for new release
-new_version = "2017AB"
-new_released = "2017-05-09" #Release date
+new_version = "2018AB"
+new_released = "2018-11-05" #Release date
 
 file_index = {}
 umls_files.each do |x|
