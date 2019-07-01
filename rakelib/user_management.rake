@@ -92,10 +92,16 @@ namespace :user do
       puts user.apikey
     end
     desc "reset APIKEY for the user"
-    task :reset, [:username] do |t, args|
+        desc "reset APIKEY for the user to random value or to specified value if API key is provided"
+    task :reset, [:username, :apikey] do |t, args|
       user = LinkedData::Models::User.find(args.username).first
       abort("FAILED: The user #{args.username} does not exist") if user.nil?
-      user.bring_remaining
+      if args.apikey.nil?
+         apikey = SecureRandom.uuid
+      else
+         apikey = args.apikey
+      end
+      user.apikey = apikey
       puts user.apikey
     end
   end
