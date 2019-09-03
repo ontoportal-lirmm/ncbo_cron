@@ -47,7 +47,7 @@ module NcboCron
           # ont_to_include = ["PHENOMEBLAST", "MYOBI", "NCBIVIRUSESTAX", "OntoOrpha", "PERTANIAN", "PHENOMEBLAST", "RTEST-LOINC", "SSACAL", "TEST", "UU", "VIRUSESTAX"]
           # ont_to_include = ["AERO", "SBO", "EHDAA", "CCO", "ONLIRA", "VT", "ZEA", "SMASH", "PLIO", "OGI", "CO", "NCIT", "GO"]
           # ont_to_include = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
-          # ont_to_include = ["FB-DV","GCC"]
+          ont_to_include = ["VICRA"]
         end
         ont_to_include
       end
@@ -202,7 +202,12 @@ module NcboCron
         # add creationDate of the first submission (AKA "ontology creation date")
         first_sub = submissions.sort_by{ |sub| sub.id }.first
         first_sub.bring(:creationDate)
-        ontology_report_date(report, "date_created", first_sub.creationDate)
+
+        begin
+          ontology_report_date(report, "date_created", first_sub.creationDate)
+        rescue Exception => e
+          add_error_code(report, :errRunningReport, ["first_sub.creationDate", e.class, e.message])
+        end
 
         # path to most recent log file
         log_file_path = log_file(ont.acronym, latest_any.submissionId.to_s)
@@ -441,13 +446,13 @@ module NcboCron
   end
 end
 
-# require 'ontologies_linked_data'
-# require 'goo'
-# require 'ncbo_annotator'
-# require 'ncbo_cron/config'
-# require_relative '../../config/config'
-#
-# ontologies_report_path = File.join("logs", "ontologies-report.log")
-# ontologies_report_logger = Logger.new(ontologies_report_path)
-# NcboCron::Models::OntologiesReport.new(ontologies_report_logger).run
+require 'ontologies_linked_data'
+require 'goo'
+require 'ncbo_annotator'
+require 'ncbo_cron/config'
+require_relative '../../config/config'
+
+ontologies_report_path = File.join("logs", "ontologies-report.log")
+ontologies_report_logger = Logger.new(ontologies_report_path)
+NcboCron::Models::OntologiesReport.new(ontologies_report_logger).run
 # ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-mapping-counts true --disable-spam-deletion true --ontologies-report '14 * * * *'
