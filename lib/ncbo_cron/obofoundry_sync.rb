@@ -7,12 +7,20 @@ module NcboCron
   module Models
     class OBOFoundrySync
 
+      def initialize
+        @logger = Logger.new(STDOUT)
+        @oauth_token = Base64.decode64(NcboCron.settings.git_repo_access_token)
+        @graphql_uri = URI.parse("https://api.github.com/graphql")
+        @request_options = { use_ssl: @graphql_uri.scheme == "https" }
+      end
+
       def run
         # Get a map of OBO ID spaces to BioPortal acronyms
         map = get_ids_to_acronyms_map
 
         onts = get_obofoundry_ontologies
         onts.reject! { |ont| ont.key?("is_obsolete") }
+        @logger.info("Found #{onts.size} non-obsolete OBO Foundry ontologies")
         missing_onts = []
 
         # Are any OBO Library ontologies missing from BioPortal?
@@ -20,14 +28,13 @@ module NcboCron
           onts.each do |ont|
             if not map.key?(ont["id"])
               missing_onts << ont
+              @logger.info("OBO Foundry ontology missing from BioPortal: #{ont['title']} (#{ont['id']})")
             end
           end
         end
 
         LinkedData::Utils::Notifications.obofoundry_sync(missing_onts)
       end
-
-      # TODO: DRY up the code in the following two methods
 
       def get_ids_to_acronyms_map
         query = "query { 
@@ -40,20 +47,8 @@ module NcboCron
                   }
                 }"
 
-        oauth_token = Base64.decode64(NcboCron.settings.git_repo_access_token)
-        uri = URI.parse("https://api.github.com/graphql")
-        req_options = { use_ssl: uri.scheme == "https" }
-        request = Net::HTTP::Post.new(uri)
-        request["Authorization"] = "bearer #{oauth_token}"
-        request.body = JSON.dump({"query" => query})
-        
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
-          http.request(request)
-        end
-
-        parsed = JSON.parse(response.body)
-        text = parsed.dig("data", "repository", "object", "text")
-        JSON.parse(text)
+        response = issue_request(query)
+        JSON.parse(response)
       end
 
       def get_obofoundry_ontologies
@@ -67,26 +62,24 @@ module NcboCron
                   }
                 }"
 
-        oauth_token = Base64.decode64(NcboCron.settings.git_repo_access_token)
-        uri = URI.parse("https://api.github.com/graphql")
-        req_options = { use_ssl: uri.scheme == "https" }
-        request = Net::HTTP::Post.new(uri)
-        request["Authorization"] = "bearer #{oauth_token}"
+        response = issue_request(query)
+        ont_registry = JSON.parse(response)
+        ont_registry["ontologies"].to_a
+      end
+
+      def issue_request(query)
+        request = Net::HTTP::Post.new(@graphql_uri)
+        request["Authorization"] = "bearer #{@oauth_token}"
         request.body = JSON.dump({"query" => query})
         
-        response = Net::HTTP.start(uri.hostname, uri.port, req_options) do |http|
+        response = Net::HTTP.start(@graphql_uri.hostname, @graphql_uri.port, @request_options) do |http|
           http.request(request)
         end
 
         parsed = JSON.parse(response.body)
-        text = parsed.dig("data", "repository", "object", "text")
-        ont_registry = JSON.parse(text)
-        onts = ont_registry["ontologies"].to_a
-        return onts
+        parsed.dig("data", "repository", "object", "text")
       end
 
     end
   end
 end
-
-
