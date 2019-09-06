@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 4e53ed11e5b253b4091204bd1eda00ddfb1ceeb5
+  revision: fc186f1921694e85ca018c69b0a7c6a9e5142896
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 7c0508c4b7f4762f568a8801173089d9f27f2244
+  revision: 9d5f693c5b25d47fc3a5d23e701a1fccb2d4b24c
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -200,7 +200,7 @@ GEM
       builder (>= 2.1.2)
       faraday (>= 0.9.0)
     ruby-xxHash (0.4.0.1)
-    rubyzip (1.2.3)
+    rubyzip (1.2.4)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
     sequel (5.24.0)
