@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 3722885c9cd209d274828b421f051753f29118d5
+  revision: e75cdef459e9b09ede770b3daeb6780858560a9c
   branch: staging
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: a5e252986470fbdab2d0e514576ce395053576db
+  revision: c9afa03222640d8654a86e93931c1910ff44857b
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 7e21b5c72fc2e4268375e12462be757239d53827
+  revision: 16ce3da3136e11ccfd789a2db86f7deac2a5bc25
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -48,11 +48,11 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/resource_index.git
-  revision: 4c38130a29ad05454229ec23fad1398f0928061d
+  revision: 24a7f14a6da4f4a0eaba1016ca5a378dfccd7441
   specs:
     ncbo_resource_index (0.0.1)
       elasticsearch (= 2.0.0)
-      mysql2
+      mysql2 (= 0.5.2)
       pony
       ref
       ruby-xxHash
@@ -165,7 +165,7 @@ GEM
       redis
     multi_json (1.14.1)
     multipart-post (2.1.1)
-    mysql2 (0.5.3)
+    mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (3.10.0)
