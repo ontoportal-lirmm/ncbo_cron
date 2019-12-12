@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 59d7b0663f60cf5455c670d1d9fd36617300d8c1
+  revision: a5e252986470fbdab2d0e514576ce395053576db
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -48,7 +48,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/resource_index.git
-  revision: 75e384e2563638cb91541082c9256f80b60b6ae9
+  revision: 4c38130a29ad05454229ec23fad1398f0928061d
   specs:
     ncbo_resource_index (0.0.1)
       elasticsearch (= 2.0.0)
@@ -94,7 +94,7 @@ GEM
       tzinfo (~> 0.3.37)
     addressable (2.3.5)
     bcrypt (3.1.13)
-    builder (3.2.3)
+    builder (3.2.4)
     coderay (1.1.2)
     concurrent-ruby (1.1.5)
     cube-ruby (0.0.3)
@@ -144,13 +144,13 @@ GEM
     hurley (0.2)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
-    json (2.2.0)
+    json (2.3.0)
     json_pure (2.2.0)
     jwt (2.2.1)
     launchy (2.4.3)
       addressable (~> 2.3)
     libxml-ruby (3.1.0)
-    logger (1.4.1)
+    logger (1.4.2)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
     mail (2.6.6)
