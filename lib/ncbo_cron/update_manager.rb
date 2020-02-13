@@ -72,6 +72,7 @@ module NcboCron
           tm = DateTime.now
           tm_str = tm.strftime("%m/%d/%Y, %I:%M %p")
           rh[:date_checked] = tm_str
+          rh[:appliance_id] = id
         rescue Exception => e
           if e.class == RestClient::NotFound
             msg = "Unable to connect to the update server"
