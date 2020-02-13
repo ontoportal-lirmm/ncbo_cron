@@ -19,21 +19,29 @@ module NcboCron
         map = get_ids_to_acronyms_map
 
         onts = get_obofoundry_ontologies
-        onts.reject! { |ont| ont.key?("is_obsolete") }
-        @logger.info("Found #{onts.size} non-obsolete OBO Foundry ontologies")
-        missing_onts = []
+        @logger.info("Found #{onts.size} OBO Library ontologies")
 
         # Are any OBO Library ontologies missing from BioPortal?
-        if onts.size != map.size
-          onts.each do |ont|
-            if not map.key?(ont["id"])
-              missing_onts << ont
-              @logger.info("OBO Foundry ontology missing from BioPortal: #{ont['title']} (#{ont['id']})")
-            end
+        missing_onts = []
+        active_onts = onts.reject { |ont| ont.key?("is_obsolete") }
+        active_onts.each do |ont|
+          if not map.key?(ont["id"])
+            missing_onts << ont
+            @logger.info("Missing OBO Library ontology: #{ont['title']} (#{ont['id']})")
           end
         end
 
-        LinkedData::Utils::Notifications.obofoundry_sync(missing_onts)
+        # Have any of the OBO Library ontologies that BioPortal hosts become obsolete?
+        obsolete_onts = []
+        ids = active_onts.map{ |ont| ont["id"] }
+        obsolete_ids = map.keys - ids
+        obsolete_ids.each do |id|
+          ont = onts.find{ |ont| ont["id"] == id }
+          @logger.info("Deprecated OBO Library ontology: #{ont['title']} (#{ont['id']})")
+          obsolete_onts << ont
+        end        
+
+        LinkedData::Utils::Notifications.obofoundry_sync(missing_onts, obsolete_onts)
       end
 
       def get_ids_to_acronyms_map
