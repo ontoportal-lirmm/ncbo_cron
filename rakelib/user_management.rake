@@ -110,4 +110,47 @@ namespace :user do
       end
     end
   end
+
+  desc "Show all artifacts administrered by the user"
+  task :artifacts, [:username] do |t, args|
+  # most of the code is copied from /bin/ncbo_spam_deletion
+    username = args.username
+
+    user = LinkedData::Models::User.find(username).include(:username).first
+    abort("FAILED: user #{args.username} does not exist") if user.nil?
+    #next if user.nil?
+
+    projects = LinkedData::Models::Project.where(creator: user.id).include(:acronym).all
+    notes = LinkedData::Models::Note.where(creator: user.id).include(:subject).all
+    reviews = LinkedData::Models::Review.where(creator: user.id).include(:body).all
+    ontologies = LinkedData::Models::Ontology.where(administeredBy: user.id).include(:acronym).all
+    prov_classes = LinkedData::Models::ProvisionalClass.where(creator: user.id).include(:label).all
+
+    puts "User #{user.username} artifacts:"
+    puts "--------------------------------"
+
+    pr = projects.map {|p| p.acronym}.join(", ")
+    pr = "none" if pr.empty?
+    puts ("Projects: #{pr}")
+    n = notes.map {|n| n.subject}.join(", ")
+    n = "none" if n.empty?
+    puts ("Notes: #{n}")
+
+    rv = reviews.map {|r| r.body}.join(", ")
+    rv = "none" if rv.empty?
+    puts ("Reviews: #{rv}")
+
+    ont = ontologies.map {|o| o.acronym}.join(", ")
+    ont = "none" if ont.empty?
+    puts ("Ontologies: #{ont}")
+
+    pc = prov_classes.map {|p| p.label}.join(", ")
+    pc = "none" if pc.empty?
+    puts ("Provisional Classes: #{pc}")
+    puts ("--------------------------------\n")
+
+
+
+
+ end
 end
