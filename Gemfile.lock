@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 04c55a0f930e5641e937e910456d020290cc1798
-  branch: master
+  revision: 703736edcb1526d954ed6867c1ac1e748837ac71
+  branch: staging
   specs:
     goo (0.0.2)
       addressable (= 2.3.5)
@@ -16,8 +16,8 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 4f956ae953d540282088bf9aac5a71387562e256
-  branch: master
+  revision: 76c8e2ac9bfff6ada076948cd4232c3054cfb1dd
+  branch: staging
   specs:
     ncbo_annotator (0.0.1)
       goo
@@ -27,8 +27,8 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 79cfaa183a64d2c2c1a12e18d6b2a2e158aa4c42
-  branch: master
+  revision: fd1a2ea1abde1fa2320a0bf5a7f3bbd7fa0c3049
+  branch: staging
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -156,7 +156,7 @@ GEM
     mail (2.6.6)
       mime-types (>= 1.16, < 4)
     memoist (0.16.2)
-    method_source (0.9.2)
+    method_source (1.0.0)
     mime-types (3.3.1)
       mime-types-data (~> 3.2015)
     mime-types-data (3.2019.1009)
@@ -168,16 +168,16 @@ GEM
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.10.2)
+    oj (3.10.5)
     omni_logger (0.1.4)
       logger
     os (1.0.1)
     parseconfig (1.0.8)
     pony (1.13.1)
       mail (>= 2.0)
-    pry (0.12.2)
-      coderay (~> 1.1.0)
-      method_source (~> 0.9.0)
+    pry (0.13.0)
+      coderay (~> 1.1)
+      method_source (~> 1.0)
     rack (2.2.2)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -200,16 +200,16 @@ GEM
       builder (>= 2.1.2)
       faraday (>= 0.9.0)
     ruby-xxHash (0.4.0.1)
-    rubyzip (2.2.0)
+    rubyzip (2.3.0)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.29.0)
+    sequel (5.30.0)
     signet (0.13.0)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    sys-proctable (1.2.2)
+    sys-proctable (1.2.3)
       ffi
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
@@ -254,4 +254,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.1.1
+   2.1.4
