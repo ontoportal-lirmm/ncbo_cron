@@ -35,7 +35,8 @@ module NcboCron
 
       def update_info
         update_check_enabled = NcboCron.settings.enable_update_check
-        info = {update_check_enabled: update_check_enabled}
+        appliance_id = iid
+        info = {update_check_enabled: update_check_enabled, appliance_id: appliance_id}
 
         if update_check_enabled
           r = redis
@@ -72,7 +73,6 @@ module NcboCron
           tm = DateTime.now
           tm_str = tm.strftime("%m/%d/%Y, %I:%M %p")
           rh[:date_checked] = tm_str
-          rh[:appliance_id] = id
         rescue Exception => e
           if e.class == RestClient::NotFound
             msg = "Unable to connect to the update server"
