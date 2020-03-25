@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 76c8e2ac9bfff6ada076948cd4232c3054cfb1dd
+  revision: 84e00c49d74fd77889c844ee3092886190f311c5
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: fd1a2ea1abde1fa2320a0bf5a7f3bbd7fa0c3049
+  revision: 5fb41c820d0f9c1859cbd99a6c5a24a8cb664828
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -145,7 +145,7 @@ GEM
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     json (2.3.0)
-    json_pure (2.2.0)
+    json_pure (2.3.0)
     jwt (2.2.1)
     launchy (2.4.3)
       addressable (~> 2.3)
