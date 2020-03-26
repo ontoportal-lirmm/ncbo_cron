@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 1abfb46b0f247ce73e1dbad2bc071a8d50756141
+  revision: 6d0c6f4cf3146abfcee9d54757121dc09dc1da3d
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 20ec661ff31e9e2f48b2f4c40a87001e6df0eeae
+  revision: cfe036ffd7d6aea5e184fb0861c0e502a8e06099
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -145,7 +145,7 @@ GEM
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     json (2.3.0)
-    json_pure (2.2.0)
+    json_pure (2.3.0)
     jwt (2.2.1)
     launchy (2.4.3)
       addressable (~> 2.3)
@@ -204,7 +204,7 @@ GEM
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
     sequel (5.30.0)
-    signet (0.13.0)
+    signet (0.13.2)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.5, < 3.0)
