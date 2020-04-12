@@ -90,9 +90,9 @@ module NcboCron
 
     ############## VM specific settings ########################
     # A config file that identifies the current version of Ontoportal
-    @settings.versions_file_path = "/srv/ncbo/virtual_appliance/deployment/versions"
+    @settings.versions_file_path = "/srv/ontoportal/virtual_appliance/deployment/versions"
     # An endpoint that checks for Ontoportal update availability
-    @settings.update_check_endpoint_url = "http://updatecheck.bioontology.org/latestversion"
+    @settings.update_check_endpoint_url = "https://updatecheck.ontoportal.org/latestversion"
 
     # Override defaults
     yield @settings if block_given?
