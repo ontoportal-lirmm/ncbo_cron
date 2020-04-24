@@ -38,9 +38,12 @@ module NcboCron
     @settings.enable_ontologies_report ||= true
     # enable SPAM deletion
     @settings.enable_spam_deletion ||= true
+    # enable update check (vor VMs)
+    @settings.enable_update_check ||= true
     # UMLS auto-pull
     @settings.pull_umls_url ||= ""
     @settings.enable_pull_umls ||= false
+    @settings.enable_obofoundry_sync ||= true
 
     # Schedules
     # 30 */4 * * * - run every 4 hours, starting at 00:30
@@ -70,6 +73,11 @@ module NcboCron
     @settings.ontology_report_path = "../../reports/ontologies_report.json"
     # 30 2 * * * - run daily at 2:30AM
     @settings.cron_spam_deletion ||= "30 2 * * *"
+    # OBOFoundry synchronization report schedule
+    # 0 8 * * 1,2,3,4,5 - run daily Monday through Friday at 8:00AM
+    @settings.cron_obofoundry_sync ||= "0 8 * * 1,2,3,4,5"
+    # 00 3 * * * - run daily at 3:00AM
+    @settings.cron_update_check ||= "00 3 * * *"
 
     @settings.log_level ||= :info
     unless (@settings.log_path && File.exists?(@settings.log_path))
@@ -88,6 +96,12 @@ module NcboCron
     @settings.minutes_between ||= 5
     # seconds between process queue checks
     @settings.seconds_between ||= nil
+
+    ############## VM specific settings ########################
+    # A config file that identifies the current version of Ontoportal
+    @settings.versions_file_path = "/srv/ontoportal/virtual_appliance/deployment/versions"
+    # An endpoint that checks for Ontoportal update availability
+    @settings.update_check_endpoint_url = "https://updatecheck.ontoportal.org/latestversion"
 
     # Override defaults
     yield @settings if block_given?

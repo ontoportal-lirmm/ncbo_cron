@@ -20,3 +20,6 @@ tmp
 logs/
 *.log
 *.pid
+
+# Ignore jEnv files
+.java-version

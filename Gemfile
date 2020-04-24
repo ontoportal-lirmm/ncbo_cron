@@ -10,7 +10,11 @@ gem 'redis'
 gem 'minitest', '< 5.0'
 gem 'pony'
 gem 'sys-proctable'
-gem 'google-api-client', '<0.9'
+gem 'google-api-client', '~> 0.10'
+gem 'parseconfig'
+gem 'mail', '2.6.6'
+gem 'rest-client'
+gem 'ffi', '< 1.9.22'
 
 # JIRA
 # gem 'jira-ruby'

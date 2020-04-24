@@ -46,6 +46,7 @@ LinkedData::Models::Ontology.all.each do |ont|
   ont.bring(:submissions)
   ont.submissions.each do |s|
     s.bring(:submisionId)
+    s.bring(:hasOntologyLanguage)
     s.bring_remaining
 
     begin
@@ -57,8 +58,18 @@ LinkedData::Models::Ontology.all.each do |ont|
       bad_subs << s
       logger.info("Error retrieving submission id #{s.id}: #{e.class}: #{e.message}\n#{e.backtrace.join("\n\t")}")
     end
+
+    begin
+      if s.hasOntologyLanguage.nil?
+        bad_subs << s
+        puts "#{s.id}: hasOntologyLanguage nil"
+      end
+    rescue Exception => e
+      bad_subs << s
+      logger.info("Error retrieving hasOntologyLanguage for submission #{s.id}: #{e.class}: #{e.message}\n#{e.backtrace.join("\n\t")}")
+    end
   end
 end
 
 bad_subs.each {|s| logger.info("Deleting submission: #{s.id}"); s.delete}
-
+logger.info("Number of bad submissions: #{bad_subs.length}")
