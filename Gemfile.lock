@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/sifrproject/ontologies_linked_data.git
-  revision: 85309e9defcb883cabbcbc0c13af63b750bb0db1
+  revision: 8db4fb8345a653e7455a804065a2daf6bf240275
   branch: virtual-appliance-3.0-merge
   specs:
     ontologies_linked_data (0.0.1)
@@ -184,7 +184,7 @@ GEM
     rake (13.0.1)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.1.4)
+    redis (4.2.0)
     ref (2.0.0)
     representable (3.0.4)
       declarative (< 0.1.0)
