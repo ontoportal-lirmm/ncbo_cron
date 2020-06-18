@@ -1,3 +1,4 @@
+.bundle/
 # Ignore RubyMine editor files
 .idea/
 config/config.rb
