@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: https://github.com/sifrproject/ncbo_annotator.git
-  revision: 2d15fc372a722a9fe0927e4b0eb6a4af58b73d48
+  revision: 08176ef39822bf51b7179f77002b299548103431
   branch: virtual-appliance-3.0-merge
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/sifrproject/ontologies_linked_data.git
-  revision: 59e6f981c379465042c68902c87e72739c66c3e6
+  revision: 98460ee8708dd529cad075c6050ef247f4551103
   branch: virtual-appliance-3.0-merge
   specs:
     ontologies_linked_data (0.0.1)
