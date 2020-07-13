@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: d4688bf4c080428d5194e1f379c940d3ef2332da
+  revision: d86932f22c371781cce9b0765e664f2bda61c154
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -163,7 +163,7 @@ GEM
     minitest (4.7.5)
     mlanett-redis-lock (0.2.7)
       redis
-    multi_json (1.14.1)
+    multi_json (1.15.0)
     multipart-post (2.1.1)
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
