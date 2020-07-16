@@ -13,7 +13,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/sparql-client.git
-  revision: 298f9c9a8d2637650a62f8102679aa30084bf878
+  revision: 87bc0e8976519cdcdef06169556677467a10fcfc
   branch: master
   specs:
     sparql-client (1.0.1)
@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/sifrproject/goo.git
-  revision: 09e8627a5a894f43eb4c9fd336a999da4a3015c3
+  revision: 34aa8878748aca41f94b65fd3ce28629d54f2d92
   branch: virtual-appliance-3.0-merge
   specs:
     goo (0.0.2)
@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: https://github.com/sifrproject/ncbo_annotator.git
-  revision: 2932e8791cb142ab56fb469c169602e1f542aa5e
+  revision: 59df18f09806fb158b278b0988963309eb8b18cc
   branch: virtual-appliance-3.0-merge
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/sifrproject/ontologies_linked_data.git
-  revision: 683c5fc8aec555d21cb92486031f475a0103417a
+  revision: 0c7bc7c0da315a6dd2c37402b1e07d3f7b30a193
   branch: virtual-appliance-3.0-merge
   specs:
     ontologies_linked_data (0.0.1)
@@ -168,7 +168,7 @@ GEM
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.10.6)
+    oj (3.10.7)
     omni_logger (0.1.4)
       logger
     os (1.1.0)
