@@ -40,30 +40,23 @@ module NcboCron
         @stop_words = Annotator.settings.stop_words_default_list
       end
 
-      def ontologies_to_include(acronyms)
-        ont_to_include = acronyms
-        if acronyms.empty?
-          ont_to_include = []
-          # ont_to_include = ["PHENOMEBLAST", "MYOBI", "NCBIVIRUSESTAX", "OntoOrpha", "PERTANIAN", "PHENOMEBLAST", "RTEST-LOINC", "SSACAL", "TEST", "UU", "VIRUSESTAX"]
-          # ont_to_include = ["AERO", "SBO", "EHDAA", "CCO", "ONLIRA", "VT", "ZEA", "SMASH", "PLIO", "OGI", "CO", "NCIT", "GO"]
-          # ont_to_include = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
-          # ont_to_include = ["VICRA"]
-        end
-        ont_to_include
-      end
-
       def run
         refresh_report([])
       end
 
       def refresh_report(acronyms=[])
-        ont_to_include = ontologies_to_include(acronyms)
+
+        # acronyms = ["PHENOMEBLAST", "MYOBI", "NCBIVIRUSESTAX", "OntoOrpha", "PERTANIAN", "PHENOMEBLAST", "RTEST-LOINC", "SSACAL", "TEST", "UU", "VIRUSESTAX"]
+        # acronyms = ["AERO", "SBO", "EHDAA", "CCO", "ONLIRA", "VT", "ZEA", "SMASH", "PLIO", "OGI", "CO", "NCIT", "GO"]
+        # acronyms = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
+        # acronyms = ["PDRO"]
+
         info_msg = 'Running ontologies report for'
         ontologies_msg = ''
         update_msg = ''
         report = empty_report
         ontologies = LinkedData::Models::Ontology.where.include(:acronym).all
-        ontologies.select! { |ont| ont_to_include.include?(ont.acronym) } unless ont_to_include.empty?
+        ontologies.select! { |ont| acronyms.include?(ont.acronym) } unless acronyms.empty?
 
         if acronyms.empty?
           ontologies_msg = 'ALL ontologies'
@@ -282,21 +275,32 @@ module NcboCron
         if metrics.nil?
           add_error_code(report, :errNoMetricsLatestSubmission)
         else
-          metrics.bring_remaining
-          cl = metrics.classes || 0
-          prop = metrics.properties || 0
+          begin
+            metrics.bring_remaining
+            cl = metrics.classes || 0
+            prop = metrics.properties || 0
 
-          if cl.to_i + prop.to_i < 10
-            add_error_code(report, :errIncorrectMetricsLatestSubmission)
+            if cl.to_i + prop.to_i < 10
+              add_error_code(report, :errIncorrectMetricsLatestSubmission)
+            end
+          rescue Exception => e
+            add_error_code(report, :errRunningReport, ["metrics.classes", e.class, e.message])
           end
         end
 
         # check if classes exist
-        gc = good_classes(sub, report)
+        gc = nil
 
-        if gc.empty?
+        begin
+          gc = good_classes(sub, report)
+        rescue Exception => e
+          gc = nil
+          add_error_code(report, :errRunningReport, ["good_classes()", e.class, e.message])
+        end
+
+        if gc&.empty?
           add_error_code(report, :errNoClassesLatestSubmission)
-        else
+        elsif gc
           delim = " | "
           search_text = gc.join(delim)
 
