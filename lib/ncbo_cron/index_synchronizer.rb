@@ -171,7 +171,7 @@ module NcboCron
                   @logger.error "*****************************************************************************"
                 else
                   ont_to_index[:queued] << acronym
-                  # NcboCron::Models::OntologySubmissionParser.new.queue_submission(submission, { index_search: true })
+                  NcboCron::Models::OntologySubmissionParser.new.queue_submission(submission, { index_search: true })
                   @logger.info "Ontology #{acronym} is missing classes from the index. Queued for re-indexing."
                   @logger.info "Classes missing from the index: #{(resource_ids - found_ids)}"
                 end
