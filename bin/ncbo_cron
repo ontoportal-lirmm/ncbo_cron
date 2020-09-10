@@ -102,6 +102,9 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--disable-ontologies-report", "disable ontologies report generation", "(default: #{options[:enable_ontologies_report]})") do |v|
     options[:enable_ontologies_report] = false
   end
+  opts.on("--disable-index-synchronizer", "disable search index synchronization job", "(default: #{options[:enable_index_synchronizer]})") do |v|
+    options[:enable_index_synchronizer] = false
+  end
   opts.on("--disable-spam-deletion", "disable SPAM deletion", "(default: #{options[:enable_spam_deletion]})") do |v|
     options[:enable_spam_deletion] = false
   end
@@ -137,6 +140,9 @@ opt_parser = OptionParser.new do |opts|
   end
   opts.on("--ontologies-report SCHED", String, "cron schedule to run ontologies report generation", "(default: #{options[:cron_ontologies_report]})") do |c|
     options[:cron_ontologies_report] = c
+  end
+  opts.on("--index-synchronizer SCHED", String, "cron schedule to run search index synchronizer", "(default: #{options[:cron_index_synchronizer]})") do |c|
+    options[:cron_index_synchronizer] = c
   end
   opts.on("--spam-deletion SCHED", String, "cron schedule to run SPAM deletion", "(default: #{options[:cron_spam_deletion]})") do |c|
     options[:cron_spam_deletion] = c
@@ -399,6 +405,27 @@ runner.execute do |opts|
     end
   end
 
+  if options[:enable_index_synchronizer]
+    index_synchronizer_thread = Thread.new do
+      index_synchronizer_options = options.dup
+      index_synchronizer_options[:job_name] = "ncbo_cron_index_synchronizer"
+      index_synchronizer_options[:scheduler_type] = :cron
+      index_synchronizer_options[:cron_schedule] = index_synchronizer_options[:cron_index_synchronizer]
+      logger.info "Setting up index synchronizer job with #{index_synchronizer_options[:cron_index_synchronizer]}"; logger.flush
+      index_synchronizer_log_path = File.join(log_path, "#{log_filename_noExt}-index-synchronizer.log")
+      index_synchronizer_logger = Logger.new(index_synchronizer_log_path)
+
+      NcboCron::Scheduler.scheduled_locking_job(index_synchronizer_options) do
+        logger.info "Starting index synchronizer..."; logger.flush
+        logger.info "Logging index synchronizer details to #{index_synchronizer_log_path}"; logger.flush
+        t0 = Time.now
+        NcboCron::Models::IndexSynchronizer.new(index_synchronizer_logger).run
+        logger.info "Index synchronizer job completed in #{Time.now - t0} sec."; logger.flush
+        logger.info "Finished index synchronization"; logger.flush
+      end
+    end
+  end
+
   if options[:enable_spam_deletion]
     spam_deletion_thread = Thread.new do
       spam_deletion_options = options.dup
@@ -474,6 +501,7 @@ runner.execute do |opts|
   warmq_thread.join if warmq_thread
   analytics_thread.join if analytics_thread
   ontologies_report_thread.join if ontologies_report_thread
+  index_synchronizer_thread.join if index_synchronizer_thread
   spam_deletion_thread.join if spam_deletion_thread
   mapping_counts_thread.join if mapping_counts_thread
   update_check_thread.join if update_check_thread
