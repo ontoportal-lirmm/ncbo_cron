@@ -105,14 +105,26 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--disable-spam-deletion", "disable SPAM deletion", "(default: #{options[:enable_spam_deletion]})") do |v|
     options[:enable_spam_deletion] = false
   end
+  opts.on("--disable-update-check", "disable check for updated version of Ontoportal (for VMs)", "(default: #{options[:enable_update_check]})") do |v|
+    options[:enable_update_check] = false
+  end
+  opts.on("--disable-obofoundry_sync", "disable OBO Foundry synchronization report", "(default: #{options[:enable_obofoundry_sync]})") do |v|
+    options[:enable_obofoundry_sync] = false
+  end
   opts.on("--pull-umls-url URL", "set UMLS pull location") do |v|
     options[:pull_umls_url] = v
   end
   opts.on("-c", "--pull-cron SCHED", String, "cron schedule for ontology pull", "(default: #{options[:pull_schedule]})") do |c|
     options[:pull_schedule] = c
   end
+  opts.on("-cl", "--pull-long-cron SCHED", String, "cron schedule for ontology less frequent pull", "(default: #{options[:pull_schedule_long]})") do |c|
+    options[:pull_schedule_long] = c
+  end
   opts.on("-f", "--flush-old-graphs SCHED", String, "cron schedule to delete class graphs of archive submissions", "(default: #{options[:cron_flush]})") do |c|
     options[:cron_flush] = c
+  end
+  opts.on("--remove-zombie-graphs", "flush class graphs from deleted ontologies") do |v|
+    options[:remove_zombie_graphs] = true
   end
   opts.on("-w", "--warm-long-queries SCHED", String, "cron schedule to warmup long time running queries", "(default: #{options[:cron_warmq]})") do |c|
     options[:cron_warmq] = c
@@ -128,6 +140,12 @@ opt_parser = OptionParser.new do |opts|
   end
   opts.on("--spam-deletion SCHED", String, "cron schedule to run SPAM deletion", "(default: #{options[:cron_spam_deletion]})") do |c|
     options[:cron_spam_deletion] = c
+  end
+  opts.on("--update-check SCHED", String, "cron schedule to run update check (for VMs)", "(default: #{options[:cron_update_check]})") do |c|
+    options[:cron_update_check] = c
+  end
+  opts.on("--obofoundry_sync SCHED", String, "cron schedule to run OBO Foundry synchronization report", "(default: #{options[:cron_obofoundry_sync]})") do |c|
+    options[:cron_obofoundry_sync] = c
   end
 
   # Display the help screen, all programs are assumed to have this option.
@@ -233,8 +251,8 @@ runner.execute do |opts|
 
   if options[:enable_pull]
     pull_thread = Thread.new do
-      logger.debug "Setting up pull cron job"; logger.flush
       pull_options = options.dup
+      logger.info "Setting up pull cron job: #{pull_options[:pull_schedule]}"; logger.flush
       pull_options.delete(:minutes_between)
       pull_options.delete(:seconds_between)
       pull_options[:job_name] = "ncbo_cron_pull_thread"
@@ -246,14 +264,32 @@ runner.execute do |opts|
         logger.info "Starting ncbo pull"; logger.flush
         logger.info "Logging pull details to #{pull_log_path}"; logger.flush
         puller = NcboCron::Models::OntologyPull.new
-        pulled_onts = puller.do_remote_ontology_pull(logger: pull_logger,
-         enable_pull_umls: options[:enable_pull_umls])
+        pulled_onts = puller.do_remote_ontology_pull(false, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls], pull_long_ontologies: pull_options[:pull_long_ontologies])
         logger.info "Finished ncbo pull"; logger.flush
         logger.info "Pull summary:\n#{pulled_onts.map {|o| o.id.to_s}}"
       end
     end
+
+    long_pull_thread = Thread.new do
+      long_pull_options = options.dup
+      logger.info "Setting up pull long cron job: #{long_pull_options[:pull_schedule_long]}"; logger.flush
+      long_pull_options[:job_name] = "ncbo_cron_pull_long_thread"
+      long_pull_options[:scheduler_type] = :cron
+      long_pull_options[:cron_schedule] = long_pull_options[:pull_schedule_long]
+      pull_log_path = File.join(log_path, "#{log_filename_noExt}-long-pull.log")
+      pull_logger = Logger.new(pull_log_path)
+      NcboCron::Scheduler.scheduled_locking_job(long_pull_options) do
+        logger.info "Starting ncbo long pull"; logger.flush
+        logger.info "Logging pull details to #{pull_log_path}"; logger.flush
+        long_puller = NcboCron::Models::OntologyPull.new
+        pulled_long_onts = long_puller.do_remote_ontology_pull(true, logger: pull_logger, enable_pull_umls: options[:enable_pull_umls], pull_long_ontologies: long_pull_options[:pull_long_ontologies])
+        logger.info "Finished ncbo pull"; logger.flush
+        logger.info "Pull summary:\n#{pulled_long_onts.map {|o| o.id.to_s}}"
+      end
+    end
   end
 
+  # Flush old graphs. Remove zombie graphs if config.remove_zombie_graphs = true
   if options[:enable_flush]
     flush_thread = Thread.new do
       flush_options = options.dup
@@ -270,7 +306,7 @@ runner.execute do |opts|
         logger.info "Logging flush details to #{flush_log_path}"; logger.flush
         t0 = Time.now
         parser = NcboCron::Models::OntologySubmissionParser.new
-        flush_onts = parser.process_flush_classes(flush_logger)
+        flush_onts = parser.process_flush_classes(flush_logger, flush_options[:remove_zombie_graphs])
         logger.info "Flushed #{flush_onts.length} submissions in #{Time.now - t0} sec."; logger.flush
         logger.info "Finished flush"; logger.flush
       end
@@ -383,6 +419,43 @@ runner.execute do |opts|
     end
   end
 
+  if options[:enable_update_check]
+    update_check_thread = Thread.new do
+      update_check_options = options.dup
+      update_check_options[:job_name] = "ncbo_cron_update_check"
+      update_check_options[:scheduler_type] = :cron
+      update_check_options[:cron_schedule] = update_check_options[:cron_update_check]
+      logger.info "Setting up update check job with #{update_check_options[:cron_update_check]}"; logger.flush
+      update_check_log_path = File.join(log_path, "#{log_filename_noExt}-update-check.log")
+      update_check_logger = Logger.new(update_check_log_path)
+      NcboCron::Scheduler.scheduled_locking_job(update_check_options) do
+        logger.info "Starting update check..."; logger.flush
+        logger.info "Logging update check details to #{update_check_log_path}"; logger.flush
+        t0 = Time.now
+        NcboCron::Models::UpdateManager.new(update_check_logger).run
+        logger.info "Update check job completed in #{Time.now - t0} sec."; logger.flush
+        logger.info "Finished update check"; logger.flush
+      end
+    end
+  end
+
+  if options[:enable_obofoundry_sync]
+    obofoundry_sync_thread = Thread.new do
+      obofoundry_sync_options = options.dup
+      obofoundry_sync_options[:job_name] = "ncbo_cron_obofoundry_sync"
+      obofoundry_sync_options[:scheduler_type] = :cron
+      obofoundry_sync_options[:cron_schedule] = obofoundry_sync_options[:cron_obofoundry_sync]
+      logger.info "Setting up OBO Foundry synchronization report job with #{obofoundry_sync_options[:cron_obofoundry_sync]}"; logger.flush
+      NcboCron::Scheduler.scheduled_locking_job(obofoundry_sync_options) do
+        logger.info "Start generating OBO Foundry synchronization report..."; logger.flush
+        t0 = Time.now
+        NcboCron::Models::OBOFoundrySync.new.run
+        logger.info "OBO Foundry synchronization report job completed in #{Time.now - t0} sec."; logger.flush
+        logger.info "Finished generating OBO Foundry synchronization report"; logger.flush
+      end
+    end
+  end
+
   # Print running child processes
   require 'sys/proctable'
   at_exit do
@@ -396,10 +469,13 @@ runner.execute do |opts|
   # Need to join here to avoid dropping out of the process
   parsing_thread.join if parsing_thread
   pull_thread.join if pull_thread
+  long_pull_thread.join if long_pull_thread
   flush_thread.join if flush_thread
   warmq_thread.join if warmq_thread
   analytics_thread.join if analytics_thread
   ontologies_report_thread.join if ontologies_report_thread
   spam_deletion_thread.join if spam_deletion_thread
   mapping_counts_thread.join if mapping_counts_thread
+  update_check_thread.join if update_check_thread
+  obofoundry_sync_thread.join if obofoundry_sync_thread
 end

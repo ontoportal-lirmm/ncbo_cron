@@ -13,20 +13,19 @@ module NcboCron
       def initialize()
       end
 
-      def do_remote_ontology_pull(options = {})
+      def do_remote_ontology_pull(isLong = false, options = {})
         logger = options[:logger] || Logger.new($stdout)
-        logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}"
+        logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}. Is long: #{isLong}"
         logger.flush
         ontologies = LinkedData::Models::Ontology.where.include(:acronym).all
         ont_to_include = []
-        # ont_to_include = ["CHEBI"]
+        # ont_to_include = ["GVP"]
         ontologies.select! { |ont| ont_to_include.include?(ont.acronym) } unless ont_to_include.empty?
         enable_pull_umls = options[:enable_pull_umls]
         umls_download_url = options[:pull_umls_url]
-
         ontologies.sort! {|a, b| a.acronym.downcase <=> b.acronym.downcase}
-
         new_submissions = []
+
         ontologies.each do |ont|
           begin
             last = ont.latest_submission(status: :any)
@@ -37,15 +36,22 @@ module NcboCron
             end
             last.bring(:pullLocation) if last.bring?(:pullLocation)
             next if last.pullLocation.nil?
+            if isLong == true && !options[:pull_long_ontologies].nil?
+              next if !options[:pull_long_ontologies].include?(ont.acronym)
+            else
+              if !options[:pull_long_ontologies].nil?
+                next if options[:pull_long_ontologies].include?(ont.acronym)
+              end
+            end
             last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
-            if (last.hasOntologyLanguage.umls? && umls_download_url)
+            if last.hasOntologyLanguage.umls? && umls_download_url
               last.pullLocation= RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
               logger.info("Using alternative download for umls #{last.pullLocation.to_s}")
               logger.flush
             end
 
-            if (last.remote_file_exists?(last.pullLocation.to_s))
+            if last.remote_file_exists?(last.pullLocation.to_s)
               logger.info "Checking download for #{ont.acronym}"
               logger.info "Location: #{last.pullLocation.to_s}"; logger.flush
               file, filename = last.download_ontology_file()
@@ -88,7 +94,7 @@ module NcboCron
       end
 
       def create_submission(ont, sub, file, filename, logger=nil,
-                            add_to_pull=true,new_version=nil)
+        add_to_pull=true,new_version=nil,new_released=nil)
         logger ||= Kernel.const_defined?("LOGGER") ? Kernel.const_get("LOGGER") : Logger.new(STDOUT)
         new_sub = LinkedData::Models::OntologySubmission.new
 
@@ -104,24 +110,51 @@ module NcboCron
         unless new_version.nil?
           new_sub.version = new_version
         end
+        if new_released.nil?
+          new_sub.released = DateTime.now
+        else
+          new_sub.released = DateTime.parse(new_released)
+        end
         new_sub.submissionStatus = nil
         new_sub.creationDate = nil
-        new_sub.released = DateTime.now
         new_sub.missingImports = nil
         new_sub.metrics = nil
+        full_file_path = File.expand_path(file_location)
 
-        if new_sub.valid?
-          new_sub.save()
-          if add_to_pull
-            submission_queue = NcboCron::Models::OntologySubmissionParser.new
-            submission_queue.queue_submission(new_sub, {all: true})
-            logger.info("OntologyPull created a new submission (#{submission_id}) for ontology #{ont.acronym}")
-          end
-        else
-          logger.error("Unable to create a new submission in OntologyPull: #{new_sub.errors}")
-          logger.flush()
+        # check if OWLAPI is able to parse the file before creating a new submission
+        owlapi = LinkedData::Parser::OWLAPICommand.new(
+            full_file_path,
+            File.expand_path(new_sub.data_folder.to_s),
+            logger: logger)
+        owlapi.disable_reasoner
+        parsable = true
+
+        begin
+          owlapi.parse
+        rescue Exception => e
+          logger.error("The new file for ontology #{ont.acronym}, submission id: #{submission_id} did not clear OWLAPI: #{e.class}: #{e.message}\n#{e.backtrace.join("\n\t")}")
+          logger.error("A new submission has NOT been created.")
+          logger.flush
+          parsable = false
         end
 
+        if parsable
+          if new_sub.valid?
+            new_sub.save()
+
+            if add_to_pull
+              submission_queue = NcboCron::Models::OntologySubmissionParser.new
+              submission_queue.queue_submission(new_sub, {all: true})
+              logger.info("OntologyPull created a new submission (#{submission_id}) for ontology #{ont.acronym}")
+            end
+          else
+            logger.error("Unable to create a new submission in OntologyPull: #{new_sub.errors}")
+            logger.flush
+          end
+        else
+          # delete the bad file
+          File.delete full_file_path if File.exist? full_file_path
+        end
         new_sub
       end
     end
