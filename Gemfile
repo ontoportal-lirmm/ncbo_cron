@@ -24,10 +24,10 @@ gem 'ffi', '< 1.9.22'
 gem 'cube-ruby', require: 'cube'
 
 # NCBO gems (can be from a local dev path or from rubygems/git)
-gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'virtual-appliance-3.0-merge'
+gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'master'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
-gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'virtual-appliance-3.0-merge'
-gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'virtual-appliance-3.0-merge'
+gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'master'
+gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'master'
 gem 'ncbo_resource_index', github: 'ncbo/resource_index'
 
 # Testing
