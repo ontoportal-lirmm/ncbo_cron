@@ -1,0 +1,107 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+
+# Configure the process for the current cron configuration.
+require_relative '../lib/ncbo_cron'
+config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
+abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
+require_relative '../config/config'
+
+platform = "local"
+if LinkedData.settings.goo_host.include? "stage"
+  platform = "stage"
+elsif LinkedData.settings.goo_host.include? "prod"
+  platform = "prod"
+end
+puts "Running on #{platform} platform"
+
+require 'uri'
+require 'benchmark'
+require 'optparse'
+
+TASKS = ['total_counts', 'pair_counts']
+options = { task: TASKS, ontologies: [] }
+
+opt_parser = OptionParser.new do |opts|
+  # Set a banner, displayed at the top of the help screen.
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+
+  opts.on('-a', '--all-ontologies', 'Rebuild all ontologies\' mapping counts (this or -o option required).') do
+    options[:all] = true
+  end
+
+  opts.on('-o', '--ontologies ACRONYM1,ACRONYM2,ACRONYM3', 'Comma-separated list of ontologies whose mapping counts (to all other ontologies) to generate (this or -a option required).') do |acronyms|
+    options[:ontologies] = acronyms.split(",").map {|o| o.strip}
+  end
+
+  opts.on('-t', '--task TASK', "Optional task to perform #{TASKS.to_s.gsub('"', '')}. Default: #{TASKS.join(' and ')}") do |o|
+    options[:task] = o
+  end
+
+  options[:logfile] = STDOUT
+  opts.on('-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
+    options[:logfile] = filename
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
+end
+
+opt_parser.parse!
+
+if TASKS.include? options[:task]
+  options[:task] = [options[:task]]
+else
+  puts "\"#{options[:task]}\" is an invalid task. Valid tasks are: #{TASKS}."
+  abort("Aborting...\n")
+end
+
+logger = nil
+
+begin
+  logger = Logger.new(options[:logfile])
+  puts "Processing details are logged to #{options[:logfile] == STDOUT ? "STDOUT" : options[:logfile]}"
+
+  if options[:all]
+    msg = "Processing #{options[:task]} for all ontologies"
+  else
+    msg = "Processing #{options[:task]} for ontologies: #{options[:ontologies]}"
+  end
+  puts msg
+  logger.info(msg)
+
+  ont_msg = options[:ontologies].empty? ? "all ontologies" : "ontologies [#{options[:ontologies].join(', ')}]"
+
+  if options[:task].include?('total_counts')
+    time = Benchmark.realtime do
+      LinkedData::Mappings.create_mapping_count_totals_for_ontologies(
+        logger, options[:ontologies])
+    end
+    msg = "Completed rebuilding total mapping counts for #{ont_msg} in #{(time/60).round(1)} minutes."
+    puts msg
+    logger.info(msg)
+  end
+
+  if options[:task].include?('pair_counts')
+    time = Benchmark.realtime do
+      LinkedData::Mappings.create_mapping_count_pairs_for_ontologies(
+        logger, options[:ontologies])
+    end
+    msg = "Completed rebuilding mapping count pairs for #{ont_msg} in #{(time/60).round(1)} minutes."
+    puts msg
+    logger.info(msg)
+  end
+rescue Exception => e
+  msg = "Failed rebuilding #{options[:task]} with exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
+  logger.error(msg)
+  puts msg
+  exit(1)
+end
