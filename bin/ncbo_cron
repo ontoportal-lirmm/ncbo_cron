@@ -265,7 +265,8 @@ runner.execute do |opts|
         logger.info "Logging pull details to #{pull_log_path}"; logger.flush
         puller = NcboCron::Models::OntologyPull.new
         pulled_onts = puller.do_remote_ontology_pull(logger: pull_logger,
-         enable_pull_umls: options[:enable_pull_umls])
+                                                     enable_pull_umls: options[:enable_pull_umls],
+                                                     cache_clear: true)
         logger.info "Finished ncbo pull"; logger.flush
         logger.info "Pull summary:\n#{pulled_onts.map {|o| o.id.to_s}}"
       end
