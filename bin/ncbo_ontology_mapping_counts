@@ -40,7 +40,7 @@ opt_parser = OptionParser.new do |opts|
   end
 
   opts.on('-t', '--task TASK', "Optional task to perform #{TASKS.to_s.gsub('"', '')}. Default: #{TASKS.join(' and ')}") do |o|
-    options[:task] = o
+    options[:task] = [o]
   end
 
   options[:logfile] = STDOUT
@@ -57,10 +57,8 @@ end
 
 opt_parser.parse!
 
-if TASKS.include? options[:task]
-  options[:task] = [options[:task]]
-else
-  puts "\"#{options[:task]}\" is an invalid task. Valid tasks are: #{TASKS}."
+if (TASKS - options[:task]).length > TASKS.length - 1
+  puts "'#{options[:task][0]}' is an invalid task. Valid tasks are: #{TASKS}."
   abort("Aborting...\n")
 end
 
