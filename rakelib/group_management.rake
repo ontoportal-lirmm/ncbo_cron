@@ -22,4 +22,21 @@ namespace :group do
       puts 'FAILED: create new ontology group'
     end
   end
+  desc 'Add ontology to a group'
+  task :add_ontology, [:group_acronym, :ontology_acronym] do |_t, args|
+    grp = LinkedData::Models::Group.find(args.group_acronym).first
+    abort("FAILED: The Group #{args.group_acronym} does not exist") if grp.nil?
+    ontology = LinkedData::Models::Ontology.find(args.ontology_acronym).first
+    abort("FAILED: The Ontology #{args.ontology_acronym} does not exist") if ontology.nil?
+    ontology.bring_remaining
+    group = ontology.group
+    group = group.dup
+    group << grp
+    ontology.group = group
+    if ontology.valid?
+      ontology.save
+    else
+      puts "FAILED: add ontology #{args.ontology_acronym} to a  #{args.group_acronym} group"
+    end
+  end
 end
