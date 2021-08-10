@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 2621b2703afd977cbb2919abfac6b98f8c0b020b
+  revision: 37996775b44ec673e7371b6f34220329c1026558
   branch: staging
   specs:
     goo (0.0.2)
@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: e607f99ea34ab0d34e4c92c610b6c1730116dc1b
+  revision: d688fb5a9c60a586420cb28680165c56714d0e4c
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +27,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: ed5e5df70bc211f89e433e393925f05c6de2a66f
+  revision: f76b84e41f033c218099c61dc2566d0b5514ce04
   branch: staging
   specs:
     ontologies_linked_data (0.0.1)
@@ -184,7 +184,7 @@ GEM
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.13.1)
+    oj (2.18.5)
     omni_logger (0.1.4)
       logger
     os (1.1.1)
@@ -259,7 +259,7 @@ DEPENDENCIES
   ncbo_annotator!
   ncbo_cron!
   ncbo_resource_index!
-  oj
+  oj (~> 2.0)
   ontologies_linked_data!
   parseconfig
   pony
