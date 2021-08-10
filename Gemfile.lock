@@ -16,7 +16,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: a1a0b8554bfc4548d345ef061bfb414a41efa1a9
+  revision: e607f99ea34ab0d34e4c92c610b6c1730116dc1b
   branch: staging
   specs:
     ncbo_annotator (0.0.1)
@@ -116,7 +116,7 @@ GEM
       mail (~> 2.6)
     ethon (0.14.0)
       ffi (>= 1.15.0)
-    faraday (1.5.0)
+    faraday (1.7.0)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -124,6 +124,7 @@ GEM
       faraday-net_http (~> 1.0)
       faraday-net_http_persistent (~> 1.1)
       faraday-patron (~> 1.0)
+      faraday-rack (~> 1.0)
       multipart-post (>= 1.2, < 3)
       ruby2_keywords (>= 0.0.4)
     faraday-em_http (1.0.0)
@@ -131,8 +132,9 @@ GEM
     faraday-excon (1.1.0)
     faraday-httpclient (1.0.1)
     faraday-net_http (1.0.1)
-    faraday-net_http_persistent (1.1.0)
+    faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
+    faraday-rack (1.0.0)
     ffi (1.15.3)
     google-api-client (0.10.3)
       addressable (~> 2.3)
@@ -143,7 +145,7 @@ GEM
       mime-types (>= 1.6)
       representable (~> 3.0)
       retriable (>= 2.0, < 4.0)
-    googleauth (0.16.2)
+    googleauth (0.17.0)
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -182,7 +184,7 @@ GEM
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (3.12.0)
+    oj (3.13.1)
     omni_logger (0.1.4)
       logger
     os (1.1.1)
@@ -195,10 +197,10 @@ GEM
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
-    rake (13.0.5)
+    rake (13.0.6)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.3.1)
+    redis (4.4.0)
     ref (2.0.0)
     representable (3.1.1)
       declarative (< 0.1.0)
@@ -214,11 +216,11 @@ GEM
       builder (>= 2.1.2)
       faraday (>= 0.9.0)
     ruby-xxHash (0.4.0.1)
-    ruby2_keywords (0.0.4)
+    ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.46.0)
+    sequel (5.47.0)
     signet (0.15.0)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
