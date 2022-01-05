@@ -90,6 +90,13 @@ module NcboCron
             next
           end
         end
+
+        if options[:cache_clear] == true
+          logger.info('Clearing Goo/HTTP caches...')
+          redis_goo.flushdb
+          redis_http.flushdb
+          logger.info('Completed clearing Goo/HTTP caches')
+        end
         new_submissions
       end
 
@@ -156,6 +163,14 @@ module NcboCron
           File.delete full_file_path if File.exist? full_file_path
         end
         new_sub
+      end
+
+      def redis_goo
+        Redis.new(host: LinkedData.settings.goo_redis_host, port: LinkedData.settings.goo_redis_port, timeout: 30)
+      end
+
+      def redis_http
+        Redis.new(host: LinkedData.settings.http_redis_host, port: LinkedData.settings.http_redis_port, timeout: 30)
       end
     end
   end

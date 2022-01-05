@@ -45,6 +45,9 @@ onts.each do |o|
     next
   end
   last.bring(:hasOntologyLanguage)
+  if last.hasOntologyLanguage.nil?
+    next
+  end
   if last.hasOntologyLanguage.umls?
     last.status = "production"
     umls_index[o.acronym] = [o,last]
