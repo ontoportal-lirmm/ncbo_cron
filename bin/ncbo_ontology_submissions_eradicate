@@ -23,11 +23,11 @@ opt_parser = OptionParser.new do |opts|
     ontology_acronym = acronym
   end
 
-  opts.on('--from', 'Submission id to start from deleting (included)') do |id|
+  opts.on('--from id', 'Submission id to start from deleting (included)') do |id|
     submission_id_from = id.to_i
   end
 
-  opts.on('--to', 'Submission id to end deleting (included)') do |id|
+  opts.on('--to id', 'Submission id to end deleting (included)') do |id|
     submission_id_to = id.to_i
   end
   # Display the help screen, all programs are assumed to have this option.
@@ -87,8 +87,7 @@ begin
   submissions = ont.submissions
   submissions_to_delete = get_submission_to_delete submissions, submission_id_from, submission_id_to
 
-  logger.info "You are attempting to remove the following submissions of #{ontology_acronym} :"
-  logger.info submissions_to_delete.map{ |s| s.submissionId }.join(', ')
+  logger.info "You are attempting to remove the following submissions of #{ontology_acronym} : #{submissions_to_delete.map{ |s| s.submissionId }.join(', ')}"
   logger.info 'They will be deleted from the triple store and local files'
   logger.info 'Do you confirm ? (Y/n)'
   choice = gets.chomp.downcase
