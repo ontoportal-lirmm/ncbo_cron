@@ -1,0 +1,98 @@
+#!/usr/bin/env ruby
+
+$0 = 'ncbo_cron'
+
+# Exit cleanly from an early interrupt
+Signal.trap('INT') { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+# redis store for looking up queued jobs
+require 'redis'
+
+require_relative '../lib/ncbo_cron'
+require_relative '../config/config'
+require 'optparse'
+ontology_acronym = ''
+submission_id_from = 0
+submission_id_to = 0
+
+opt_parser = OptionParser.new do |opts|
+  opts.banner = 'Usage: ncbo_ontology_sumissions_eradicate [options]'
+  opts.on('-o', '--ontology ACRONYM', 'Ontology acronym which we want to eradicate (remove triples+files) specific submissions') do |acronym|
+    ontology_acronym = acronym
+  end
+
+  opts.on('--from', 'Submission id to start from deleting (included)') do |id|
+    submission_id_from = id.to_i
+  end
+
+  opts.on('--to', 'Submission id to end deleting (included)') do |id|
+    submission_id_to = id.to_i
+  end
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+opt_parser.parse!
+
+
+
+
+
+def ontology_exists?(ontology_acronym)
+  ont = LinkedData::Models::Ontology.find(ontology_acronym)
+                                    .include(submissions: [:submissionId])
+                                    .first
+  if ont.nil?
+    logger.error "ontology not found: #{options[:ontology]}"
+    exit(1)
+  end
+  ont.bring(:submissions) if ont.bring?(:submissions)
+  ont
+end
+
+
+def get_submission_to_delete(submissions, from, to)
+  min, max = [from, to].minmax
+  submissions.select { |s| s.submissionId.between?(min, max) }.sort { |s1, s2| s1.submissionId <=> s2.submissionId}
+end
+
+def eradicate(ontology_acronym, submissions , logger)
+  logger ||= Logger.new($stderr)
+  submissions.each do |submission|
+    begin
+      logger.info "Start removing submission #{submission.submissionId.to_s}"
+      NcboCron::Models::OntologySubmissionEradicator.new.eradicate ontology_acronym, submission
+      logger.info"Submission #{submission.submissionId.to_s} deleted successfully"
+    rescue NcboCron::Models::OntologySubmissionEradicator::RemoveSubmissionFileException => e
+      logger.error "RemoveSubmissionFileException in submission #{submission.submissionId.to_s} : #{e.message}"
+    rescue  NcboCron::Models::OntologySubmissionEradicator::RemoveSubmissionDataException => e
+      logger.error "RemoveSubmissionDataException in submission #{submission.submissionId.to_s} : #{e.message}"
+    rescue  Exception => e
+      logger.error "Error in submission #{submission.submissionId.to_s} remove: #{e.message}"
+    end
+  end
+end
+
+begin
+  logger = Logger.new($stderr)
+
+  logger.info 'Start of NCBO ontology submissions eradicate'
+
+  ont = ontology_exists? ontology_acronym
+
+  submissions = ont.submissions
+  submissions_to_delete = get_submission_to_delete submissions, submission_id_from, submission_id_to
+
+  logger.info "You are attempting to remove the following submissions of #{ontology_acronym} :"
+  logger.info submissions_to_delete.map{ |s| s.submissionId }.join(', ')
+  logger.info 'They will be deleted from the triple store and local files'
+  logger.info 'Do you confirm ? (Y/n)'
+  choice = gets.chomp.downcase
+  exit(1) if choice.eql? 'n'
+  eradicate ontology_acronym , submissions_to_delete, logger
+  exit(0)
+end
