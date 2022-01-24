@@ -67,6 +67,11 @@ def eradicate(ontology_acronym, submissions , logger)
       logger.info "Start removing submission #{submission.submissionId.to_s}"
       NcboCron::Models::OntologySubmissionEradicator.new.eradicate ontology_acronym, submission
       logger.info"Submission #{submission.submissionId.to_s} deleted successfully"
+    rescue NcboCron::Models::OntologySubmissionEradicator::RemoveNotArchivedSubmissionException
+      logger.info "Submission #{submission.submissionId.to_s} is not archived"
+      ask? logger, 'Do you want to force remove ? (Y/n)'
+      NcboCron::Models::OntologySubmissionEradicator.new.eradicate ontology_acronym, submission, true
+      logger.info"Submission #{submission.submissionId.to_s} deleted successfully"
     rescue NcboCron::Models::OntologySubmissionEradicator::RemoveSubmissionFileException => e
       logger.error "RemoveSubmissionFileException in submission #{submission.submissionId.to_s} : #{e.message}"
     rescue  NcboCron::Models::OntologySubmissionEradicator::RemoveSubmissionDataException => e
@@ -75,6 +80,12 @@ def eradicate(ontology_acronym, submissions , logger)
       logger.error "Error in submission #{submission.submissionId.to_s} remove: #{e.message}"
     end
   end
+end
+
+def ask?(logger, prompt)
+  logger.info prompt
+  choice = gets.chomp.downcase
+  exit(1) if choice.eql? 'n'
 end
 
 begin
@@ -89,9 +100,8 @@ begin
 
   logger.info "You are attempting to remove the following submissions of #{ontology_acronym} : #{submissions_to_delete.map{ |s| s.submissionId }.join(', ')}"
   logger.info 'They will be deleted from the triple store and local files'
-  logger.info 'Do you confirm ? (Y/n)'
-  choice = gets.chomp.downcase
-  exit(1) if choice.eql? 'n'
+  ask? logger, 'Do you confirm ? (Y/n)'
+
   eradicate ontology_acronym , submissions_to_delete, logger
   exit(0)
 end

@@ -8,16 +8,19 @@ module NcboCron
       class RemoveSubmissionDataException < StandardError
       end
 
+      class RemoveNotArchivedSubmissionException < StandardError
+      end
+
       def initialize()
       end
 
-      def eradicate(ontology_acronym, submission)
+      def eradicate(ontology_acronym, submission , force=false)
         submission.bring(:submissionStatus) if submission.bring(:submissionStatus)
-        if submission.archived?
+        if submission.archived? || force
           delete_submission_files ontology_acronym, submission
           delete_submission_data submission
-        else
-          raise RemoveSubmissionDataException, "Submission #{submission.submissionId} is not an archived submission"
+        else submission.ready?
+          raise RemoveNotArchivedSubmissionException, "Submission #{submission.submissionId} is not an archived submission"
         end
 
       end
