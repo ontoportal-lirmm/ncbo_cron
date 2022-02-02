@@ -2,7 +2,7 @@ source 'https://rubygems.org'
 
 gemspec
 
-
+gem 'faraday', '~> 1.9'
 gem 'ffi'
 gem 'google-api-client', '~> 0.10'
 gem 'mail', '2.6.6'
