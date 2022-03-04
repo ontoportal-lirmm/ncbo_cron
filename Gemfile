@@ -1,6 +1,6 @@
-source 'https://rubygems.org'
+# frozen_string_literal: true
 
-gemspec
+source 'https://rubygems.org'
 
 gem 'faraday', '~> 1.9'
 gem 'ffi'
@@ -33,4 +33,3 @@ group :test do
   gem 'email_spec'
   gem 'test-unit-minitest'
 end
-
