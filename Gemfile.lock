@@ -23,8 +23,8 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 89a8f665f70644989adf70cd132bf0f38ef3414d
-  branch: master
+  revision: fdbc4aed4416a6521a301371ebfa997a7e5ed503
+  branch: development
   specs:
     goo (0.0.2)
       addressable (= 2.3.5)
@@ -50,8 +50,8 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 6e034079590d5025158f70c3ad06eb55a875279f
-  branch: master
+  revision: 04246760a2ceb3403acc7377fe1cf7be8d242559
+  branch: development
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -90,7 +90,7 @@ GEM
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
     addressable (2.3.5)
-    bcrypt (3.1.16)
+    bcrypt (3.1.17)
     builder (3.2.4)
     coderay (1.1.3)
     concurrent-ruby (1.1.9)
@@ -240,12 +240,12 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8)
+    unf_ext (0.0.8.1)
     uuid (2.3.9)
       macaddr (~> 1.0)
 
 PLATFORMS
-  x86_64-linux
+  x86_64-darwin-21
 
 DEPENDENCIES
   cube-ruby
@@ -272,4 +272,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.7
+   2.3.5
