@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ncbo_annotator.git
-  revision: 29240aa30cb17e015d0d3983d012f1dcde6dff42
+  revision: 2ebcb237008958d7a8eb45319cd986312a814dae
   branch: development
   specs:
     ncbo_annotator (0.0.1)
