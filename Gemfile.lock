@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 89a8f665f70644989adf70cd132bf0f38ef3414d
+  revision: 56fc95c3a9981e2467afe6f61ff466e5e550ed48
   branch: master
   specs:
     goo (0.0.2)
@@ -39,7 +39,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ncbo_annotator.git
-  revision: 9c399786b08c6562d083f3b6ddd3935c7c0a97b5
+  revision: 2ebcb237008958d7a8eb45319cd986312a814dae
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 6e034079590d5025158f70c3ad06eb55a875279f
+  revision: fc4d30bf7f571b0e58cdfccbb91d9cb794661d3c
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -90,7 +90,7 @@ GEM
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
     addressable (2.3.5)
-    bcrypt (3.1.16)
+    bcrypt (3.1.17)
     builder (3.2.4)
     coderay (1.1.3)
     concurrent-ruby (1.1.9)
@@ -240,7 +240,7 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8)
+    unf_ext (0.0.8.1)
     uuid (2.3.9)
       macaddr (~> 1.0)
 
