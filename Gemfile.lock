@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: fdbc4aed4416a6521a301371ebfa997a7e5ed503
+  revision: ca344b0966b941e55e51ef175a31e79b24c8ab70
   branch: development
   specs:
     goo (0.0.2)
@@ -39,8 +39,8 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ncbo_annotator.git
-  revision: 9c399786b08c6562d083f3b6ddd3935c7c0a97b5
-  branch: master
+  revision: a505c5719e6a31c433779594989c85c998258404
+  branch: development
   specs:
     ncbo_annotator (0.0.1)
       goo
