@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 56fc95c3a9981e2467afe6f61ff466e5e550ed48
+  revision: 7e18f1001dfca89045cb8ba7839b1a0b33334495
   branch: master
   specs:
     goo (0.0.2)
@@ -93,7 +93,7 @@ GEM
     bcrypt (3.1.17)
     builder (3.2.4)
     coderay (1.1.3)
-    concurrent-ruby (1.1.9)
+    concurrent-ruby (1.1.10)
     cube-ruby (0.0.3)
     dante (0.2.0)
     declarative (0.0.20)
@@ -167,7 +167,7 @@ GEM
     launchy (2.4.3)
       addressable (~> 2.3)
     libxml-ruby (3.2.2)
-    logger (1.5.0)
+    logger (1.5.1)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
     mail (2.6.6)
