@@ -23,8 +23,8 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 7e18f1001dfca89045cb8ba7839b1a0b33334495
-  branch: master
+  revision: 60c686f9408fddc86e930fa5afcb1774f8dc693d
+  branch: development
   specs:
     goo (0.0.2)
       addressable (= 2.3.5)
@@ -40,7 +40,7 @@ GIT
 GIT
   remote: https://github.com/ontoportal-lirmm/ncbo_annotator.git
   revision: 2ebcb237008958d7a8eb45319cd986312a814dae
-  branch: master
+  branch: development
   specs:
     ncbo_annotator (0.0.1)
       goo
@@ -50,8 +50,8 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: f4e385e2da567b0a4b55156e9913f0da3501acff
-  branch: master
+  revision: a12f82056cbc3ebefc0d97f03e10690cfccc28be
+  branch: development
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
@@ -245,7 +245,7 @@ GEM
       macaddr (~> 1.0)
 
 PLATFORMS
-  x86_64-linux
+  x86_64-darwin-21
 
 DEPENDENCIES
   cube-ruby
