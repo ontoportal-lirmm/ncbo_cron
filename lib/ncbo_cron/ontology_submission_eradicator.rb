@@ -38,7 +38,7 @@ module NcboCron
         begin
           # delete the folder
           submission_dir = File.join(LinkedData.settings.repository_folder, ontology_acronym.to_s, submission.submissionId.to_s)
-          FileUtils.rm_rf(submission_dir)
+          FileUtils.remove_dir(submission_dir, force: true)
         rescue Exception => e
           raise RemoveSubmissionFileException, e.message
         end
