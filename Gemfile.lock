@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: ca344b0966b941e55e51ef175a31e79b24c8ab70
+  revision: 60c686f9408fddc86e930fa5afcb1774f8dc693d
   branch: development
   specs:
     goo (0.0.2)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 04246760a2ceb3403acc7377fe1cf7be8d242559
+  revision: a12f82056cbc3ebefc0d97f03e10690cfccc28be
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -93,7 +93,7 @@ GEM
     bcrypt (3.1.17)
     builder (3.2.4)
     coderay (1.1.3)
-    concurrent-ruby (1.1.9)
+    concurrent-ruby (1.1.10)
     cube-ruby (0.0.3)
     dante (0.2.0)
     declarative (0.0.20)
@@ -167,7 +167,7 @@ GEM
     launchy (2.4.3)
       addressable (~> 2.3)
     libxml-ruby (3.2.2)
-    logger (1.5.0)
+    logger (1.5.1)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
     mail (2.6.6)
@@ -272,4 +272,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.7
+   2.3.4
