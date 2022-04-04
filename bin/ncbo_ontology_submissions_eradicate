@@ -65,12 +65,12 @@ def eradicate(ontology_acronym, submissions , logger)
   submissions.each do |submission|
     begin
       logger.info "Start removing submission #{submission.submissionId.to_s}"
-      NcboCron::Models::OntologySubmissionEradicator.new.eradicate ontology_acronym, submission
+      NcboCron::Models::OntologySubmissionEradicator.new.eradicate submission
       logger.info"Submission #{submission.submissionId.to_s} deleted successfully"
     rescue NcboCron::Models::OntologySubmissionEradicator::RemoveNotArchivedSubmissionException
       logger.info "Submission #{submission.submissionId.to_s} is not archived"
       ask? logger, 'Do you want to force remove ? (Y/n)'
-      NcboCron::Models::OntologySubmissionEradicator.new.eradicate ontology_acronym, submission, true
+      NcboCron::Models::OntologySubmissionEradicator.new.eradicate submission, true
       logger.info"Submission #{submission.submissionId.to_s} deleted successfully"
     rescue NcboCron::Models::OntologySubmissionEradicator::RemoveSubmissionFileException => e
       logger.error "RemoveSubmissionFileException in submission #{submission.submissionId.to_s} : #{e.message}"
