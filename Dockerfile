@@ -11,4 +11,3 @@ WORKDIR /srv/ontoportal/ncbo_cron
 RUN gem install bundler -v "$(grep -A 1 "BUNDLED WITH" Gemfile.lock | tail -n 1)"
 RUN bundle install
 COPY . /srv/ontoportal/ncbo_cron
-#CMD ["bundle","exec","rackup","-p","9393","--host","0.0.0.0"]
