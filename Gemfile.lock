@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 9aa06b55b82e1168d1a842ec797dca464f8fc947
+  revision: dc653acd412ac6b3d538394a53481bd5c3c11f4c
   branch: develop
   specs:
     goo (0.0.2)
@@ -11,12 +11,11 @@ GIT
       rest-client
       rsolr
       sparql-client
-      systemu
       uuid
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 08732ff394d08c0a5e6693b7ced2dec932f40429
+  revision: 84114f956aa2e6ef951d0d5fed447aeff6dd3f10
   branch: develop
   specs:
     ncbo_annotator (0.0.1)
@@ -27,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: ed6666eee52e973ebe43360c08c9692902a719b4
+  revision: 983516900a08e83e59fe3649187107cddee025f0
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -72,12 +71,9 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (4.0.13)
-      i18n (~> 0.6, >= 0.6.9)
-      minitest (~> 4.2)
-      multi_json (~> 1.3)
-      thread_safe (~> 0.1)
-      tzinfo (~> 0.3.37)
+    activesupport (3.2.22.5)
+      i18n (~> 0.6, >= 0.6.4)
+      multi_json (~> 1.0)
     addressable (2.3.5)
     bcrypt (3.1.17)
     builder (3.2.4)
@@ -208,19 +204,18 @@ GEM
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
-    thread_safe (0.3.6)
     trailblazer-option (0.1.2)
-    tzinfo (0.3.60)
+    tzinfo (2.0.4)
+      concurrent-ruby (~> 1.0)
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8)
+    unf_ext (0.0.8.1)
     uuid (2.3.9)
       macaddr (~> 1.0)
 
 PLATFORMS
-  ruby
-  x86_64-darwin-17
+  x86_64-darwin-19
 
 DEPENDENCIES
   cube-ruby
@@ -247,4 +242,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.1.4
+   2.3.11
