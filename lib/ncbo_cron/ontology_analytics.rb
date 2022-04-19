@@ -94,6 +94,12 @@ module NcboCron
       def authenticate_google
         Google::Apis::ClientOptions.default.application_name = NcboCron.settings.analytics_app_name
         Google::Apis::ClientOptions.default.application_version = NcboCron.settings.analytics_app_version
+        # enable google api call retries in order to
+        # minigate analytics processing failure due to ocasional google api timeouts and other outages
+        Google::Apis::RequestOptions.default.retries = 5
+        # uncoment to enable logging for debugging purposes
+        # Google::Apis.logger.level = Logger::DEBUG
+        # Google::Apis.logger = @logger
         client = Google::Apis::AnalyticsV3::AnalyticsService.new
         key = Google::APIClient::KeyUtils::load_from_pkcs12(NcboCron.settings.analytics_path_to_key_file, 'notasecret')
         client.authorization = Signet::OAuth2::Client.new(
