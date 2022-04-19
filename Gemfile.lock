@@ -215,7 +215,9 @@ GEM
       macaddr (~> 1.0)
 
 PLATFORMS
+  ruby
   x86_64-darwin-19
+  x86_64-linux
 
 DEPENDENCIES
   cube-ruby
