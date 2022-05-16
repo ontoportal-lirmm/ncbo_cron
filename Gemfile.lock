@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 60c686f9408fddc86e930fa5afcb1774f8dc693d
+  revision: 50f248f53c2a95fe6902eedc52cb31e8a7cf7d9e
   branch: development
   specs:
     goo (0.0.2)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: cf964e994d22dc749b169fe4e04bf5858d3c5649
+  revision: fa49a53a6f14569a8ad77bcd1baa503f2380c011
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -203,7 +203,7 @@ GEM
       addressable (>= 2.2)
     redis (4.6.0)
     ref (2.0.0)
-    representable (3.1.1)
+    representable (3.2.0)
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
@@ -221,7 +221,7 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.55.0)
+    sequel (5.56.0)
     signet (0.15.0)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
@@ -245,11 +245,12 @@ GEM
       macaddr (~> 1.0)
 
 PLATFORMS
-  x86_64-linux
+  x86_64-darwin-21
 
 DEPENDENCIES
   cube-ruby
   email_spec
+  faraday (~> 1.9)
   ffi
   goo!
   google-api-client (~> 0.10)
@@ -272,4 +273,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.4
+   2.3.7
