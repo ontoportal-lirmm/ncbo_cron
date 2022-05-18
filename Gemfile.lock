@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 8b60742983df3c3097b3645be3fad56f51a1dd1b
+  revision: 6809a1442d1d6ef5d6d069667f72f7c4fd5ce6db
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -90,7 +90,7 @@ GEM
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
     addressable (2.3.5)
-    bcrypt (3.1.17)
+    bcrypt (3.1.18)
     builder (3.2.4)
     coderay (1.1.3)
     concurrent-ruby (1.1.10)
@@ -161,8 +161,8 @@ GEM
     hurley (0.2)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
-    json (2.6.1)
-    json_pure (2.6.1)
+    json (2.6.2)
+    json_pure (2.6.2)
     jwt (2.3.0)
     launchy (2.4.3)
       addressable (~> 2.3)
