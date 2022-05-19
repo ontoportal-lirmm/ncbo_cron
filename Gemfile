@@ -4,7 +4,7 @@ gemspec
 
 gem 'faraday', '~> 1.9'
 gem 'ffi'
-gem 'google-api-client', '~> 0.10'
+gem "google-apis-analytics_v3"
 gem 'mail', '2.6.6'
 gem 'minitest', '< 5.0'
 gem 'multi_json'
