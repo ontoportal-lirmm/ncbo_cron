@@ -24,8 +24,7 @@ gem 'cube-ruby', require: 'cube'
 
 gem 'goo', github: 'ncbo/goo', branch: 'master'
 gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
-gem 'ncbo_resource_index', github: 'ncbo/resource_index'
-gem 'ontologies_linked_data', github: 'ncbo/ontologies_linked_data', branch: 'master'
+gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'pl/enhance-zipped-submissions-support'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
 
 # Testing
