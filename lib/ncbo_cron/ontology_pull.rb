@@ -118,6 +118,7 @@ module NcboCron
         new_sub.submissionStatus = nil
         new_sub.creationDate = nil
         new_sub.missingImports = nil
+        new_sub.masterFileName = nil
         new_sub.metrics = nil
         full_file_path = File.expand_path(file_location)
 
