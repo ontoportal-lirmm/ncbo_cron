@@ -1,0 +1,20 @@
+name: Ruby Unit Tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: copy config.rb file from template
+      run:  cp config/config.test.rb config/config.rb
+    - name: Build docker-compose
+      working-directory: ./test
+      run: docker-compose build
+    - name: Run unit tests
+      working-directory: ./test
+      run: docker-compose run unit-test wait-for-it solr-ut:8983 -- rake test TESTOPTS='-v'
+
