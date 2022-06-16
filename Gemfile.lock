@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: c4f56dc27fe5eaea066f5273249a5cfa11ee65fe
+  revision: 4b4211cc7c61d4254821cea5238855d846e53f3e
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -105,16 +105,16 @@ GEM
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
     faraday-httpclient (1.0.1)
-    faraday-multipart (1.0.3)
-      multipart-post (>= 1.2, < 3)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
     ffi (1.15.5)
-    google-apis-analytics_v3 (0.7.0)
-      google-apis-core (>= 0.4, < 2.a)
+    google-apis-analytics_v3 (0.8.0)
+      google-apis-core (>= 0.5, < 2.a)
     google-apis-core (0.5.0)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.16.2, < 2.a)
@@ -133,17 +133,17 @@ GEM
       signet (>= 0.16, < 2.a)
     htmlentities (4.3.4)
     http-accept (1.7.0)
-    http-cookie (1.0.4)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     httpclient (2.8.3)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     json (2.6.2)
     json_pure (2.6.2)
-    jwt (2.3.0)
+    jwt (2.4.1)
     launchy (2.5.0)
       addressable (~> 2.7)
-    libxml-ruby (3.2.2)
+    libxml-ruby (3.2.3)
     logger (1.5.1)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
@@ -159,7 +159,7 @@ GEM
     mlanett-redis-lock (0.2.7)
       redis
     multi_json (1.15.0)
-    multipart-post (2.1.1)
+    multipart-post (2.2.3)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
     oj (2.18.5)
@@ -173,7 +173,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.7)
-    rack (2.2.3)
+    rack (2.2.3.1)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rake (13.0.6)
@@ -215,15 +215,15 @@ GEM
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8.1)
+    unf_ext (0.0.8.2)
     uuid (2.3.9)
       macaddr (~> 1.0)
     webrick (1.7.0)
 
 PLATFORMS
   ruby
-  x86_64-linux
   x86_64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
   cube-ruby
@@ -250,4 +250,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.11
+   2.3.15

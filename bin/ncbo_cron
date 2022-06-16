@@ -111,6 +111,19 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--disable-update-check", "disable check for updated version of Ontoportal (for VMs)", "(default: #{options[:enable_update_check]})") do |v|
     options[:enable_update_check] = false
   end
+
+
+
+
+  opts.on("--disable-dictionary-generation", "disable mgrep dictionary generation job", "(default: #{options[:enable_dictionary_generation]})") do |v|
+    options[:enable_dictionary_generation] = false
+  end
+
+
+
+
+
+
   opts.on("--disable-obofoundry_sync", "disable OBO Foundry synchronization report", "(default: #{options[:enable_obofoundry_sync]})") do |v|
     options[:enable_obofoundry_sync] = false
   end
@@ -147,6 +160,17 @@ opt_parser = OptionParser.new do |opts|
   opts.on("--obofoundry_sync SCHED", String, "cron schedule to run OBO Foundry synchronization report", "(default: #{options[:cron_obofoundry_sync]})") do |c|
     options[:cron_obofoundry_sync] = c
   end
+
+
+
+
+  opts.on("--dictionary-generation SCHED", String, "cron schedule to run mgrep dictionary generation job", "(default: #{options[:cron_dictionary_generation]})") do |c|
+    options[:cron_dictionary_generation] = c
+  end
+
+
+
+
 
   # Display the help screen, all programs are assumed to have this option.
   opts.on_tail('--help', 'Display this screen') do
@@ -460,6 +484,49 @@ runner.execute do |opts|
     end
   end
 
+
+
+
+
+
+
+
+  # temporary job to generate mgrep dictionary file
+  # separate from ontology processing due to
+  # https://github.com/ncbo/ncbo_cron/issues/45
+
+  if options[:enable_dictionary_generation]
+    dictionary_generation_thread = Thread.new do
+      dictionary_generation_options = options.dup
+      dictionary_generation_options[:job_name] = "ncbo_cron_dictionary_generation"
+      dictionary_generation_options[:scheduler_type] = :cron
+      dictionary_generation_options[:cron_schedule] = dictionary_generation_options[:cron_dictionary_generation]
+      logger.info "Setting up mgrep dictionary generation job with #{dictionary_generation_options[:cron_dictionary_generation]}"; logger.flush
+      NcboCron::Scheduler.scheduled_locking_job(dictionary_generation_options) do
+        logger.info "Starting mgrep dictionary generation..."; logger.flush
+        t0 = Time.now
+        annotator = Annotator::Models::NcboAnnotator.new
+        annotator.generate_dictionary_file()
+        logger.info "mgrep dictionary generation job completed in #{Time.now - t0} sec."; logger.flush
+        logger.info "Finished mgrep dictionary generation"; logger.flush
+      end
+    end
+  end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   # Print running child processes
   require 'sys/proctable'
   at_exit do
@@ -482,4 +549,12 @@ runner.execute do |opts|
   mapping_counts_thread.join if mapping_counts_thread
   update_check_thread.join if update_check_thread
   obofoundry_sync_thread.join if obofoundry_sync_thread
+
+
+
+
+  dictionary_generation_thread.join if dictionary_generation_thread
+
+
+
 end
