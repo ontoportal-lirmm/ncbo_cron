@@ -45,7 +45,7 @@ module NcboCron
 
 
     # enable mgrep dictionary generation job
-    @settings.enable_dictionary_generation ||= false
+    @settings.enable_dictionary_generation ||= true
 
 
 
