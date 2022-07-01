@@ -23,7 +23,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 2de5397eeccdbd607a990b07f2e7b98924c8a6d6
+  revision: f0eadc24271e07d8a0d96487dd0acbcbbb12d213
   branch: development
   specs:
     goo (0.0.2)
@@ -50,7 +50,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 74975b522aabef186a12b1bb94a23ece6b2322df
+  revision: 76a39ade64bb7952f731743f95fe40a7994c5ab8
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -201,7 +201,7 @@ GEM
     rake (13.0.6)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.7.0)
+    redis (4.7.1)
     ref (2.0.0)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -273,4 +273,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.15
+   2.3.14
