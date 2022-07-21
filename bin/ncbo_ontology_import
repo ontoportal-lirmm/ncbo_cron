@@ -1,0 +1,159 @@
+#!/usr/bin/env ruby
+
+$0 = 'ncbo_cron'
+
+# Exit cleanly from an early interrupt
+Signal.trap('INT') { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+# redis store for looking up queued jobs
+require 'redis'
+
+require_relative '../lib/ncbo_cron'
+require_relative '../config/config'
+require 'net/http'
+
+# Script for importing ontologies + latest_submission into ontoportal appliance
+
+
+require 'optparse'
+ontologies_acronyms = ''
+ontology_source = ''
+source_api = ''
+username = ''
+opt_parser = OptionParser.new do |opts|
+  opts.banner = 'Usage: ncbo_ontology_import [options]'
+  opts.on('-o', '--ontology ACRONYM', 'Ontologies acronyms which we want to import (separated by comma)') do |acronym|
+    ontologies_acronyms = acronym
+  end
+
+  opts.on('--from url', 'The ontoportal api url source of the ontology') do |url|
+    ontology_source = url.to_s
+  end
+
+  opts.on('--from-api api', 'An apikey to acces the ontoportal api') do |api|
+    source_api = api.to_s
+  end
+
+  opts.on('--admin-user username', 'The target admin user that will submit the ontology') do |user|
+    username = user.to_s
+  end
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+opt_parser.parse!
+
+# URL of the API and APIKEY of the Otoportal  we want to import data FROM
+SOURCE_API =  ontology_source || 'http://data.bioontology.org'
+SOURCE_APIKEY =  source_api ||  '8b5b7825-538d-40e0-9e9e-5ab9274a9aeb'
+
+# URL of the API  of the BioPortal we want to import data TO
+TARGET_API = 'http://localhost:9393'
+
+# The username of the user that will have the administration rights on the ontology on the target portal
+TARGETED_PORTAL_USER = username
+
+# The list of acronyms of ontologies to import
+ONTOLOGIES_TO_IMPORT = ontologies_acronyms.split(',') || []
+
+
+def get_user(username)
+  user = LinkedData::Models::User.find(username).first
+  raise "The user #{username} does not exist" if user.nil?
+  user.bring_remaining
+end
+
+
+# A function to create a new ontology (if already Acronym already existing on the portal it will return HTTPConflict)
+def create_ontology(ont_info)
+  uri = URI.parse(TARGET_API)
+  http = Net::HTTP.new(uri.host, uri.port)
+  req = Net::HTTP::Put.new("/ontologies/#{ont_info['acronym']}")
+  req['Content-Type'] = 'application/json'
+  req['Authorization'] = "apikey token=#{TARGET_APIKEY}"
+
+  if ont_info['viewingRestriction'] == 'private'
+    # In case of private ontology (acl: list of user that have the right to see the ontology)
+    req.body = { 'acronym': ont_info['acronym'], 'name': ont_info['name'],
+                 'administeredBy': [TARGETED_PORTAL_USER],
+                 'viewingRestriction': 'private',
+                 'acl': [TARGETED_PORTAL_USER] }.to_json
+  else
+    req.body = { 'acronym': ont_info['acronym'], 'name': ont_info['name'],
+                 'group': ont_info['group'],
+                 'administeredBy': [TARGETED_PORTAL_USER] }.to_json
+  end
+
+  http.start do |http|
+    http.request(req)
+  end
+end
+
+# A function that take the submission informations from the source Ontoportal to create a new submission
+# 2 possibilities:
+# - the source Ontoportal pulls the ontology from an URL (pullLocation is filled), in this case we directly pull from this URL
+# - Or it stores it directly in the portal, in this case we pull it from the portal download link
+def upload_submission(sub_info)
+  uri = URI.parse(TARGET_API)
+  http = Net::HTTP.new(uri.host, uri.port)
+
+  req = Net::HTTP::Post.new("/ontologies/#{sub_info['ontology']['acronym']}/submissions")
+  req['Content-Type'] = 'application/json'
+  req['Authorization'] = "apikey token=#{TARGET_APIKEY}"
+
+  # Check if the source BioPortal is pulling the ontology from an URL
+  # If yes then we will pull the ontology from this place (allow auto update of the ontology when the ontology is changed in its source URL)
+  if sub_info['pullLocation'].nil?
+    sub_info['pullLocation'] = "#{sub_info['ontology']['links']['download']}?apikey=#{SOURCE_APIKEY}"
+  end
+
+  # Build the json body
+  # hasOntologyLanguage options: OWL, UMLS, SKOS, OBO
+  # status: alpha, beta, production, retired
+  attr_to_reject = %w[id submissionStatus submissionId ontology @id @type contact]
+  to_copy = sub_info.select do |k,v|
+    !v.nil? && !v.is_a?(Hash) && !v.to_s.empty? && !attr_to_reject.include?(k)
+  end
+  to_copy["ontology"] = sub_info["ontology"]["acronym"]
+  to_copy["contact"] =  [{name: USER.username, email: USER.email}]
+  req.body = to_copy.to_json
+
+  http.start do |http|
+    http.request(req)
+  end
+end
+
+
+USER = get_user username
+#get apikey for admin user
+TARGET_APIKEY = USER.apikey
+
+SOURCE_APIKEY == '' && abort('SOURCE_APIKEY has to be set')
+
+def response_log(ont, response)
+  if response.kind_of? Net::HTTPSuccess
+    puts "#{ont} imported successfully"
+  else
+    puts JSON.parse(response.body)["errors"]
+  end
+end
+
+# Go through all ontologies acronym and get their latest_submission informations
+ONTOLOGIES_TO_IMPORT.each do |ont|
+  sub_info = JSON.parse(Net::HTTP.get(URI.parse("#{SOURCE_API}/ontologies/#{ont}/latest_submission?apikey=#{SOURCE_APIKEY}&display=all")))
+  puts "Import #{ont} " ,
+       "From #{SOURCE_API} to #{TARGET_API}"
+  # if the ontology is already created then it will return HTTPConflict, no consequences
+  raise "The ontology #{ont} does not exist" if sub_info['ontology'].nil?
+  response = create_ontology(sub_info['ontology'])
+  response_log(ont, response)
+  response = upload_submission(sub_info)
+  response_log(sub_info["id"], response)
+end
+
+
+
