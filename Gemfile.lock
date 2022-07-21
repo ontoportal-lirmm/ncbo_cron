@@ -13,7 +13,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: f0eadc24271e07d8a0d96487dd0acbcbbb12d213
+  revision: 835aefa458186485eef60d3845315c478a95ff23
   branch: development
   specs:
     goo (0.0.2)
@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 76a39ade64bb7952f731743f95fe40a7994c5ab8
+  revision: 25fb6acb43e58f710ddd88ee6628436d747b0e7a
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -221,7 +221,7 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.57.0)
+    sequel (5.58.0)
     signet (0.15.0)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
@@ -235,7 +235,7 @@ GEM
     trailblazer-option (0.1.2)
     typhoeus (1.4.0)
       ethon (>= 0.9.0)
-    tzinfo (2.0.4)
+    tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
     unf (0.1.4)
@@ -245,7 +245,6 @@ GEM
       macaddr (~> 1.0)
 
 PLATFORMS
-  x86_64-darwin-21
   x86_64-linux
 
 DEPENDENCIES
@@ -274,4 +273,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.7
+   2.3.14
