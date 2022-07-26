@@ -12,18 +12,8 @@ GIT
       typhoeus
 
 GIT
-  remote: https://github.com/ncbo/sparql-client.git
-  revision: fb4a89b420f8eb6dda5190a126b6c62e32c4c0c9
-  branch: master
-  specs:
-    sparql-client (1.0.1)
-      json_pure (>= 1.4)
-      net-http-persistent (= 2.9.4)
-      rdf (>= 1.0)
-
-GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: f5569700ca0580432a635a802ad100947eadb573
+  revision: d1d34dcf455491f3e6413a60e8c4edd977830cf8
   branch: master
   specs:
     goo (0.0.2)
@@ -50,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 91099ba4187b8a84c0af7479144aad89d18b30fc
+  revision: b9a3395eeb241a2e1554c6a614ed66638bd9ad74
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -68,6 +58,16 @@ GIT
       rack-test
       rsolr
       rubyzip
+
+GIT
+  remote: https://github.com/ontoportal-lirmm/sparql-client.git
+  revision: aed51baf4106fd0f3d0e3f9238f0aad9406aa3f0
+  branch: master
+  specs:
+    sparql-client (1.0.1)
+      json_pure (>= 1.4)
+      net-http-persistent (= 2.9.4)
+      rdf (>= 1.0)
 
 PATH
   remote: .
@@ -129,8 +129,8 @@ GEM
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
     faraday-httpclient (1.0.1)
-    faraday-multipart (1.0.3)
-      multipart-post (>= 1.2, < 3)
+    faraday-multipart (1.0.4)
+      multipart-post (~> 2)
     faraday-net_http (1.0.1)
     faraday-net_http_persistent (1.2.0)
     faraday-patron (1.0.0)
@@ -155,7 +155,7 @@ GEM
       signet (~> 0.15)
     htmlentities (4.3.4)
     http-accept (1.7.0)
-    http-cookie (1.0.4)
+    http-cookie (1.0.5)
       domain_name (~> 0.5)
     httpclient (2.8.3)
     hurley (0.2)
@@ -163,10 +163,10 @@ GEM
       concurrent-ruby (~> 1.0)
     json (2.6.2)
     json_pure (2.6.2)
-    jwt (2.3.0)
+    jwt (2.4.1)
     launchy (2.4.3)
       addressable (~> 2.3)
-    libxml-ruby (3.2.2)
+    libxml-ruby (3.2.3)
     logger (1.5.1)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
@@ -181,7 +181,7 @@ GEM
     mlanett-redis-lock (0.2.7)
       redis
     multi_json (1.15.0)
-    multipart-post (2.1.1)
+    multipart-post (2.2.3)
     mysql2 (0.5.2)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
@@ -195,13 +195,13 @@ GEM
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    rack (2.2.3)
-    rack-test (1.1.0)
-      rack (>= 1.0, < 3)
+    rack (2.2.4)
+    rack-test (2.0.2)
+      rack (>= 1.3)
     rake (13.0.6)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.6.0)
+    redis (4.7.1)
     ref (2.0.0)
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -221,7 +221,7 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.56.0)
+    sequel (5.58.0)
     signet (0.15.0)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
@@ -235,12 +235,12 @@ GEM
     trailblazer-option (0.1.2)
     typhoeus (1.4.0)
       ethon (>= 0.9.0)
-    tzinfo (2.0.4)
+    tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
-    unf_ext (0.0.8.1)
+    unf_ext (0.0.8.2)
     uuid (2.3.9)
       macaddr (~> 1.0)
 
