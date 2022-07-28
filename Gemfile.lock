@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: b7874b1fd4a3e067a8370543c153cc261e9021f6
+  revision: 7fe22f03b56a944822c986269076a2e2aa64d6a2
   branch: develop
   specs:
     goo (0.0.2)
@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 00d04b4a4a43da4534aee5662a5175e74ff7d628
+  revision: bad8c646205014b1fc82793fb9c07d7075b4c068
   branch: develop
   specs:
     ncbo_annotator (0.0.1)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: ce1cf4f4987fe473716578d3393b2f9822962046
+  revision: 53cd329b4a4a5fa4c4294cf4fe2dd43b0d748948
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -210,7 +210,7 @@ GEM
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
     trailblazer-option (0.1.2)
-    tzinfo (2.0.4)
+    tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
     uber (0.1.0)
     unf (0.1.4)
