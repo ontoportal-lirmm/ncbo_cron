@@ -47,9 +47,9 @@ opt_parser = OptionParser.new do |opts|
 end
 opt_parser.parse!
 
-# URL of the API and APIKEY of the Otoportal  we want to import data FROM
-SOURCE_API =  ontology_source || 'http://data.bioontology.org'
-SOURCE_APIKEY =  source_api ||  '8b5b7825-538d-40e0-9e9e-5ab9274a9aeb'
+# URL of the API and APIKEY of the Ontoportal  we want to import data FROM
+SOURCE_API =  ontology_source
+SOURCE_APIKEY =  source_api
 
 
 # The username of the user that will have the administration rights on the ontology on the target portal
@@ -129,7 +129,8 @@ USER = get_user username
 #get apikey for admin user
 TARGET_APIKEY = USER.apikey
 
-SOURCE_APIKEY == '' && abort('SOURCE_APIKEY has to be set')
+SOURCE_APIKEY == '' && abort('--from-api has to be set')
+SOURCE_API == '' && abort('--from has to be set')
 
 def result_log(ressource, errors)
   if !errors
