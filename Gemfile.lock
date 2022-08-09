@@ -40,7 +40,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: b9a3395eeb241a2e1554c6a614ed66638bd9ad74
+  revision: 2e4f9c1c3debc144df317a6d777a58b90405f644
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -50,7 +50,6 @@ GIT
       json
       libxml-ruby
       multi_json
-      ncbo_resource_index
       oj
       omni_logger
       pony
@@ -113,7 +112,7 @@ GEM
       mail (~> 2.6)
     ethon (0.15.0)
       ffi (>= 1.15.0)
-    faraday (1.10.0)
+    faraday (1.10.1)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -221,7 +220,7 @@ GEM
     rubyzip (2.3.2)
     rufus-scheduler (2.0.24)
       tzinfo (>= 0.3.22)
-    sequel (5.58.0)
+    sequel (5.59.0)
     signet (0.15.0)
       addressable (~> 2.3)
       faraday (>= 0.17.3, < 2.0)
@@ -273,4 +272,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.5
+   2.3.4
