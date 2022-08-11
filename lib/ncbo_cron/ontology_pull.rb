@@ -8,10 +8,14 @@ module NcboCron
     class OntologyPull
 
       class RemoteFileException < StandardError
+        attr_reader :submission
+
+        def initialize(submission)
+          super
+          @submission = submission
+        end
       end
 
-      def initialize()
-      end
 
       def do_remote_ontology_pull(options = {})
         logger = options[:logger] || Logger.new($stdout)
