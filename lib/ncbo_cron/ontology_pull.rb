@@ -27,7 +27,7 @@ module NcboCron
         ontologies.select! { |ont| ont_to_include.include?(ont.acronym) } unless ont_to_include.empty?
         enable_pull_umls = options[:enable_pull_umls]
         umls_download_url = options[:pull_umls_url]
-        ontologies.sort! {|a, b| a.acronym.downcase <=> b.acronym.downcase}
+        ontologies.sort! { |a, b| a.acronym.downcase <=> b.acronym.downcase }
         new_submissions = []
 
         ontologies.each do |ont|
@@ -115,7 +115,7 @@ module NcboCron
         last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
         if last.hasOntologyLanguage.umls? && umls_download_url
-          last.pullLocation= RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
+          last.pullLocation = RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
           logger.info("Using alternative download for umls #{last.pullLocation.to_s}")
           logger.flush
         end
@@ -142,8 +142,8 @@ module NcboCron
         end
       end
 
-      def create_submission(ont, sub, file, filename, logger=nil,
-        add_to_pull=true,new_version=nil,new_released=nil)
+      def create_submission(ont, sub, file, filename, logger = nil,
+                            add_to_pull = true, new_version = nil, new_released = nil)
         logger ||= Kernel.const_defined?("LOGGER") ? Kernel.const_get("LOGGER") : Logger.new(STDOUT)
         new_sub = LinkedData::Models::OntologySubmission.new
 
@@ -172,9 +172,9 @@ module NcboCron
 
         # check if OWLAPI is able to parse the file before creating a new submission
         owlapi = LinkedData::Parser::OWLAPICommand.new(
-            full_file_path,
-            File.expand_path(new_sub.data_folder.to_s),
-            logger: logger)
+          full_file_path,
+          File.expand_path(new_sub.data_folder.to_s),
+          logger: logger)
         owlapi.disable_reasoner
         parsable = true
 
@@ -193,7 +193,7 @@ module NcboCron
 
             if add_to_pull
               submission_queue = NcboCron::Models::OntologySubmissionParser.new
-              submission_queue.queue_submission(new_sub, {all: true})
+              submission_queue.queue_submission(new_sub, { all: true })
               logger.info("OntologyPull created a new submission (#{submission_id}) for ontology #{ont.acronym}")
             end
           else
