@@ -92,9 +92,10 @@ module NcboCron
         new_submissions
       end
 
-      def do_ontology_pull(ontology_acronym, enable_pull_umls: false, umls_download_url: '' , isLong: false, logger:nil)
-        ont  = LinkedData::Models::Ontology.find(ontology_acronym).include(:acronym).first
-        raise StandardError, "Ontology #{ontology_acronym} not found"  if ont.nil?
+      def do_ontology_pull(ontology_acronym, enable_pull_umls: false, umls_download_url: '', logger: nil)
+        ont = LinkedData::Models::Ontology.find(ontology_acronym).include(:acronym).first
+        new_submission = nil
+        raise StandardError, "Ontology #{ontology_acronym} not found" if ont.nil?
 
         last = ont.latest_submission(status: :any)
         raise StandardError, "No submission found for #{ontology_acronym}" if last.nil?
@@ -118,32 +119,22 @@ module NcboCron
         if last.remote_file_exists?(last.pullLocation.to_s)
           logger.info "Checking download for #{ont.acronym}"
           logger.info "Location: #{last.pullLocation.to_s}"; logger.flush
-          file, filename = last.download_ontology_file()
-          file = File.open(file.path, "rb")
-          remote_contents  = file.read
-          md5remote = Digest::MD5.hexdigest(remote_contents)
-
-          if last.uploadFilePath && File.exist?(last.uploadFilePath)
-            file_contents = open(last.uploadFilePath) { |f| f.read }
-            md5local = Digest::MD5.hexdigest(file_contents)
-            new_file_exists = (not md5remote.eql?(md5local))
-          else
-            # There is no existing file, so let's create a submission with the downloaded one
-            new_file_exists = true
-          end
+          file, filename = last.download_ontology_file
+          file, md5local, md5remote, new_file_exists = new_file_exists?(file, last)
 
           if new_file_exists
             logger.info "New file found for #{ont.acronym}\nold: #{md5local}\nnew: #{md5remote}"
             logger.flush()
-            new_submissions << create_submission(ont, last, file, filename, logger)
+            new_submission = create_submission(ont, last, file, filename, logger)
           else
             logger.info "There is no new file found for #{ont.acronym}"
             logger.flush()
           end
 
           file.close
+          new_submission
         else
-            raise RemoteFileException
+          raise RemoteFileException.new(last)
         end
       end
 
@@ -210,6 +201,25 @@ module NcboCron
           File.delete full_file_path if File.exist? full_file_path
         end
         new_sub
+      end
+
+
+      private
+
+      def new_file_exists?(file, last)
+        file = File.open(file.path, "rb")
+        remote_contents = file.read
+        md5remote = Digest::MD5.hexdigest(remote_contents)
+
+        if last.uploadFilePath && File.exist?(last.uploadFilePath)
+          file_contents = open(last.uploadFilePath) { |f| f.read }
+          md5local = Digest::MD5.hexdigest(file_contents)
+          new_file_exists = (not md5remote.eql?(md5local))
+        else
+          # There is no existing file, so let's create a submission with the downloaded one
+          new_file_exists = true
+        end
+        return file, md5local, md5remote, new_file_exists
       end
 
       def redis_goo
