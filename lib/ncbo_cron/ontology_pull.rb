@@ -93,6 +93,61 @@ module NcboCron
         new_submissions
       end
 
+      def do_ontology_pull(ontology_acronym, enable_pull_umls: false, umls_download_url: '' , isLong: false, logger:nil)
+        ont  = LinkedData::Models::Ontology.find(ontology_acronym).include(:acronym).first
+        raise StandardError, "Ontology #{ontology_acronym} not found"  if ont.nil?
+
+        last = ont.latest_submission(status: :any)
+        raise StandardError, "No submission found for #{ontology_acronym}" if last.nil?
+
+        last.bring(:hasOntologyLanguage) if last.bring?(:hasOntologyLanguage)
+        if !enable_pull_umls && last.hasOntologyLanguage.umls?
+          raise StandardError, "Pull umls not enabled"
+        end
+
+        last.bring(:pullLocation) if last.bring?(:pullLocation)
+        raise StandardError, "#{ontology_acronym} has no pullLocation" if last.pullLocation.nil?
+
+        last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
+
+        if last.hasOntologyLanguage.umls? && umls_download_url
+          last.pullLocation= RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
+          logger.info("Using alternative download for umls #{last.pullLocation.to_s}")
+          logger.flush
+        end
+
+        if last.remote_file_exists?(last.pullLocation.to_s)
+          logger.info "Checking download for #{ont.acronym}"
+          logger.info "Location: #{last.pullLocation.to_s}"; logger.flush
+          file, filename = last.download_ontology_file()
+          file = File.open(file.path, "rb")
+          remote_contents  = file.read
+          md5remote = Digest::MD5.hexdigest(remote_contents)
+
+          if last.uploadFilePath && File.exist?(last.uploadFilePath)
+            file_contents = open(last.uploadFilePath) { |f| f.read }
+            md5local = Digest::MD5.hexdigest(file_contents)
+            new_file_exists = (not md5remote.eql?(md5local))
+          else
+            # There is no existing file, so let's create a submission with the downloaded one
+            new_file_exists = true
+          end
+
+          if new_file_exists
+            logger.info "New file found for #{ont.acronym}\nold: #{md5local}\nnew: #{md5remote}"
+            logger.flush()
+            new_submissions << create_submission(ont, last, file, filename, logger)
+          else
+            logger.info "There is no new file found for #{ont.acronym}"
+            logger.flush()
+          end
+
+          file.close
+        else
+            raise RemoteFileException
+        end
+      end
+
       def create_submission(ont, sub, file, filename, logger=nil,
         add_to_pull=true,new_version=nil,new_released=nil)
         logger ||= Kernel.const_defined?("LOGGER") ? Kernel.const_get("LOGGER") : Logger.new(STDOUT)
