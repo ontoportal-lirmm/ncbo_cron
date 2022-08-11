@@ -38,7 +38,7 @@ module NcboCron
             next if last.pullLocation.nil?
             last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
-            if last.hasOntologyLanguage.umls? && umls_download_url
+            if last.hasOntologyLanguage.umls? && !umls_download_url.empty?
               last.pullLocation= RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
               logger.info("Using alternative download for umls #{last.pullLocation.to_s}")
               logger.flush
@@ -66,7 +66,6 @@ module NcboCron
                 logger.flush()
                 new_submissions << create_submission(ont, last, file, filename, logger)
               end
-
               file.close
             else
               begin
