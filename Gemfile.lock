@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/lifewatch-eric/ontologies_linked_data.git
-  revision: a09337d5f467578a97a7b6ce50974518231ba7b8
+  revision: 4ea983a1afcbffff64fb17399e32024dadc2c63b
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
