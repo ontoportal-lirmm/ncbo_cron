@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 59223437a6b466f0f9bb15b30ab87ae4608f7fa7
+  revision: a00dac9a0825697cb7f6ac5e0f4db6ab8f4bae79
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -114,8 +114,8 @@ GEM
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
     ffi (1.15.5)
-    google-apis-analytics_v3 (0.11.0)
-      google-apis-core (>= 0.9.0, < 2.a)
+    google-apis-analytics_v3 (0.12.0)
+      google-apis-core (>= 0.9.1, < 2.a)
     google-apis-core (0.9.1)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.16.2, < 2.a)
@@ -144,7 +144,7 @@ GEM
     jwt (2.5.0)
     launchy (2.5.0)
       addressable (~> 2.7)
-    libxml-ruby (3.2.3)
+    libxml-ruby (3.2.4)
     logger (1.5.1)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
@@ -182,7 +182,7 @@ GEM
       addressable (>= 2.2)
     redis (5.0.5)
       redis-client (>= 0.9.0)
-    redis-client (0.10.0)
+    redis-client (0.11.0)
       connection_pool
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -208,8 +208,8 @@ GEM
       faraday (>= 0.17.5, < 3.a)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    sys-proctable (1.2.6)
-      ffi
+    sys-proctable (1.2.7)
+      ffi (~> 1.1)
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
