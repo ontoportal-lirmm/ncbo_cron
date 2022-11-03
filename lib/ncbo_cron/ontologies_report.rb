@@ -48,7 +48,7 @@ module NcboCron
 
         # acronyms = ["PHENOMEBLAST", "MYOBI", "NCBIVIRUSESTAX", "OntoOrpha", "PERTANIAN", "PHENOMEBLAST", "RTEST-LOINC", "SSACAL", "TEST", "UU", "VIRUSESTAX"]
         # acronyms = ["AERO", "SBO", "EHDAA", "CCO", "ONLIRA", "VT", "ZEA", "SMASH", "PLIO", "OGI", "CO", "NCIT", "GO"]
-        # acronyms = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
+        acronyms = ["AEO", "DATA-CITE", "FLOPO", "ICF-d8", "OGG-MM", "PP", "PROV", "TESTONTOO"]
         # acronyms = ["PDRO"]
 
         info_msg = 'Running ontologies report for'
@@ -345,7 +345,7 @@ module NcboCron
         page_size = 1000
         classes_size = 10
         good_classes = Array.new
-        paging = LinkedData::Models::Class.in(submission).include(:prefLabel, :synonym, metrics: :classes).page(page_num, page_size)
+        paging = LinkedData::Models::Class.in(submission).include(:prefLabel, :synonym, submission: [metrics: :classes]).page(page_num, page_size)
         cls_count = submission.class_count(@logger).to_i
         # prevent a COUNT SPARQL query if possible
         paging.page_count_set(cls_count) if cls_count > -1

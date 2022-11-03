@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 7fe22f03b56a944822c986269076a2e2aa64d6a2
+  revision: 091e0ca001244a7dbaed0644b0b1087a3a24d16a
   branch: develop
   specs:
     goo (0.0.2)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 53cd329b4a4a5fa4c4294cf4fe2dd43b0d748948
+  revision: 59223437a6b466f0f9bb15b30ab87ae4608f7fa7
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -74,12 +74,13 @@ GEM
     activesupport (3.2.22.5)
       i18n (~> 0.6, >= 0.6.4)
       multi_json (~> 1.0)
-    addressable (2.8.0)
-      public_suffix (>= 2.0.2, < 5.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
     bcrypt (3.1.18)
     builder (3.2.4)
     coderay (1.1.3)
     concurrent-ruby (1.1.10)
+    connection_pool (2.3.0)
     cube-ruby (0.0.3)
     dante (0.2.0)
     declarative (0.0.20)
@@ -89,7 +90,7 @@ GEM
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
       mail (~> 2.6)
-    faraday (1.10.0)
+    faraday (1.10.2)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -113,9 +114,9 @@ GEM
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
     ffi (1.15.5)
-    google-apis-analytics_v3 (0.10.0)
-      google-apis-core (>= 0.7, < 2.a)
-    google-apis-core (0.7.0)
+    google-apis-analytics_v3 (0.11.0)
+      google-apis-core (>= 0.9.0, < 2.a)
+    google-apis-core (0.9.1)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.16.2, < 2.a)
       httpclient (>= 2.8.1, < 3.a)
@@ -124,7 +125,7 @@ GEM
       retriable (>= 2.0, < 4.a)
       rexml
       webrick
-    googleauth (1.2.0)
+    googleauth (1.3.0)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -140,7 +141,7 @@ GEM
       concurrent-ruby (~> 1.0)
     json (2.6.2)
     json_pure (2.6.2)
-    jwt (2.4.1)
+    jwt (2.5.0)
     launchy (2.5.0)
       addressable (~> 2.7)
     libxml-ruby (3.2.3)
@@ -172,14 +173,17 @@ GEM
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    public_suffix (4.0.7)
-    rack (2.2.4)
+    public_suffix (5.0.0)
+    rack (3.0.0)
     rack-test (2.0.2)
       rack (>= 1.3)
     rake (13.0.6)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.7.1)
+    redis (5.0.5)
+      redis-client (>= 0.9.0)
+    redis-client (0.10.0)
+      connection_pool
     representable (3.2.0)
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
@@ -221,6 +225,8 @@ GEM
     webrick (1.7.0)
 
 PLATFORMS
+  ruby
+  x86_64-darwin-18
   x86_64-darwin-21
 
 DEPENDENCIES
@@ -248,4 +254,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.14
+   2.3.15
