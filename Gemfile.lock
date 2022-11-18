@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 091e0ca001244a7dbaed0644b0b1087a3a24d16a
+  revision: 204cecf98bedb30f8b4b6e6afb1984f7659175d8
   branch: develop
   specs:
     goo (0.0.2)
@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: bad8c646205014b1fc82793fb9c07d7075b4c068
+  revision: 75d1a8f302c8af4060bf62fc619f230084da521e
   branch: develop
   specs:
     ncbo_annotator (0.0.1)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: a00dac9a0825697cb7f6ac5e0f4db6ab8f4bae79
+  revision: 8628abe3c349052fd389751db203b27e6e541087
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -182,7 +182,7 @@ GEM
       addressable (>= 2.2)
     redis (5.0.5)
       redis-client (>= 0.9.0)
-    redis-client (0.11.0)
+    redis-client (0.11.2)
       connection_pool
     representable (3.2.0)
       declarative (< 0.1.0)
@@ -254,4 +254,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.15
+   2.3.22
