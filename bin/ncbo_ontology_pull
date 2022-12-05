@@ -33,11 +33,7 @@ logger.info "Starting ncbo pull"; logger.flush
 puller = NcboCron::Models::OntologyPull.new
 begin
   puller.do_ontology_pull(ontology_acronym, logger: logger , enable_pull_umls:true )
-rescue NcboCron::Models::OntologyPull::RemoteFileException => e
-  logger.error "RemoteFileException: No submission file at pull location #{last.pullLocation.to_s} for ontology #{ont.acronym}."
-  logger.flush
 rescue StandardError => e
-  e.backtrace
   logger.error e.message
   logger.flush
 end
