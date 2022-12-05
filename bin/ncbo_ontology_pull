@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+
+$0 = "ncbo_ontology_pull"
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+# redis store for looking up queued jobs
+require 'redis'
+
+require_relative '../lib/ncbo_cron'
+require_relative '../config/config'
+require 'optparse'
+
+ontology_acronym = ''
+opt_parser = OptionParser.new do |opts|
+  opts.on('-o', '--ontology ACRONYM', 'Ontology acronym to pull if new version exist') do |acronym|
+    ontology_acronym = acronym
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+opt_parser.parse!
+
+logger = Logger.new($stdout)
+logger.info "Starting ncbo pull"; logger.flush
+puller = NcboCron::Models::OntologyPull.new
+begin
+  puller.do_ontology_pull(ontology_acronym, logger: logger , isLong: false ,enable_pull_umls:true, options: {})
+rescue NcboCron::Models::OntologyPull::RemoteFileException => e
+  logger.error e.message
+  logger.flush
+rescue StandardError => e
+  logger.error e.message
+  logger.flush
+end
+logger.info "Finished ncbo pull"; logger.flush
+
+
