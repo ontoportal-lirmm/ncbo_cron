@@ -6,7 +6,7 @@ on:
 
 jobs:
   test:
-     strategy:
+    strategy:
       matrix:
         backend: ['ruby', 'ruby-agraph'] # ruby runs tests with 4store backend and ruby-agraph runs with AllegroGraph backend
     runs-on: ubuntu-latest
