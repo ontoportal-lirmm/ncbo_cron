@@ -28,6 +28,8 @@ gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
 
 group :test do
   gem 'email_spec'
+  gem 'simplecov'
+  gem 'simplecov-cobertura' # for codecov.io
   gem 'test-unit-minitest'
 end
 
