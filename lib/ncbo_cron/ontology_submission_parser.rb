@@ -10,6 +10,7 @@ module NcboCron
 
       ACTIONS = {
         :process_rdf => true,
+        :extract_metadata => true,
         :index_search => true,
         :index_properties => true,
         :run_metrics => true,
