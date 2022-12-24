@@ -10,6 +10,7 @@ module NcboCron
 
       ACTIONS = {
         :process_rdf => true,
+        :extract_metadata => true,
         :index_search => true,
         :index_properties => true,
         :run_metrics => true,
@@ -236,7 +237,10 @@ module NcboCron
           begin
             annotator = Annotator::Models::NcboAnnotator.new
             annotator.create_term_cache_for_submission(logger, sub)
-            annotator.generate_dictionary_file()
+            # commenting this action out for now due to a problem with hgetall in redis
+            # see https://github.com/ncbo/ncbo_cron/issues/45 for details
+            # mgrep dictionary generation will occur as a separate CRON task
+            # annotator.generate_dictionary_file()
           rescue Exception => e
             logger.error(e.message + "\n" + e.backtrace.join("\n\t"))
             logger.flush()

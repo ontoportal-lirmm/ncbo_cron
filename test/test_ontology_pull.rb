@@ -41,14 +41,14 @@ class TestOntologyPull < TestCase
     @@redis.del NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER
   end
 
-  def test_remote_ontology_pull()
+  def test_remote_ontology_pull
     ontologies = init_ontologies(1)
     ont = LinkedData::Models::Ontology.find(ontologies[0].id).first
     ont.bring(:submissions) if ont.bring?(:submissions)
     assert_equal 1, ont.submissions.length
 
     pull = NcboCron::Models::OntologyPull.new
-    pull.do_remote_ontology_pull()
+    pull.do_remote_ontology_pull
 
     # check that the pull creates a new submission when the file has changed
     ont = LinkedData::Models::Ontology.find(ontologies[0].id).first
@@ -72,7 +72,7 @@ class TestOntologyPull < TestCase
     ont = LinkedData::Models::Ontology.find(ontologies[0].id).first
     ont.bring(:submissions) if ont.bring?(:submissions)
     assert_equal 2, ont.submissions.length
-    pull.do_remote_ontology_pull()
+    pull.do_remote_ontology_pull
     assert_equal 2, ont.submissions.length
   end
 
@@ -172,7 +172,7 @@ class TestOntologyPull < TestCase
       sub.pullLocation = RDF::IRI.new(@@url)
       sub.save() rescue binding.pry
     end
-    return ontologies
+    ontologies
   end
 
 end
