@@ -13,6 +13,9 @@ repo*
 .DS_Store
 tmp
 
+# Code coverage reports
+coverage*
+
 # Ignore eclipse .project
 .project
 .pmd

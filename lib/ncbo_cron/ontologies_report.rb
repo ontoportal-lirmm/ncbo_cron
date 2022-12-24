@@ -345,7 +345,7 @@ module NcboCron
         page_size = 1000
         classes_size = 10
         good_classes = Array.new
-        paging = LinkedData::Models::Class.in(submission).include(:prefLabel, :synonym, metrics: :classes).page(page_num, page_size)
+        paging = LinkedData::Models::Class.in(submission).include(:prefLabel, :synonym, submission: [metrics: :classes]).page(page_num, page_size)
         cls_count = submission.class_count(@logger).to_i
         # prevent a COUNT SPARQL query if possible
         paging.page_count_set(cls_count) if cls_count > -1
