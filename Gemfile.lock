@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 92968978e5d2436c648bf7956e25aff05440b59d
-  branch: master
+  revision: 3d5bbe1db4a6aca2ff621ccfcdb85a32dbe9704e
+  branch: development
   specs:
     goo (0.0.2)
       addressable (~> 2.8)
@@ -26,8 +26,8 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: b1d8504f434d3821b967fa07cbe17f7f3d286b41
-  branch: master
+  revision: daffac732b62d51b5440cac55aed874036e52e51
+  branch: development
   specs:
     ontologies_linked_data (0.0.1)
       activesupport
