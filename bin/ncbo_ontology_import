@@ -104,12 +104,13 @@ def upload_submission(sub_info, ontology)
   end
   to_copy["ontology"] = ontology
 
-  unless LinkedData::Models::Contact.where(email: USER.email).to_a[0]
-    LinkedData::Models::Contact.new(name: USER.username, email: USER.email).save
+  contact = LinkedData::Models::Contact.where(email: USER.email).first
+  unless contact
+    contact = LinkedData::Models::Contact.new(name: USER.username, email: USER.email).save
     puts "created a new contact; name: #{USER.username}, email: #{USER.email}"
   end
 
-  to_copy["contact"] = [LinkedData::Models::Contact.where(email: USER.email).first]
+  to_copy["contact"] = [contact]
   to_copy["hasOntologyLanguage"] = LinkedData::Models::OntologyFormat.where(acronym: sub_info["hasOntologyLanguage"]).first
 
   to_copy.each do |key, value|
