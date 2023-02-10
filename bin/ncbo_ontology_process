@@ -31,9 +31,9 @@ opt_parser = OptionParser.new do |opts|
   end
 
   options[:tasks] = NcboCron::Models::OntologySubmissionParser::ACTIONS
-  opts.on('-t', '--tasks process_rdf,index_search,run_metrics', "Optional comma-separated list of processing tasks to perform. Default: #{NcboCron::Models::OntologySubmissionParser::ACTIONS.keys.join(',')}") do |tasks|
-    t = tasks.split(",").map {|t| t.strip.sub(/^:/, '').to_sym}
-    options[:tasks].each {|k, _| options[:tasks][k] = false unless t.include?(k)}
+  opts.on('-t', '--tasks process_rdf,generate_labels=false,index_search,run_metrics', "Optional comma-separated list of processing tasks to perform (or exclude). Default: #{NcboCron::Models::OntologySubmissionParser::ACTIONS.keys.join(',')}") do |tasks|
+    work_tasks = tasks.split(',').map { |t| t.gsub(/\s+/, '').gsub(/^:/, '') }.select { |t| k = t.split('='); k.length <= 1 || k[1].downcase === 'true' }.map { |t| t.gsub(/\=true$/, '').to_sym }
+    options[:tasks].each {|k, _| options[:tasks][k] = false unless work_tasks.include?(k)}
   end
 
   options[:logfile] = STDOUT

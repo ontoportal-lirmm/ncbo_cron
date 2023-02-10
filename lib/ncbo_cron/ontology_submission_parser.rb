@@ -10,6 +10,7 @@ module NcboCron
 
       ACTIONS = {
         :process_rdf => true,
+        :generate_labels => true,
         :index_search => true,
         :index_properties => true,
         :run_metrics => true,
