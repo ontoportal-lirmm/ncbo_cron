@@ -32,8 +32,13 @@ opt_parser = OptionParser.new do |opts|
 
   options[:tasks] = NcboCron::Models::OntologySubmissionParser::ACTIONS
   opts.on('-t', '--tasks process_rdf,generate_labels=false,index_search,run_metrics', "Optional comma-separated list of processing tasks to perform (or exclude). Default: #{NcboCron::Models::OntologySubmissionParser::ACTIONS.keys.join(',')}") do |tasks|
-    work_tasks = tasks.split(',').map { |t| t.gsub(/\s+/, '').gsub(/^:/, '') }.select { |t| k = t.split('='); k.length <= 1 || k[1].downcase === 'true' }.map { |t| t.gsub(/\=true$/, '').to_sym }
-    options[:tasks].each {|k, _| options[:tasks][k] = false unless work_tasks.include?(k)}
+    tasks_obj = {}
+    tasks.split(',').each { |t|
+      t_arr = t.gsub(/\s+/, '').gsub(/^:/, '').split('=')
+      tasks_obj[t_arr[0].to_sym] = (t_arr.length <= 1 || t_arr[1].downcase === 'true')
+    }
+    tasks_obj[:generate_labels] = true if tasks_obj[:process_rdf] && !tasks_obj.has_key?(:generate_labels)
+    options[:tasks].each {|k, _| options[:tasks][k] = false unless tasks_obj[k]}
   end
 
   options[:logfile] = STDOUT
