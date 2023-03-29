@@ -28,28 +28,24 @@ opt_parser = OptionParser.new do |opts|
     ontologies_acronyms = acronym
   end
 
-  opts.on('--from url', 'The ontoportal api url source of the ontology') do |url|
+  opts.on('--from URL', 'The ontoportal api url source of the ontology') do |url|
     ontology_source = url.to_s
   end
 
-  opts.on('--from-apikey apikey', 'An apikey to acces the ontoportal api') do |apikey|
+  opts.on('--from-apikey APIKEY', 'An apikey to acces the ontoportal api') do |apikey|
     source_apikey = apikey.to_s
   end
 
-  opts.on('--admin-user username', 'The target admin user that will submit the ontology') do |user|
+  opts.on('--admin-user USERNAME', 'The target admin user that will submit the ontology') do |user|
     username = user.to_s
   end
   # Display the help screen, all programs are assumed to have this option.
-  opts.on( '-h', '--help', 'Display this screen') do
+  opts.on('-h', '--help', 'Display this screen') do
     puts opts
     exit
   end
 end
 opt_parser.parse!
-if ontologies_acronyms.empty?
-  puts opts
-  exit(1)
-end
 
 # URL of the API and APIKEY of the Ontoportal  we want to import data FROM
 SOURCE_API = ontology_source
@@ -131,7 +127,6 @@ def upload_submission(sub_info, ontology)
 
   new_submission
 end
-
 
 USER = get_user username
 # get apikey for admin user
