@@ -8,7 +8,6 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{}
   gem.homepage      = "https://github.com/ncbo/ncbo_cron"
 
-  #gem.files         = `git ls-files`.split($\)
   gem.files         = Dir['**/*']
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
