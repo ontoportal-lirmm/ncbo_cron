@@ -23,7 +23,8 @@ gem 'cube-ruby', require: 'cube'
 # NCBO
 gem 'goo', github: 'ncbo/goo', branch: 'master'
 gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
-gem 'ontologies_linked_data', github: 'ncbo/ontologies_linked_data', branch: 'master'
+gem 'ncbo_resource_index', github: 'ncbo/resource_index'
+gem 'ontologies_linked_data', github: 'lifewatch-eric/ontologies_linked_data', branch: 'master'
 gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
 
 group :test do
