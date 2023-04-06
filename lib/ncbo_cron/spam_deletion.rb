@@ -25,7 +25,7 @@ module NcboCron
       end
 
       def run
-        auth_token = Base64.decode64(NcboCron.settings.git_repo_access_token)
+        auth_token = NcboCron.settings.git_repo_access_token
         res = `curl --header 'Authorization: token #{auth_token}' --header 'Accept: application/vnd.github.v3.raw' --location #{FULL_FILE_PATH}`
 
         begin
@@ -109,25 +109,25 @@ module NcboCron
           @logger.info("Deleting #{delete_prov_classes.length} provisional classes...")
           @logger.info("Deleting #{delete_users.length} users...")
 
-          # delete_projects.each {|p| p.delete}
-          # delete_notes.each {|n| n.delete}
-          # delete_reviews.each {|r| r.delete}
-          # delete_ontologies.each {|o| o.delete}
-          # delete_prov_classes.each {|pc| pc.delete}
-          # delete_users.each {|u| u.delete}
+          delete_projects.each {|p| p.delete}
+          delete_notes.each {|n| n.delete}
+          delete_reviews.each {|r| r.delete}
+          delete_ontologies.each {|o| o.delete}
+          delete_prov_classes.each {|pc| pc.delete}
+          delete_users.each {|u| u.delete}
         end
       end
     end
   end
 end
 
-require 'ontologies_linked_data'
-require 'goo'
-require 'ncbo_annotator'
-require 'ncbo_cron/config'
-require_relative '../../config/config'
-
-spam_deletion_path = File.join("logs", "spam-deletion.log")
-spam_deletion_logger = Logger.new(spam_deletion_path)
-NcboCron::Models::SpamDeletion.new(spam_deletion_logger).run
+# require 'ontologies_linked_data'
+# require 'goo'
+# require 'ncbo_annotator'
+# require 'ncbo_cron/config'
+# require_relative '../../config/config'
+#
+# spam_deletion_path = File.join("logs", "spam-deletion.log")
+# spam_deletion_logger = Logger.new(spam_deletion_path)
+# NcboCron::Models::SpamDeletion.new(spam_deletion_logger).run
 # ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontology-analytics true --disable-mapping-counts true --disable-ontologies-report true --spam-deletion '14 * * * *'
