@@ -166,7 +166,7 @@ module NcboCron
 
           # Check to make sure the file has been downloaded
           if sub.pullLocation && (!sub.uploadFilePath || !File.exist?(sub.uploadFilePath))
-            multi_logger.debug "Pull location found, but no file in the upload file path. Retrying download."
+            multi_logger.debug "Pull location found (#{sub.pullLocation}, but no file in the upload file path (#{sub.uploadFilePath}. Retrying download."
             file, filename = sub.download_ontology_file
             file_location = sub.class.copy_file_repository(sub.ontology.acronym, sub.submissionId, file, filename)
             file_location = "../" + file_location if file_location.start_with?(".") # relative path fix
