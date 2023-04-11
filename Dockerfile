@@ -20,4 +20,6 @@ ENV BUNDLE_PATH=/srv/ontoportal/bundle
 RUN bundle install
 
 COPY . /srv/ontoportal/ncbo_cron
+RUN cp /srv/ontoportal/ncbo_cron/config/config.rb.sample /srv/ontoportal/ncbo_cron/config/config.rb
+
 CMD ["/bin/bash"]
