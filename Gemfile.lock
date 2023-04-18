@@ -1,28 +1,6 @@
 GIT
-  remote: https://github.com/lifewatch-eric/ontologies_linked_data.git
-  revision: 2b5d8ebf6bc13ae182db549da8785a1b49a2e5e2
-  branch: master
-  specs:
-    ontologies_linked_data (0.0.1)
-      activesupport
-      bcrypt
-      goo
-      json
-      libxml-ruby
-      multi_json
-      ncbo_resource_index
-      oauth2
-      oj
-      omni_logger
-      pony
-      rack
-      rack-test
-      rsolr
-      rubyzip
-
-GIT
-  remote: https://github.com/ncbo/goo.git
-  revision: d0dd816a0afd5b85a02c4b909502cf3a93e6be58
+  remote: https://github.com/ontoportal-lirmm/goo.git
+  revision: 92968978e5d2436c648bf7956e25aff05440b59d
   branch: master
   specs:
     goo (0.0.2)
@@ -36,8 +14,8 @@ GIT
       uuid
 
 GIT
-  remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: ed325ae9f79e3b0a0061b1af0b02f624de1d0eef
+  remote: https://github.com/ontoportal-lirmm/ncbo_annotator.git
+  revision: 57204d8e54432ba660af4c49806e2a3019a23fa2
   branch: master
   specs:
     ncbo_annotator (0.0.1)
@@ -47,8 +25,8 @@ GIT
       ruby-xxHash
 
 GIT
-  remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 052e17698a59ff548a749fa7e365156c39aa7305
+  remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
+  revision: c98145605413e459d3c09a41d3c28a5acd0c49e4
   branch: master
   specs:
     ontologies_linked_data (0.0.1)
@@ -68,21 +46,8 @@ GIT
       rubyzip
 
 GIT
-  remote: https://github.com/ncbo/resource_index.git
-  revision: 24a7f14a6da4f4a0eaba1016ca5a378dfccd7441
-  specs:
-    ncbo_resource_index (0.0.1)
-      elasticsearch (= 2.0.0)
-      mysql2 (= 0.5.2)
-      pony
-      ref
-      ruby-xxHash
-      sequel
-      typhoeus
-
-GIT
-  remote: https://github.com/ncbo/sparql-client.git
-  revision: fb4a89b420f8eb6dda5190a126b6c62e32c4c0c9
+  remote: https://github.com/ontoportal-lirmm/sparql-client.git
+  revision: aed51baf4106fd0f3d0e3f9238f0aad9406aa3f0
   branch: master
   specs:
     sparql-client (1.0.1)
@@ -107,29 +72,27 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    activesupport (4.0.13)
-      i18n (~> 0.6, >= 0.6.9)
-      minitest (~> 4.2)
-      multi_json (~> 1.3)
-      thread_safe (~> 0.1)
-      tzinfo (~> 0.3.37)
-    addressable (2.3.5)
-    bcrypt (3.1.16)
+    activesupport (3.2.22.5)
+      i18n (~> 0.6, >= 0.6.4)
+      multi_json (~> 1.0)
+    addressable (2.8.1)
+      public_suffix (>= 2.0.2, < 6.0)
+    bcrypt (3.1.18)
     builder (3.2.4)
     coderay (1.1.3)
-    concurrent-ruby (1.1.9)
+    concurrent-ruby (1.1.10)
+    connection_pool (2.3.0)
     cube-ruby (0.0.3)
     dante (0.2.0)
     declarative (0.0.20)
+    docile (1.4.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     email_spec (2.1.1)
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
       mail (~> 2.6)
-    ethon (0.15.0)
-      ffi (>= 1.15.0)
-    faraday (1.10.0)
+    faraday (1.10.2)
       faraday-em_http (~> 1.0)
       faraday-em_synchrony (~> 1.0)
       faraday-excon (~> 1.1)
@@ -153,9 +116,9 @@ GEM
     faraday-rack (1.0.0)
     faraday-retry (1.0.3)
     ffi (1.15.5)
-    google-apis-analytics_v3 (0.10.0)
-      google-apis-core (>= 0.7, < 2.a)
-    google-apis-core (0.7.0)
+    google-apis-analytics_v3 (0.12.0)
+      google-apis-core (>= 0.9.1, < 2.a)
+    google-apis-core (0.9.2)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.16.2, < 2.a)
       httpclient (>= 2.8.1, < 3.a)
@@ -164,7 +127,7 @@ GEM
       retriable (>= 2.0, < 4.a)
       rexml
       webrick
-    googleauth (1.2.0)
+    googleauth (1.3.0)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
@@ -178,13 +141,13 @@ GEM
     httpclient (2.8.3)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
-    json (2.6.1)
-    json_pure (2.6.1)
-    jwt (2.3.0)
-    launchy (2.4.3)
-      addressable (~> 2.3)
-    libxml-ruby (3.2.2)
-    logger (1.5.0)
+    json (2.6.3)
+    json_pure (2.6.3)
+    jwt (2.6.0)
+    launchy (2.5.0)
+      addressable (~> 2.7)
+    libxml-ruby (3.2.4)
+    logger (1.5.3)
     macaddr (1.7.2)
       systemu (~> 2.6.5)
     mail (2.6.6)
@@ -220,15 +183,18 @@ GEM
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    rack (2.2.3)
-    rack-test (1.1.0)
-      rack (>= 1.0, < 3)
+    public_suffix (5.0.1)
+    rack (3.0.2)
+    rack-test (2.0.2)
+      rack (>= 1.3)
     rake (13.0.6)
     rdf (1.0.8)
       addressable (>= 2.2)
-    redis (4.6.0)
-    ref (2.0.0)
-    representable (3.1.1)
+    redis (5.0.5)
+      redis-client (>= 0.9.0)
+    redis-client (0.11.2)
+      connection_pool
+    representable (3.2.0)
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
@@ -253,18 +219,23 @@ GEM
       faraday (>= 0.17.3, < 2.0)
       jwt (>= 1.5, < 3.0)
       multi_json (~> 1.10)
-    snaky_hash (2.0.1)
-      hashie
-      version_gem (~> 1.1, >= 1.1.1)
-    sys-proctable (1.2.6)
-      ffi
+    simplecov (0.22.0)
+      docile (~> 1.1)
+      simplecov-html (~> 0.11)
+      simplecov_json_formatter (~> 0.1)
+    simplecov-cobertura (2.1.0)
+      rexml
+      simplecov (~> 0.19)
+    simplecov-html (0.12.3)
+    simplecov_json_formatter (0.1.4)
+    sys-proctable (1.2.7)
+      ffi (~> 1.1)
     systemu (2.6.5)
     test-unit-minitest (0.9.1)
       minitest (~> 4.7)
     trailblazer-option (0.1.2)
-    typhoeus (1.4.0)
-      ethon (>= 0.9.0)
-    tzinfo (0.3.60)
+    tzinfo (2.0.5)
+      concurrent-ruby (~> 1.0)
     uber (0.1.0)
     unf (0.1.4)
       unf_ext
@@ -273,7 +244,6 @@ GEM
       macaddr (~> 1.0)
 
 PLATFORMS
-  ruby
   x86_64-darwin-21
   x86_64-linux
 
@@ -297,9 +267,11 @@ DEPENDENCIES
   rake
   redis
   rest-client
+  simplecov
+  simplecov-cobertura
   sparql-client!
   sys-proctable
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.14
+   2.3.22

@@ -26,6 +26,13 @@ module NcboCron
         # ont_acronyms = ["NCIT", "ONTOMA", "CMPO", "AEO", "SNOMEDCT"]
         filter_str = (NcboCron.settings.analytics_filter_str.nil? || NcboCron.settings.analytics_filter_str.empty?) ? "" : ";#{NcboCron.settings.analytics_filter_str}"
 
+        # If the user add filter through the configuration file
+        if !NcboCron.settings.analytics_filter_str.nil? && NcboCron.settings.analytics_filter_str != ""
+          analytics_filter = ";" + NcboCron.settings.analytics_filter_str
+        else
+          analytics_filter = ""
+        end
+
         ont_acronyms.each do |acronym|
           max_results = 10000
           num_results = 10000
