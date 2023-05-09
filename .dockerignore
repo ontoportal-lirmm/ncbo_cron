@@ -12,5 +12,6 @@ tmp/*
 coverage
 create_permissions.log
 # Ignore generated test data
+test/data/dictionary.txt
 test/data/ontology_files/repo/**/*
 test/data/tmp/*
