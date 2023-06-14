@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 3296b59388798c60c5bb09cfca4c00651a044469
+  revision: a89a452eb168c06665fa18941f2c9beaf3434cf1
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -189,6 +189,8 @@ GEM
       declarative (< 0.1.0)
       trailblazer-option (>= 0.1.1, < 0.2.0)
       uber (< 0.2.0)
+    request_store (1.5.1)
+      rack (>= 1.4)
     rest-client (2.1.0)
       http-accept (>= 1.7.0, < 2.0)
       http-cookie (>= 1.0.2, < 2.0)
@@ -257,6 +259,7 @@ DEPENDENCIES
   pry
   rake
   redis
+  request_store
   rest-client
   simplecov
   simplecov-cobertura
