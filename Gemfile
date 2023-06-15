@@ -16,6 +16,7 @@ gem 'rake'
 gem 'redis'
 gem 'rest-client'
 gem 'sys-proctable'
+gem 'request_store'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'

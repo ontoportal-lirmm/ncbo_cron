@@ -150,6 +150,9 @@ class TestOntologySubmissionParser < TestCase
     zombies = parser.zombie_classes_graphs
     assert_equal 1, zombies.length
     assert zombies.first["/TEST-ONT-0/submissions/2"]
+    o2 = @@ontologies[1]
+    o2.delete
+    @@ont_count, @@acronyms, @@ontologies = LinkedData::SampleData::Ontology.create_ontologies_and_submissions(ont_count: 2, submission_count: 2, process_submission: false)
   end
 
   def test_extract_metadata
