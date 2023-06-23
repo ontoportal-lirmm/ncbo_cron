@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 8a0c14a6e6942b20749894806f1f1f512f9afcfa
+  revision: fb203b0396d03c1df61abfcdbc4070787010f052
   branch: develop
   specs:
     goo (0.0.2)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 79527b94fbb59081ba58281a5cd51ec3448fadb0
+  revision: 1f535313248f27170f7ecdb3450ae8247be735eb
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -126,7 +126,7 @@ GEM
       retriable (>= 2.0, < 4.a)
       rexml
       webrick
-    googleauth (1.5.2)
+    googleauth (1.6.0)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
