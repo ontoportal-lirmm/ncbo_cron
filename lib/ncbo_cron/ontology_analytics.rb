@@ -13,7 +13,7 @@ module NcboCron
       end
 
       def run
-        redis = Redis.new(:host => NcboCron.settings.redis_host, :port => NcboCron.settings.redis_port)
+        redis = Redis.new(:host => NcboCron.settings.ontology_analytics_redis_host, :port => NcboCron.settings.ontology_analytics_redis_port)
         ontology_analytics = fetch_ontology_analytics
         redis.set(ONTOLOGY_ANALYTICS_REDIS_FIELD, Marshal.dump(ontology_analytics))
       end
@@ -120,7 +120,8 @@ end
 # require 'ncbo_annotator'
 # require 'ncbo_cron/config'
 # require_relative '../../config/config'
-# ontology_analytics_log_path = File.join("logs", "ontology-analytics.log")
-# ontology_analytics_logger = Logger.new(ontology_analytics_log_path)
+# # ontology_analytics_log_path = File.join("logs", "ontology-analytics.log")
+# # ontology_analytics_logger = Logger.new(ontology_analytics_log_path)
+# ontology_analytics_logger = Logger.new(STDOUT)
 # NcboCron::Models::OntologyAnalytics.new(ontology_analytics_logger).run
 # ./bin/ncbo_cron --disable-processing true --disable-pull true --disable-flush true --disable-warmq true --disable-ontologies-report true --disable-mapping-counts true --disable-spam-deletion true --ontology-analytics '14 * * * *'

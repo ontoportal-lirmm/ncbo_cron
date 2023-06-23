@@ -220,10 +220,11 @@ module NcboCron
           begin
             annotator = Annotator::Models::NcboAnnotator.new
             annotator.create_term_cache_for_submission(logger, sub)
-            # commenting this action out for now due to a problem with hgetall in redis
+            # this action only occurs if the CRON dictionary generation job is disabled
+            # if the CRON dictionary generation job is running,
+            # the dictionary will NOT be generated on each ontology parsing
             # see https://github.com/ncbo/ncbo_cron/issues/45 for details
-            # mgrep dictionary generation will occur as a separate CRON task
-            # annotator.generate_dictionary_file()
+            annotator.generate_dictionary_file() unless NcboCron.settings.enable_dictionary_generation_cron_job
           rescue Exception => e
             logger.error(e.message + "\n" + e.backtrace.join("\n\t"))
             logger.flush()
