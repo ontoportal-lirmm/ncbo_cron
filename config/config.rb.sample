@@ -69,14 +69,14 @@ NcboCron.config do |config|
   config.search_index_all_url = "http://localhost:8983/solr/term_search_core2"
   config.property_search_index_all_url = "http://localhost:8983/solr/prop_search_core2"
 
-  # Google Analytics config
-  config.analytics_service_account_email_address = "123456789999-sikipho0wk8q0atflrmw62dj4kpwoj3c@developer.gserviceaccount.com"
-  config.analytics_path_to_key_file              = "config/bioportal-analytics.p12"
-  config.analytics_profile_id                    = "ga:1234567"
-  config.analytics_app_name                      = "BioPortal"
-  config.analytics_app_version                   = "1.0.0"
-  config.analytics_start_date                    = "2013-10-01"
-  config.analytics_filter_str                    = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
+  # Google Analytics GA4 config
+  config.analytics_path_to_key_file     = "config/your_analytics_key.json"
+  config.analytics_property_id          = "123456789"
+  # path to the Universal Analytics data, which stopped collecting on June 1st, 2023
+  config.analytics_path_to_ua_data_file = "data/your_ua_data.json"
+  # path to the file that will hold your Google Analytics data
+  # this is in addition to storing it in Redis
+  config.analytics_path_to_ga_data_file = "data/your_ga_data.json"
 
   # this is a Base64.encode64 encoded personal access token
   # you need to run Base64.decode64 on it before using it in your code

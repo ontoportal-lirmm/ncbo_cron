@@ -3,6 +3,7 @@
 config/config.rb
 config/config_*.rb
 config/*.p12
+config/*.json
 projectFilesBackup/
 .ruby-version
 repo*
