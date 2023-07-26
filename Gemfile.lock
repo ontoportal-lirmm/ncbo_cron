@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 79527b94fbb59081ba58281a5cd51ec3448fadb0
+  revision: 13bb138aa40ca72bfafc91a1a7416c162ba8d325
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -141,22 +141,22 @@ GEM
       google-protobuf (~> 3.14)
       googleapis-common-protos-types (~> 1.2)
       grpc (~> 1.27)
-    googleapis-common-protos-types (1.6.0)
+    googleapis-common-protos-types (1.7.0)
       google-protobuf (~> 3.14)
-    googleauth (1.6.0)
+    googleauth (1.7.0)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
       memoist (~> 0.16)
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    grpc (1.56.0)
+    grpc (1.56.2)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
-    grpc (1.56.0-x86_64-darwin)
+    grpc (1.56.2-x86_64-darwin)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
-    grpc (1.56.0-x86_64-linux)
+    grpc (1.56.2-x86_64-linux)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
     htmlentities (4.3.4)
