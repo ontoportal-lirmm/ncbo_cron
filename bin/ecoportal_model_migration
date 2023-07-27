@@ -1,0 +1,362 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+require 'binding_of_caller'
+# Configure the process for the current cron configuration.
+require_relative '../lib/ncbo_cron'
+config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
+abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
+require_relative '../config/config'
+
+require 'optparse'
+options = {}
+opt_parser = OptionParser.new do |opts|
+  # Set a banner, displayed at the top of the help screen.
+  # opts.banner = "Usage: ncbo_ontology_process [options]"
+  opts.separator 'A script that migrate data from old EcoPortal model to the new (AgroPortal) model'
+  opts.on('-o', '--ontologies ACRONYM[,ACRONYM,...]', 'Migrate submission model of the  of this ontology acronym(s).') do |acronym|
+    options[:ontologies] = acronym.split(',')
+  end
+  opts.on('--migrate-all', 'Migrate all submission models') do |d|
+    options[:migrate_all] = true
+  end
+
+  options[:logfile] = "ecoportal_migration.log"
+  opts.on('-l', '--logfile FILE', "Write log to FILE (default is 'deletions.log')") do |filename|
+    options[:logfile] = filename
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+# Parse the command-line. The 'parse' method simply parses ARGV, while the 'parse!' method parses ARGV and removes
+# any options found there, as well as any parameters for the options.
+opt_parser.parse!
+
+### OLD Models to Migrate
+class LinkedData::Models::Affiliation < LinkedData::Models::Base
+  AFFILIATION_IDENTIFIER_SCHEMES = { ISNI: 'https://isni.org/', ROR: 'https://ror.org/', GRID: 'https://www.grid.ac/' }
+  model :affiliation, name_with: lambda { |cc| uuid_uri_generator(cc) }
+  attribute :affiliationIdentifierScheme, enforce: [:existence], enforcedValues: AFFILIATION_IDENTIFIER_SCHEMES.keys
+  attribute :affiliationIdentifier, enforce: [:existence]
+  attribute :affiliation, enforce: [:existence]
+  attribute :acronym
+  attribute :homepage, enforce: [:uri]
+  attribute :email
+
+  attribute :schemeURI, handler: :scheme_uri_infer
+
+  embedded true
+
+  def scheme_uri_infer
+    self.bring(:affiliationIdentifierScheme) if self.bring?(:affiliationIdentifierScheme)
+    AFFILIATION_IDENTIFIER_SCHEMES[self.affiliationIdentifierScheme.to_sym] if self.affiliationIdentifierScheme
+  end
+
+end
+
+class LinkedData::Models::CreatorIdentifier < LinkedData::Models::Base
+  IDENTIFIER_SCHEMES = { ORCID: 'https://orcid.org', ISNI: 'https://isni.org/', ROR: 'https://ror.org/', GRID: 'https://www.grid.ac/' }
+  model :creator_identifier, name_with: lambda { |cc| uuid_uri_generator(cc) }
+  attribute :nameIdentifierScheme, enforce: [:existence], enforcedValues: IDENTIFIER_SCHEMES.keys
+  attribute :nameIdentifier, enforce: [:existence]
+  attribute :schemeURI, handler: :scheme_uri_infer
+
+  embedded true
+
+  def scheme_uri_infer
+    self.bring(:nameIdentifierScheme) if self.bring?(:nameIdentifierScheme)
+    IDENTIFIER_SCHEMES[self.nameIdentifierScheme.to_sym] if self.nameIdentifierScheme
+  end
+end
+
+class LinkedData::Models::Creator < LinkedData::Models::Base
+  model :creator, name_with: lambda { |c| uuid_uri_generator(c) }
+  attribute :nameType, default: lambda { |_| "Personal" }, enforcedValues: %w[Organizational Personal]
+  attribute :givenName
+  attribute :familyName
+  attribute :creatorName, enforce: [:existence]
+  attribute :creatorIdentifiers, enforce: [:creator_identifier, :list]
+  attribute :affiliations, enforce: [:affiliation, :list]
+  attribute :email
+  embedded true
+  embed :creatorIdentifiers, :affiliations
+end
+
+class LinkedData::Models::Title < LinkedData::Models::Base
+  model :title, name_with: lambda { |cc| uuid_uri_generator(cc) }
+  attribute :title, enforce: [:existence]
+  attribute :lang, enforce: [:existence]
+  attribute :titleType, enforce: [:existence], enforcedValues: ["AlternativeTitle", "Subtitle", "TranslatedTitle", "Other"]
+
+  embedded true
+end
+
+class LinkedData::Models::OntologySubmission
+  attribute :resourceType, namespace: :datacite
+  attribute :oldIdentifier, property: :identifier, namespace: :datacite
+  attribute :titles, namespace: :datacite, enforce: [:existence, :title, :list]
+  attribute :creators, namespace: :datacite, enforce: [:existence, :creator, :list]
+  attribute :oldPublisher, property: :publisher, namespace: :datacite
+  attribute :oldPublication, property: :publication
+end
+
+# Migrator class
+class EcoPortalMigrator
+
+  def initialize(submission:, logger:)
+    @submission = submission
+    @logger = logger
+  end
+
+  def migrate_submission
+    sub = @submission
+    sub.bring_remaining
+
+    if not_valid?(sub, "submission not valid")
+      sub.URI = sub.id if sub.URI.nil?
+      sub.publication = [RDF::URI.new(sub.publication.first)]
+    end
+
+    log_info "Start submission #{sub.id} migration"
+
+    stop_to_fix('submission not valid') if not_valid?(sub, "is not valid can't be migrated")
+
+    log_info "Submission #{sub.id} is valid"
+
+    array_migrate(sub, 'identifier', sub.oldIdentifier)
+    sub.identifier = sub.identifier.map{|p| RDF::URI.new(p)}
+    stop_to_fix('identifier not valid') if not_valid?(sub, 'identifier migration failed')
+    log_info "Submission #{sub.id} identifier migrated: #{sub.identifier} (old: #{sub.oldIdentifier})"
+
+
+    if sub.resourceType
+      case sub.resourceType
+      when 'SKOS', 'Thesaurus'
+        url = "http://w3id.org/nkos/nkostype#thesaurus"
+      when "Controlled vocabulary"
+        url = 'http://w3id.org/nkos/nkostype#terminology'
+      when 'Taxonomy'
+        url = 'http://w3id.org/nkos/nkostype#terminology'
+      else
+        url = 'http://w3id.org/nkos/nkostype#ontology'
+      end
+      sub.hasFormalityLevel = RDF::URI.new(url)
+    end
+
+    stop_to_fix('hasFormalityLevel not valid') if not_valid?(sub, 'resourceType to hasFormalityLevel migration failed')
+    log_info ">> Submission #{sub.id} hasFormalityLevel migrated: #{sub.hasFormalityLevel} (old: #{sub.resourceType})"
+
+    migrate_title(sub)
+    stop_to_fix('alternative not valid') if not_valid?(sub, 'titles to alternative migration failed')
+    log_info ">> Submission #{sub.id} alternative migrated: #{sub.alternative} (old: #{sub.titles})"
+
+    log_info "Start submission #{sub.id} creators migration"
+    migrate_creators(sub)
+    log_info "#{sub.id} creators migration ended"
+
+    if sub.valid?
+      sub.save rescue  stop_to_fix('not valid submission')
+      log_info ">> #{sub.id} migrated successfully"
+    else
+      stop_to_fix "#{sub.id} migration failed submission not valid"
+    end
+
+    log_info "> Submission #{sub.id} migration ended"
+  end
+
+  private
+
+
+  def logger
+    @logger
+  end
+
+  def admin_user(username = 'admin')
+    user = LinkedData::Models::User.find(username).first
+    raise "The user #{username} does not exist" if user.nil?
+    user.bring_remaining
+  end
+
+  def array_migrate(sub, attr, new_val)
+    old_val = sub.send(attr.to_s)
+    sub.send("#{attr}=", (Array(old_val) + [new_val]).uniq) if new_val
+  end
+
+  def create_identifier(notation, schema_agency)
+    new_id = LinkedData::Models::AgentIdentifier.new
+    new_id.notation = notation
+    new_id.schemaAgency = schema_agency
+    new_id.creator = admin_user
+
+    id = LinkedData::Models::AgentIdentifier.generate_identifier(new_id.notation, new_id.schemaAgency)
+    log_info "Start identifier #{id} migration"
+    identifier = LinkedData::Models::AgentIdentifier.find(RDF::URI.new(id)).first
+
+    if identifier
+      new_id = identifier
+      log_info "Identifier #{id} already exist, re-use it."
+    else
+      if new_id.valid?
+        new_id.save
+        log_info "Identifier #{id}  created."
+      else
+        old_id = new_id
+        new_id = nil
+        stop_to_fix "identifier with id #{id} migration failed"
+      end
+    end
+
+    new_id
+  end
+
+  def migrate_creator_identifier(creator, agent)
+    Array(creator.creatorIdentifiers).each do |id|
+      id.bring_remaining
+      new_id = create_identifier(id.nameIdentifier, id.nameIdentifierScheme)
+      array_migrate(agent, 'identifiers', new_id)
+      log_info "Creator #{creator.id} added identifier:  #{new_id.id})"
+    end
+  end
+
+  def not_valid?(sub, msg)
+    unless sub.valid?
+      log_error msg
+      log_error "Submission #{sub.id} errors: #{sub.errors}"
+      true
+    end
+  end
+
+  def stop_to_fix(msg)
+    log_error "Stop to fix #{msg}"
+    caller_binding = binding.of_caller(1)
+    binding.pry(caller_binding)
+    log_error "End stop to fix"
+  end
+
+
+  def log_error(msg)
+    logger.error "> #{msg}"
+  end
+
+  def log_info(msg)
+    logger.info "> #{msg}"
+  end
+
+  def migrate_affiliations(creator, agent)
+    Array(creator.affiliations).each do |affiliation|
+      affiliation.bring_remaining
+      log_info "Start affiliation #{affiliation.id} migration"
+
+      new_affiliation = LinkedData::Models::Agent.new
+      new_affiliation.agentType = 'organization'
+      new_affiliation.name = affiliation.affiliation
+      new_affiliation.creator = admin_user
+
+      scheme_url = LinkedData::Models::AgentIdentifier::IDENTIFIER_SCHEMES[affiliation.affiliationIdentifierScheme.to_sym]
+
+      stop_to_fix("#{affiliation.id} has not a good scheme url: #{affiliation.affiliationIdentifierScheme}") unless scheme_url
+
+      log_info "Start identifiers of #{affiliation.id} migration"
+      new_id = create_identifier(affiliation.affiliationIdentifier, affiliation.affiliationIdentifierScheme)
+      array_migrate(new_affiliation, 'identifiers', new_id)
+
+      if new_affiliation.valid?
+        new_affiliation.save
+        array_migrate(agent, 'affiliations', new_affiliation)
+      else
+        affiliation = LinkedData::Models::Agent.where(name: new_affiliation.name).first
+        if affiliation
+          log_info "found  an existant affiliation with the same name #{new_affiliation.name}"
+          array_migrate(agent, 'affiliations', affiliation)
+        else
+          stop_to_fix "affiliation  migration failed"
+        end
+      end
+
+      log_info "Affiliation #{new_affiliation.name} migration ended"
+    end
+
+  end
+
+  def migrate_creators(sub)
+    Array(sub.creators).each do |creator|
+      creator.bring_remaining
+      log_info "Start creator #{creator.id} migration"
+      new_agent = LinkedData::Models::Agent.new
+      new_agent.agentType = creator.nameType.eql?('Personal') ? 'person' : 'organization'
+      new_agent.name = creator.creatorName
+      new_agent.creator = admin_user
+
+      log_info "Start identifiers of #{creator.id}  migration"
+      migrate_creator_identifier(creator, new_agent)
+      log_info "All identifiers of #{creator.id} are migrated."
+
+      log_info "Start affiliations of #{creator.id}  migration"
+      migrate_affiliations(creator, new_agent)
+      log_info "All affiliations of #{creator.id} are migrated."
+
+      if new_agent.valid?
+        new_agent.save
+        array_migrate(sub, 'hasCreator', new_agent)
+      else
+        creator = LinkedData::Models::Agent.where(name: new_agent.name).first
+        if creator
+          log_info "found  an existant creator with the same name #{new_agent.name}"
+          array_migrate(sub, 'hasCreator', creator)
+        else
+          stop_to_fix "creator with id #{creator.id.to_s} migration failed"
+        end
+      end
+      log_info "Creator #{creator.id} migration ended"
+    end
+
+  end
+
+  def migrate_title(sub)
+    Array(sub.titles).each do |title|
+      title.bring_remaining
+      title = title.title
+      array_migrate(sub, 'alternative', title)
+    end
+  end
+
+end
+
+logger = Logger.new(options[:logfile])
+# a formatter to write simultaneously into a file and stout
+logger.formatter = proc do |severity, datetime, progname, msg|
+  out = "#{severity} [#{datetime}] #{msg} \n"
+  puts out
+  out
+end
+
+begin
+  puts "EcoPortal migration details are logged to #{options[:logfile]}"
+
+  if options[:migrate_all]
+    submissions = LinkedData::Models::Ontology.all.each { |o| o.latest_submission }
+  else
+    submissions = options[:ontologies].map do |acronym|
+      ont = LinkedData::Models::Ontology.find(acronym).first
+      ont.latest_submission(status: :any)
+    end
+  end
+
+  submissions.each do |sub|
+    EcoPortalMigrator.new(submission: sub, logger: logger).migrate_submission
+  end
+
+rescue Exception => e
+  logger.error "Failed, exception: #{e.to_json}."
+  binding.pry
+  exit(1)
+end
+
