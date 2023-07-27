@@ -20,9 +20,9 @@ gem 'sys-proctable'
 # Monitoring
 gem 'cube-ruby', require: 'cube'
 
-gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'master'
+gem 'goo', git: 'https://github.com/ontoportal-lirmm/goo.git', branch: 'ecoportal'
 gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'master'
-gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'master'
+gem 'ontologies_linked_data', git: 'https://github.com/lifewatch-eric/ontologies_linked_data.git', branch: 'ecoportal-ontoportal-reset'
 gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'master'
 # Testing
 group :test do
@@ -32,3 +32,4 @@ group :test do
   gem 'test-unit-minitest'
 end
 
+gem "binding_of_caller", "~> 1.0"
