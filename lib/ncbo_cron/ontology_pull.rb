@@ -74,7 +74,7 @@ module NcboCron
 
         last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
-        if self.not_pull_submission(last, ont, isLong, enable_pull_umls, options)
+        if not_pull_submission(last, ont, isLong, enable_pull_umls, options)
           raise StandardError, "Pull umls not enabled"
         end
 
