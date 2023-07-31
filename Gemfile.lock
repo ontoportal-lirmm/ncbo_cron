@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 8a0c14a6e6942b20749894806f1f1f512f9afcfa
+  revision: 8e80a4f842331e874055aec6a507ca5e3be4e3a4
   branch: develop
   specs:
     goo (0.0.2)
@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 9fd2649b66d3bd6ef7666729d9f91087aa406266
+  revision: 3ae6bfb56dc59a670b5bc1a513ff4929f8cf3756
   branch: develop
   specs:
     ncbo_annotator (0.0.1)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: 13bb138aa40ca72bfafc91a1a7416c162ba8d325
+  revision: afda3aacfdd0e5e33e5e5beae1dffd79d4980a30
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -214,7 +214,7 @@ GEM
       http-cookie (>= 1.0.2, < 2.0)
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
-    rexml (3.2.5)
+    rexml (3.2.6)
     rsolr (2.5.0)
       builder (>= 2.1.2)
       faraday (>= 0.9, < 3, != 2.0.0)
@@ -283,4 +283,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.15
+   2.3.26
