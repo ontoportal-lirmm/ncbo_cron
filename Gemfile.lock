@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ontoportal-lirmm/goo.git
-  revision: 5f33c380fbe51a8270ac3bcd56834251fbdfa3fa
+  revision: 1d78bde5a711d05475da0459308c7db074af5e21
   branch: development
   specs:
     goo (0.0.2)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: 50619e649691d1b251342739210b600e377ad0f8
+  revision: 8139d6cfd385274d9f1542edb52c96d4b946decd
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -77,12 +77,15 @@ GEM
     addressable (2.8.4)
       public_suffix (>= 2.0.2, < 6.0)
     bcrypt (3.1.19)
+    binding_of_caller (1.0.0)
+      debug_inspector (>= 0.0.1)
     builder (3.2.4)
     coderay (1.1.3)
     concurrent-ruby (1.2.2)
     connection_pool (2.4.1)
     cube-ruby (0.0.3)
     dante (0.2.0)
+    debug_inspector (1.1.0)
     declarative (0.0.20)
     docile (1.4.0)
     domain_name (0.5.20190701)
@@ -117,7 +120,7 @@ GEM
     ffi (1.15.5)
     google-apis-analytics_v3 (0.13.0)
       google-apis-core (>= 0.11.0, < 2.a)
-    google-apis-core (0.11.0)
+    google-apis-core (0.11.1)
       addressable (~> 2.5, >= 2.5.1)
       googleauth (>= 0.16.2, < 2.a)
       httpclient (>= 2.8.1, < 3.a)
@@ -197,7 +200,7 @@ GEM
       mime-types (>= 1.16, < 4.0)
       netrc (~> 0.8)
     retriable (3.1.2)
-    rexml (3.2.5)
+    rexml (3.2.6)
     rsolr (2.5.0)
       builder (>= 2.1.2)
       faraday (>= 0.9, < 3, != 2.0.0)
@@ -237,9 +240,11 @@ GEM
     webrick (1.8.1)
 
 PLATFORMS
+  x86_64-darwin-21
   x86_64-linux
 
 DEPENDENCIES
+  binding_of_caller (~> 1.0)
   cube-ruby
   email_spec
   faraday (~> 1.9)
@@ -267,4 +272,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.14
+   2.3.15
