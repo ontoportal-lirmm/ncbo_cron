@@ -90,29 +90,12 @@ GEM
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
       mail (~> 2.6)
-    faraday (1.10.3)
-      faraday-em_http (~> 1.0)
-      faraday-em_synchrony (~> 1.0)
-      faraday-excon (~> 1.1)
-      faraday-httpclient (~> 1.0)
-      faraday-multipart (~> 1.0)
-      faraday-net_http (~> 1.0)
-      faraday-net_http_persistent (~> 1.0)
-      faraday-patron (~> 1.0)
-      faraday-rack (~> 1.0)
-      faraday-retry (~> 1.0)
+    faraday (2.7.10)
+      faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
-    faraday-em_http (1.0.0)
-    faraday-em_synchrony (1.0.0)
-    faraday-excon (1.1.0)
-    faraday-httpclient (1.0.1)
-    faraday-multipart (1.0.4)
-      multipart-post (~> 2)
-    faraday-net_http (1.0.1)
-    faraday-net_http_persistent (1.2.0)
-    faraday-patron (1.0.0)
-    faraday-rack (1.0.0)
-    faraday-retry (1.0.3)
+    faraday-net_http (3.0.2)
+    faraday-retry (2.2.0)
+      faraday (~> 2.0)
     ffi (1.15.5)
     gapic-common (0.19.1)
       faraday (>= 1.9, < 3.a)
@@ -185,10 +168,9 @@ GEM
     mlanett-redis-lock (0.2.7)
       redis
     multi_json (1.15.0)
-    multipart-post (2.3.0)
     net-http-persistent (2.9.4)
     netrc (0.11.0)
-    oj (2.18.5)
+    oj (3.15.1)
     omni_logger (0.1.4)
       logger
     os (1.1.4)
@@ -259,7 +241,6 @@ PLATFORMS
 DEPENDENCIES
   cube-ruby
   email_spec
-  faraday (~> 1.9)
   ffi
   goo!
   google-analytics-data
@@ -268,7 +249,7 @@ DEPENDENCIES
   multi_json
   ncbo_annotator!
   ncbo_cron!
-  oj (~> 2.0)
+  oj (~> 3.0)
   ontologies_linked_data!
   parseconfig
   pony

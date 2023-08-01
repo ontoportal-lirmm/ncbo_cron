@@ -2,12 +2,11 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'faraday', '~> 1.9'
 gem 'ffi'
 gem 'google-analytics-data'
 gem 'mail', '2.6.6'
 gem 'multi_json'
-gem 'oj', '~> 2.0'
+gem 'oj', '~> 3.0'
 gem 'parseconfig'
 gem 'pony'
 gem 'pry'
