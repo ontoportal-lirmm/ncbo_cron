@@ -17,7 +17,7 @@ module NcboCron
       end
 
       def run
-        redis = Redis.new(:host => NcboCron.settings.ontology_analytics_redis_host, :port => NcboCron.settings.ontology_analytics_redis_port)
+        redis = Redis.new(:host => LinkedData.settings.ontology_analytics_redis_host, :port => LinkedData.settings.ontology_analytics_redis_port)
         ontology_analytics = fetch_ontology_analytics
         File.open(NcboCron.settings.analytics_path_to_ga_data_file, 'w') do |f|
           f.write(ontology_analytics.to_json)
