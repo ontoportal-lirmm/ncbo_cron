@@ -60,20 +60,6 @@ class AgroPortalMigrator
     end
 
     if not_valid?(sub, "submission not valid")
-      sub.errors.each do |key, errors|
-        next unless errors.keys.include?(:uri)
-
-        log_info "Fix submission #{sub.id} #{key} URL values"
-        values = sub.send(key)
-        next if values.nil? || values.empty?
-
-        is_array = values.is_a?(Array)
-
-        values = Array(values).map { |x| RDF::URI.new(x) }
-
-        sub.send("#{key}=", is_array ? values : values.first)
-      end
-
       sub.valid = nil if attribute_error?(sub, :valid)
       sub.curatedOn = sub.creationDate if attribute_error?(sub, :curatedOn)
 
@@ -137,6 +123,24 @@ class AgroPortalMigrator
         string_values
       end.flatten.compact
 
+      sub.send("#{key}=", is_array ? values : values.first)
+    end
+
+    sub.errors.each do |key, errors|
+      next unless errors.keys.include?(:uri)
+
+      log_info "Fix submission #{sub.id} #{key} URL values"
+      values = sub.send(key)
+      next if values.nil? || values.empty?
+
+      is_array = values.is_a?(Array)
+
+      values = Array(values).map { |x| RDF::URI.new(x) }
+
+      sub.class.model_settings[:attributes][key.to_sym][:enforce].delete(:uri)
+      sub.send("#{key}=", is_array ? [] : nil)
+      sub.save rescue stop_to_fix('not valid submission')
+      sub.class.model_settings[:attributes][key.to_sym][:enforce].push(:uri)
       sub.send("#{key}=", is_array ? values : values.first)
     end
 
