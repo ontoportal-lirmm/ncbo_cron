@@ -33,3 +33,4 @@ group :test do
   gem 'test-unit-minitest'
 end
 
+gem "binding_of_caller", "~> 1.0"
