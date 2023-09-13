@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ncbo/goo.git
-  revision: 911d71aefe433314d11398445e3856fca503b9c1
+  revision: 83425ba6c05d051d86c6f5775540727ce4238443
   branch: develop
   specs:
     goo (0.0.2)
@@ -15,7 +15,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ncbo_annotator.git
-  revision: 3ae6bfb56dc59a670b5bc1a513ff4929f8cf3756
+  revision: 067104ae94c0e9d058cfbf419364fbf03f34de43
   branch: develop
   specs:
     ncbo_annotator (0.0.1)
@@ -26,7 +26,7 @@ GIT
 
 GIT
   remote: https://github.com/ncbo/ontologies_linked_data.git
-  revision: e33a0e451f8a8226d98291168e45b46d7065e670
+  revision: 711ebf27722355a25a0e53a8204b4ae472902bd0
   branch: develop
   specs:
     ontologies_linked_data (0.0.1)
@@ -76,6 +76,7 @@ GEM
       multi_json (~> 1.0)
     addressable (2.8.5)
       public_suffix (>= 2.0.2, < 6.0)
+    base64 (0.1.1)
     bcrypt (3.1.19)
     builder (3.2.4)
     coderay (1.1.3)
@@ -90,7 +91,8 @@ GEM
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
       mail (~> 2.6)
-    faraday (2.7.10)
+    faraday (2.7.11)
+      base64
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
     faraday-net_http (3.0.2)
@@ -108,8 +110,8 @@ GEM
     google-analytics-data (0.4.0)
       google-analytics-data-v1beta (>= 0.7, < 2.a)
       google-cloud-core (~> 1.6)
-    google-analytics-data-v1beta (0.8.1)
-      gapic-common (>= 0.19.1, < 2.a)
+    google-analytics-data-v1beta (0.9.0)
+      gapic-common (>= 0.20.0, < 2.a)
       google-cloud-errors (~> 1.0)
     google-cloud-core (1.6.0)
       google-cloud-env (~> 1.0)
@@ -126,20 +128,19 @@ GEM
       grpc (~> 1.27)
     googleapis-common-protos-types (1.8.0)
       google-protobuf (~> 3.18)
-    googleauth (1.7.0)
+    googleauth (1.8.0)
       faraday (>= 0.17.3, < 3.a)
       jwt (>= 1.4, < 3.0)
-      memoist (~> 0.16)
       multi_json (~> 1.11)
       os (>= 0.9, < 2.0)
       signet (>= 0.16, < 2.a)
-    grpc (1.57.0)
+    grpc (1.58.0)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
-    grpc (1.57.0-x86_64-darwin)
+    grpc (1.58.0-x86_64-darwin)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
-    grpc (1.57.0-x86_64-linux)
+    grpc (1.58.0-x86_64-linux)
       google-protobuf (~> 3.23)
       googleapis-common-protos-types (~> 1.0)
     htmlentities (4.3.4)
@@ -159,7 +160,6 @@ GEM
       systemu (~> 2.6.5)
     mail (2.6.6)
       mime-types (>= 1.16, < 4)
-    memoist (0.16.2)
     method_source (1.0.0)
     mime-types (3.5.1)
       mime-types-data (~> 3.2015)
