@@ -1,16 +1,42 @@
-LinkedData.config do |config|
-  config.enable_monitoring = false
-  config.cube_host = "localhost"
-  config.goo_host = "localhost"
-  config.goo_port = 8080
-  config.search_server_url = "http://localhost:8983/solr/term_search_core1"
-  config.property_search_server_url = "http://localhost:8983/solr/prop_search_core1"
-  config.repository_folder = "./test/data/ontology_files/repo"
-  config.http_redis_host = "localhost"
-  config.http_redis_port = 6379
-  config.goo_redis_host = "localhost"
-  config.goo_redis_port = 6379
+# This file is designed to be used for unit testing with docker-compose
 
+GOO_BACKEND_NAME      = ENV.include?("GOO_BACKEND_NAME")      ? ENV["GOO_BACKEND_NAME"]      : "4store"
+GOO_HOST              = ENV.include?("GOO_HOST")              ? ENV["GOO_HOST"]              : "localhost"
+GOO_PATH_DATA         = ENV.include?("GOO_PATH_DATA")         ? ENV["GOO_PATH_DATA"]         : "/data/"
+GOO_PATH_QUERY        = ENV.include?("GOO_PATH_QUERY")        ? ENV["GOO_PATH_QUERY"]        : "/sparql/"
+GOO_PATH_UPDATE       = ENV.include?("GOO_PATH_UPDATE")       ? ENV["GOO_PATH_UPDATE"]       : "/update/"
+GOO_PORT              = ENV.include?("GOO_PORT")              ? ENV["GOO_PORT"]              : 9000
+MGREP_HOST            = ENV.include?("MGREP_HOST")            ? ENV["MGREP_HOST"]            : "localhost"
+MGREP_PORT            = ENV.include?("MGREP_PORT")            ? ENV["MGREP_PORT"]            : 55555
+MGREP_DICT_PATH       = ENV.include?("MGREP_DICT_PATH")       ? ENV["MGREP_DICT_PATH"]       : "./test/data/dictionary.txt"
+REDIS_GOO_CACHE_HOST  = ENV.include?("REDIS_GOO_CACHE_HOST")  ? ENV["REDIS_GOO_CACHE_HOST"]  : "localhost"
+REDIS_HTTP_CACHE_HOST = ENV.include?("REDIS_HTTP_CACHE_HOST") ? ENV["REDIS_HTTP_CACHE_HOST"] : "localhost"
+REDIS_PERSISTENT_HOST = ENV.include?("REDIS_PERSISTENT_HOST") ? ENV["REDIS_PERSISTENT_HOST"] : "localhost"
+REDIS_PORT            = ENV.include?("REDIS_PORT")            ? ENV["REDIS_PORT"]            : 6379
+REPORT_PATH           = ENV.include?("REPORT_PATH")           ? ENV["REPORT_PATH"]           : "./test/tmp/ontologies_report.json"
+REPOSITORY_FOLDER     = ENV.include?("REPOSITORY_FOLDER")     ? ENV["REPOSITORY_FOLDER"]     : "./test/data/ontology_files/repo"
+REST_URL_PREFIX       = ENV.include?("REST_URL_PREFIX")       ? ENV["REST_URL_PREFIX"]       : "http://localhost:9393"
+SOLR_PROP_SEARCH_URL  = ENV.include?("SOLR_PROP_SEARCH_URL")  ? ENV["SOLR_PROP_SEARCH_URL"]  : "http://localhost:8983/solr/prop_search_core1"
+SOLR_TERM_SEARCH_URL  = ENV.include?("SOLR_TERM_SEARCH_URL")  ? ENV["SOLR_TERM_SEARCH_URL"]  : "http://localhost:8983/solr/term_search_core1"
+
+LinkedData.config do |config|
+  config.goo_backend_name              = GOO_BACKEND_NAME.to_s
+  config.goo_host                      = GOO_HOST.to_s
+  config.goo_port                      = GOO_PORT.to_i
+  config.goo_path_query                = GOO_PATH_QUERY.to_s
+  config.goo_path_data                 = GOO_PATH_DATA.to_s
+  config.goo_path_update               = GOO_PATH_UPDATE.to_s
+  config.goo_redis_host                = REDIS_GOO_CACHE_HOST.to_s
+  config.goo_redis_port                = REDIS_PORT.to_i
+  config.http_redis_host               = REDIS_HTTP_CACHE_HOST.to_s
+  config.http_redis_port               = REDIS_PORT.to_i
+  config.ontology_analytics_redis_host = REDIS_PERSISTENT_HOST.to_s
+  config.ontology_analytics_redis_port = REDIS_PORT.to_i
+  config.repository_folder             = REPOSITORY_FOLDER.to_s
+  config.search_server_url             = SOLR_TERM_SEARCH_URL.to_s
+  config.property_search_server_url    = SOLR_PROP_SEARCH_URL.to_s
+#  config.replace_url_prefix            = false
+#  config.rest_url_prefix               = REST_URL_PREFIX.to_s
   # Email notifications.
   config.enable_notifications    = true
   config.email_sender            = "sender@domain.com" # Default sender for emails
@@ -19,35 +45,38 @@ LinkedData.config do |config|
   config.smtp_user               = nil
   config.smtp_password           = nil
   config.smtp_auth_type          = :none
-  config.smtp_domain             = "localhost.localhost"  
+  config.smtp_domain             = "localhost.localhost"
 end
 
 Annotator.config do |config|
-  config.mgrep_dictionary_file   ||= "./test/tmp/dict"
-  config.stop_words_default_file ||= "./config/default_stop_words.txt"
   config.mgrep_host              ||= "localhost"
-  config.mgrep_port              ||= 55555
-  config.annotator_redis_host  ||= "localhost"
-  config.annotator_redis_port  ||= 6379
+  config.annotator_redis_host  = REDIS_PERSISTENT_HOST.to_s
+  config.annotator_redis_port  = REDIS_PORT.to_i
+  config.mgrep_host            = MGREP_HOST.to_s
+  config.mgrep_port            = MGREP_PORT.to_i
+  config.mgrep_dictionary_file = MGREP_DICT_PATH.to_s
 end
 
 NcboCron.config do |config|
-  config.redis_host  ||= "localhost"
-  config.redis_port  ||= 6379
+  config.redis_host = REDIS_PERSISTENT_HOST.to_s
+  config.redis_port = REDIS_PORT.to_i
+  # Ontologies Report config
+  config.ontology_report_path = REPORT_PATH
+
+  # do not deaemonize in docker
+  config.daemonize  = false
+
   config.search_index_all_url = "http://localhost:8983/solr/term_search_core2"
   config.property_search_index_all_url = "http://localhost:8983/solr/prop_search_core2"
 
-  # Ontologies Report config
-  config.ontology_report_path = "./test/reports/ontologies_report.json"
-
-  # Google Analytics config
-  config.analytics_service_account_email_address = "123456789999-sikipho0wk8q0atflrmw62dj4kpwoj3c@developer.gserviceaccount.com"
-  config.analytics_path_to_key_file              = "config/bioportal-analytics.p12"
-  config.analytics_profile_id                    = "ga:1234567"
-  config.analytics_app_name                      = "BioPortal"
-  config.analytics_app_version                   = "1.0.0"
-  config.analytics_start_date                    = "2013-10-01"
-  config.analytics_filter_str                    = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
+  # Google Analytics GA4 config
+  config.analytics_path_to_key_file     = "config/your_analytics_key.json"
+  config.analytics_property_id          = "123456789"
+  # path to the Universal Analytics data, which stopped collecting on June 1st, 2023
+  config.analytics_path_to_ua_data_file = "data/your_ua_data.json"
+  # path to the file that will hold your Google Analytics data
+  # this is in addition to storing it in Redis
+  config.analytics_path_to_ga_data_file = "data/your_ga_data.json"
 
   # this is a Base64.encode64 encoded personal access token
   # you need to run Base64.decode64 on it before using it in your code

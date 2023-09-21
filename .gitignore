@@ -3,6 +3,8 @@
 config/config.rb
 config/config_*.rb
 config/*.p12
+config/*.json
+data/
 projectFilesBackup/
 .ruby-version
 repo*
@@ -10,6 +12,9 @@ repo*
 *.swp
 .DS_Store
 tmp
+
+# Code coverage reports
+coverage*
 
 # Ignore eclipse .project
 .project

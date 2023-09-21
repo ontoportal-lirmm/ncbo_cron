@@ -1,3 +1,21 @@
+# Start simplecov if this is a coverage task or if it is run in the CI pipeline
+if ENV['COVERAGE'] == 'true' || ENV['CI'] == 'true'
+  require 'simplecov'
+  require 'simplecov-cobertura'
+  # https://github.com/codecov/ruby-standard-2
+  # Generate HTML and Cobertura reports which can be consumed by codecov uploader
+  SimpleCov.formatters = SimpleCov::Formatter::MultiFormatter.new([
+    SimpleCov::Formatter::HTMLFormatter,
+    SimpleCov::Formatter::CoberturaFormatter
+  ])
+  SimpleCov.start do
+    add_filter '/test/'
+    add_filter 'app.rb'
+    add_filter 'init.rb'
+    add_filter '/config/'
+  end
+end
+
 require 'ontologies_linked_data'
 require_relative '../lib/ncbo_cron'
 require_relative '../config/config'
@@ -7,7 +25,7 @@ Goo.use_cache = false # Make sure tests don't cache
 require 'test/unit'
 
 # Check to make sure you want to run if not pointed at localhost
-safe_host = Regexp.new(/localhost|-ut|ncbo-dev*|ncbo-unittest*/)
+safe_host = Regexp.new(/localhost|-ut/)
 unless LinkedData.settings.goo_host.match(safe_host) &&
        LinkedData.settings.search_server_url.match(safe_host) &&
        NcboCron.settings.redis_host.match(safe_host)
