@@ -11,31 +11,121 @@ require_relative '../lib/ncbo_cron'
 config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
 abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
 require_relative '../config/config'
+require 'optparse'
 
-logfile = 'archive_old_submissions.log'
+options = { delete: false }
+opt_parser = OptionParser.new do |opts|
+  # Set a banner, displayed at the top of the help screen.
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+
+  options[:logfile] = STDOUT
+  opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
+    options[:logfile] = filename
+  end
+
+  # Delete submission if it contains bad data
+  opts.on( '-d', '--delete', "Delete submissions that contain bad data" ) do
+    options[:delete] = true
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on( '-h', '--help', 'Display this screen' ) do
+    puts opts
+    exit
+  end
+end
+
+opt_parser.parse!
+logfile = options[:logfile]
 if File.file?(logfile); File.delete(logfile); end
 logger = Logger.new(logfile)
-options = { process_rdf: false, index_search: false, index_commit: false,
-            run_metrics: false, reasoning: false, archive: true }
+process_actions = { process_rdf: false, generate_labels: false, index_search: false, index_commit: false,
+            process_annotator: false, diff: false, run_metrics: false, archive: true }
 onts = LinkedData::Models::Ontology.all
 onts.each { |ont| ont.bring(:acronym, :submissions) }
-onts.sort! { |a,b| a.acronym <=> b.acronym }
+onts.sort! { |a, b| a.acronym <=> b.acronym }
+bad_submissions = {}
 
 onts.each do |ont|
   latest_sub = ont.latest_submission
-  if not latest_sub.nil?
+
+  unless latest_sub.nil?
     id = latest_sub.submissionId
     subs = ont.submissions
-    old_subs = subs.reject { |sub| sub.submissionId >= id }
-    old_subs.sort! { |a,b| a.submissionId <=> b.submissionId }
+
+    old_subs = subs.reject { |sub|
+      begin
+        sub.submissionId >= id
+      rescue => e
+        msg = "Invalid submission ID detected (String instead of Integer): #{ont.acronym}/#{sub.submissionId} - #{e.class}:\n#{e.backtrace.join("\n")}"
+        puts msg
+        logger.error(msg)
+
+        if options[:delete]
+          sub.delete if options[:delete]
+          msg = "Deleted submission #{ont.acronym}/#{sub.submissionId} due to invalid Submission ID"
+          puts msg
+          logger.error(msg)
+        end
+        bad_submissions["#{ont.acronym}/#{sub.submissionId}"] = "Invalid Submission ID"
+        true
+      end
+    }
+    old_subs.sort! { |a, b| a.submissionId <=> b.submissionId }
     old_subs.each do |sub|
-      if not sub.archived?
+      unless sub.archived?
         msg = "#{ont.acronym}: found un-archived old submission with ID #{sub.submissionId}."
         puts msg
         logger.info msg
-        NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, options)
+
+        begin
+          NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, process_actions)
+        rescue => e
+          if e.class == Goo::Base::NotValidException
+            if sub.valid?
+              msg = "Error archiving submission #{ont.acronym}/#{sub.submissionId} - #{e.class}:\n#{e.backtrace.join("\n")}"
+              puts msg
+              logger.error(msg)
+              bad_submissions["#{ont.acronym}/#{sub.submissionId}"] = "Submission passes valid check but cannot be saved"
+            else
+              msg = "Error archiving submission #{ont.acronym}/#{sub.submissionId}:\n#{JSON.pretty_generate(sub.errors)}"
+              puts msg
+              logger.error(msg)
+
+              if options[:delete]
+                sub.delete if options[:delete]
+                msg = "Deleted submission #{ont.acronym}/#{sub.submissionId} due to invalid data"
+                puts msg
+                logger.error(msg)
+              end
+              bad_submissions["#{ont.acronym}/#{sub.submissionId}"] = "Submission is not valid to be saved"
+            end
+          else
+            msg = "Error archiving submission #{ont.acronym}/#{sub.submissionId} - #{e.class}:\n#{e.backtrace.join("\n")}"
+            puts msg
+            logger.error(msg)
+
+            if options[:delete] && (e.class == Net::HTTPBadResponse || e.class == Errno::ECONNREFUSED)
+              sub.delete
+              msg = "Deleted submission #{ont.acronym}/#{sub.submissionId} due to a non-working pull URL"
+              puts msg
+              logger.error(msg)
+            end
+            bad_submissions["#{ont.acronym}/#{sub.submissionId}"] = "#{e.class} - Runtime error"
+          end
+        end
       end
     end
   end
 end
+
+msg = JSON.pretty_generate(bad_submissions)
+puts
+puts msg
+logger.error(msg)
+
+msg = "Number of errored submissions: #{bad_submissions.length}"
+puts msg
+logger.error(msg)
+
 
