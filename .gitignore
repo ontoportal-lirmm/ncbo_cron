@@ -1,6 +1,8 @@
+.bundle/
 # Ignore RubyMine editor files
 .idea/
 config/config.rb
+config/appliance.rb
 config/config_*.rb
 config/*.p12
 projectFilesBackup/
@@ -10,6 +12,9 @@ repo*
 *.swp
 .DS_Store
 tmp
+
+# Code coverage reports
+coverage*
 
 # Ignore eclipse .project
 .project

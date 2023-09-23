@@ -8,14 +8,17 @@ module NcboCron
     class OntologyPull
 
       class RemoteFileException < StandardError
+        attr_reader :submission
+
+        def initialize(submission)
+          super
+          @submission = submission
+        end
       end
 
-      def initialize()
-      end
-
-      def do_remote_ontology_pull(options = {})
+      def do_remote_ontology_pull(isLong = false, options = {})
         logger = options[:logger] || Logger.new($stdout)
-        logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}"
+        logger.info "UMLS auto-pull #{options[:enable_pull_umls] == true}. Is long: #{isLong}"
         logger.flush
         ontologies = LinkedData::Models::Ontology.where.include(:acronym).all
         ont_to_include = []
@@ -23,65 +26,28 @@ module NcboCron
         ontologies.select! { |ont| ont_to_include.include?(ont.acronym) } unless ont_to_include.empty?
         enable_pull_umls = options[:enable_pull_umls]
         umls_download_url = options[:pull_umls_url]
-        ontologies.sort! {|a, b| a.acronym.downcase <=> b.acronym.downcase}
+        ontologies.sort! { |a, b| a.acronym.downcase <=> b.acronym.downcase }
         new_submissions = []
 
         ontologies.each do |ont|
           begin
-            last = ont.latest_submission(status: :any)
-            next if last.nil?
-            last.bring(:hasOntologyLanguage) if last.bring?(:hasOntologyLanguage)
-            if !enable_pull_umls && last.hasOntologyLanguage.umls?
-              next
-            end
-            last.bring(:pullLocation) if last.bring?(:pullLocation)
-            next if last.pullLocation.nil?
-            last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
-
-            if last.hasOntologyLanguage.umls? && umls_download_url
-              last.pullLocation= RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
-              logger.info("Using alternative download for umls #{last.pullLocation.to_s}")
+            begin
+              new_submission = self.do_ontology_pull(ont.acronym,
+                                                     isLong: isLong,
+                                                     enable_pull_umls: enable_pull_umls,
+                                                     umls_download_url: umls_download_url,
+                                                     logger: logger, options: options)
+              new_submissions << new_submission if new_submission
+            rescue RemoteFileException => error
+              logger.info "RemoteFileException: No submission file at pull location #{error.submission.pullLocation.to_s} for ontology #{ont.acronym}."
               logger.flush
+              LinkedData::Utils::Notifications.remote_ontology_pull(error.submission)
             end
-
-            if last.remote_file_exists?(last.pullLocation.to_s)
-              logger.info "Checking download for #{ont.acronym}"
-              logger.info "Location: #{last.pullLocation.to_s}"; logger.flush
-              file, filename = last.download_ontology_file()
-              file = File.open(file.path, "rb")
-              remote_contents  = file.read
-              md5remote = Digest::MD5.hexdigest(remote_contents)
-
-              if last.uploadFilePath && File.exist?(last.uploadFilePath)
-                file_contents = open(last.uploadFilePath) { |f| f.read }
-                md5local = Digest::MD5.hexdigest(file_contents)
-                new_file_exists = (not md5remote.eql?(md5local))
-              else
-                # There is no existing file, so let's create a submission with the downloaded one
-                new_file_exists = true
-              end
-
-              if new_file_exists
-                logger.info "New file found for #{ont.acronym}\nold: #{md5local}\nnew: #{md5remote}"
-                logger.flush()
-                new_submissions << create_submission(ont, last, file, filename, logger)
-              end
-
-              file.close
-            else
-              begin
-                raise RemoteFileException
-              rescue RemoteFileException
-                logger.info "RemoteFileException: No submission file at pull location #{last.pullLocation.to_s} for ontology #{ont.acronym}."
-                logger.flush
-                LinkedData::Utils::Notifications.remote_ontology_pull(last)
-              end
-            end
-          rescue Exception => e
-            logger.error "Problem retrieving #{ont.acronym} in OntologyPull:\n" + e.message + "\n" + e.backtrace.join("\n\t")
-            logger.flush()
-            next
           end
+        rescue Exception => e
+          logger.error "Problem retrieving #{ont.acronym} in OntologyPull:\n" + e.message + "\n" + e.backtrace.join("\n\t")
+          logger.flush()
+          next
         end
 
         if options[:cache_clear] == true
@@ -93,8 +59,63 @@ module NcboCron
         new_submissions
       end
 
-      def create_submission(ont, sub, file, filename, logger=nil,
-        add_to_pull=true,new_version=nil,new_released=nil)
+      def do_ontology_pull(ontology_acronym, enable_pull_umls: false, isLong: false, umls_download_url: '', logger: nil, options:)
+        ont = LinkedData::Models::Ontology.find(ontology_acronym).include(:acronym).first
+        new_submission = nil
+        raise StandardError, "Ontology #{ontology_acronym} not found" if ont.nil?
+
+        last = ont.latest_submission(status: :any)
+        raise StandardError, "No submission found for #{ontology_acronym}" if last.nil?
+
+        last.bring(:hasOntologyLanguage) if last.bring?(:hasOntologyLanguage)
+
+        last.bring(:pullLocation) if last.bring?(:pullLocation)
+        raise StandardError, "#{ontology_acronym} has no pullLocation" if last.pullLocation.nil?
+
+        last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
+
+        if not_pull_submission(last, ont, isLong, enable_pull_umls, options)
+          raise StandardError, "Pull umls not enabled"
+        end
+
+        if isLong && !options[:pull_long_ontologies].nil?
+          return nil unless options[:pull_long_ontologies].include?(ont.acronym)
+        else
+          unless options[:pull_long_ontologies].nil?
+            return nil if options[:pull_long_ontologies].include?(ont.acronym)
+          end
+        end
+
+        if last.hasOntologyLanguage.umls? && umls_download_url
+          last.pullLocation = RDF::URI.new(umls_download_url + last.pullLocation.split("/")[-1])
+          logger.info("Using alternative download for umls #{last.pullLocation.to_s}")
+          logger.flush
+        end
+
+        if last.remote_file_exists?(last.pullLocation.to_s)
+          logger.info "Checking download for #{ont.acronym}"
+          logger.info "Location: #{last.pullLocation.to_s}"; logger.flush
+          file, filename = last.download_ontology_file
+          file, md5local, md5remote, new_file_exists = new_file_exists?(file, last)
+
+          if new_file_exists
+            logger.info "New file found for #{ont.acronym}\nold: #{md5local}\nnew: #{md5remote}"
+            logger.flush()
+            new_submission = create_submission(ont, last, file, filename, logger)
+          else
+            logger.info "There is no new file found for #{ont.acronym}"
+            logger.flush()
+          end
+
+          file.close
+          new_submission
+        else
+          raise RemoteFileException.new(last)
+        end
+      end
+
+      def create_submission(ont, sub, file, filename, logger = nil,
+                            add_to_pull = true, new_version = nil, new_released = nil)
         logger ||= Kernel.const_defined?("LOGGER") ? Kernel.const_get("LOGGER") : Logger.new(STDOUT)
         new_sub = LinkedData::Models::OntologySubmission.new
 
@@ -118,33 +139,18 @@ module NcboCron
         new_sub.submissionStatus = nil
         new_sub.creationDate = nil
         new_sub.missingImports = nil
+        new_sub.masterFileName = nil
         new_sub.metrics = nil
         full_file_path = File.expand_path(file_location)
 
         # check if OWLAPI is able to parse the file before creating a new submission
-        owlapi = LinkedData::Parser::OWLAPICommand.new(
-            full_file_path,
-            File.expand_path(new_sub.data_folder.to_s),
-            logger: logger)
-        owlapi.disable_reasoner
-        parsable = true
-
-        begin
-          owlapi.parse
-        rescue Exception => e
-          logger.error("The new file for ontology #{ont.acronym}, submission id: #{submission_id} did not clear OWLAPI: #{e.class}: #{e.message}\n#{e.backtrace.join("\n\t")}")
-          logger.error("A new submission has NOT been created.")
-          logger.flush
-          parsable = false
-        end
-
-        if parsable
+        if new_sub.parsable?(logger: logger)
           if new_sub.valid?
-            new_sub.save()
+            new_sub.save
 
             if add_to_pull
               submission_queue = NcboCron::Models::OntologySubmissionParser.new
-              submission_queue.queue_submission(new_sub, {all: true})
+              submission_queue.queue_submission(new_sub, { all: true })
               logger.info("OntologyPull created a new submission (#{submission_id}) for ontology #{ont.acronym}")
             end
           else
@@ -152,10 +158,45 @@ module NcboCron
             logger.flush
           end
         else
+          logger.error("The new file for ontology #{ont.acronym}, submission id: #{submission_id} did not clear OWLAPI: #{e.class}: #{e.message}\n#{e.backtrace.join("\n\t")}")
+          logger.error("A new submission has NOT been created.")
+          logger.flush
+
           # delete the bad file
           File.delete full_file_path if File.exist? full_file_path
         end
+
         new_sub
+      end
+
+      private
+
+      def not_pull_submission(submission, ontology, isLong, enable_pull_umls, options)
+        if !enable_pull_umls && submission.hasOntologyLanguage.umls?
+          return true
+        end
+
+        if isLong && !options[:pull_long_ontologies].nil?
+          !options[:pull_long_ontologies].include?(ontology.acronym)
+        else
+          !options[:pull_long_ontologies].nil? && options[:pull_long_ontologies].include?(ontology.acronym)
+        end
+      end
+
+      def new_file_exists?(file, last)
+        file = File.open(file.path, "rb")
+        remote_contents = file.read
+        md5remote = Digest::MD5.hexdigest(remote_contents)
+
+        if last.uploadFilePath && File.exist?(last.uploadFilePath)
+          file_contents = open(last.uploadFilePath) { |f| f.read }
+          md5local = Digest::MD5.hexdigest(file_contents)
+          new_file_exists = (not md5remote.eql?(md5local))
+        else
+          # There is no existing file, so let's create a submission with the downloaded one
+          new_file_exists = true
+        end
+        return file, md5local, md5remote, new_file_exists
       end
 
       def redis_goo
@@ -168,7 +209,6 @@ module NcboCron
     end
   end
 end
-
 # require 'ontologies_linked_data'
 # require 'goo'
 # require 'ncbo_annotator'

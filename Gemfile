@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'faraday', '~> 1.9'
-gem 'ffi'
+gem 'ffi', '~> 1.15.5'
 gem "google-apis-analytics_v3"
 gem 'mail', '2.6.6'
 gem 'minitest', '< 5.0'
@@ -20,15 +20,16 @@ gem 'sys-proctable'
 # Monitoring
 gem 'cube-ruby', require: 'cube'
 
-# NCBO
-gem 'goo', github: 'ncbo/goo', branch: 'master'
-gem 'ncbo_annotator', github: 'ncbo/ncbo_annotator', branch: 'master'
-gem 'ncbo_resource_index', github: 'ncbo/resource_index'
-gem 'ontologies_linked_data', github: 'lifewatch-eric/ontologies_linked_data', branch: 'master'
-gem 'sparql-client', github: 'ncbo/sparql-client', branch: 'master'
-
+gem 'goo', git: 'https://github.com/ontoportal-lirmm/goo.git', branch: 'ecoportal'
+gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'master'
+gem 'ontologies_linked_data', git: 'https://github.com/lifewatch-eric/ontologies_linked_data.git', branch: 'master'
+gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'master'
+# Testing
 group :test do
   gem 'email_spec'
+  gem 'simplecov'
+  gem 'simplecov-cobertura' # for codecov.io
   gem 'test-unit-minitest'
 end
 
+gem "binding_of_caller", "~> 1.0"

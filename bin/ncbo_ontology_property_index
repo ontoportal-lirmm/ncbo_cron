@@ -114,12 +114,13 @@ elsif options[:all]
   puts "You are about to clear the property index on #{options[:solr_core_url]} and kick off a full re-indexing process. Are you sure?"
 end
 
+=begin
 if options[:all]
   puts "Type 'yes' to continue: "
   $stdout.flush
   confirm = $stdin.gets
   abort("Aborting...\n\n") unless (confirm.strip == 'yes')
-end
+=end
 
 begin
   logger = Logger.new(options[:logfile])
