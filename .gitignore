@@ -5,6 +5,8 @@ config/config.rb
 config/appliance.rb
 config/config_*.rb
 config/*.p12
+config/*.json
+data/
 projectFilesBackup/
 .ruby-version
 repo*

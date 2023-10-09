@@ -11,6 +11,7 @@ module NcboCron
       ACTIONS = {
         :process_rdf => true,
         :extract_metadata => true,
+        :generate_labels => true,
         :index_search => true,
         :index_properties => true,
         :run_metrics => true,
@@ -182,7 +183,7 @@ module NcboCron
 
           # Check to make sure the file has been downloaded
           if sub.pullLocation && (!sub.uploadFilePath || !File.exist?(sub.uploadFilePath))
-            multi_logger.debug "Pull location found, but no file in the upload file path. Retrying download."
+            multi_logger.debug "Pull location found (#{sub.pullLocation}, but no file in the upload file path (#{sub.uploadFilePath}. Retrying download."
             file, filename = sub.download_ontology_file
             file_location = sub.class.copy_file_repository(sub.ontology.acronym, sub.submissionId, file, filename)
             file_location = "../" + file_location if file_location.start_with?(".") # relative path fix
@@ -237,10 +238,11 @@ module NcboCron
           begin
             annotator = Annotator::Models::NcboAnnotator.new
             annotator.create_term_cache_for_submission(logger, sub)
-            # commenting this action out for now due to a problem with hgetall in redis
+            # this action only occurs if the CRON dictionary generation job is disabled
+            # if the CRON dictionary generation job is running,
+            # the dictionary will NOT be generated on each ontology parsing
             # see https://github.com/ncbo/ncbo_cron/issues/45 for details
-            # mgrep dictionary generation will occur as a separate CRON task
-            # annotator.generate_dictionary_file()
+            annotator.generate_dictionary_file() unless NcboCron.settings.enable_dictionary_generation_cron_job
           rescue Exception => e
             logger.error(e.message + "\n" + e.backtrace.join("\n\t"))
             logger.flush()
