@@ -31,3 +31,5 @@ group :test do
   gem 'simplecov-cobertura' # for codecov.io
   gem 'test-unit-minitest'
 end
+
+gem "binding_of_caller", "~> 1.0"
