@@ -28,9 +28,9 @@ x-app: &app
       #- /Users/alexskr/ontoportal:/Users/alexskr/ontoportal
     depends_on: &depends_on
       solr-ut:
-        condition: service_healthy
+        condition: service_started
       redis-ut:
-        condition: service_healthy
+        condition: service_started
       mgrep-ut:
         condition: service_healthy
 
@@ -74,12 +74,8 @@ services:
 
   redis-ut:
     image: redis
-    command: ["redis-server", "--save", "", "--appendonly", "no"]
-    healthcheck:
-      test: redis-cli ping
-      interval: 10s
-      timeout: 3s
-      retries: 10
+    ports:
+      - 6379:6379
 
   4store-ut:
     image: bde2020/4store
@@ -91,13 +87,16 @@ services:
       - 4store
 
   solr-ut:
-    image: ontoportal/solr-ut:0.1
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8983/solr/term_search_core1/admin/ping?wt=json | grep -iq '\"status\":\"OK\"}' || exit 1"]
-      start_period: 3s
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    image: solr:8
+    volumes:
+      - ./solr/configsets:/configsets:ro
+    ports:
+      - "8983:8983"
+    command: >
+      bash -c "precreate-core term_search_core1 /configsets/term_search
+      && precreate-core prop_search_core1 /configsets/property_search
+      && solr-foreground"
+  
 
   mgrep-ut:
     image: ontoportal/mgrep-ncbo:0.1
