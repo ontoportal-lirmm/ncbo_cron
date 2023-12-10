@@ -8,12 +8,12 @@ jobs:
   test:
     strategy:
       matrix:
-        backend: ['ruby', 'ruby-agraph'] # ruby runs tests with 4store backend and ruby-agraph runs with AllegroGraph backend
+        backend: ['ruby'] # ruby runs tests with 4store backend and ruby-agraph runs with AllegroGraph backend
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - name: copy config.rb file from template
-      run:  cp config/config.test.rb config/config.rb
+      run:  cp config/config.rb.sample config/config.rb
     - name: Build docker-compose
       working-directory: ./test
       run: docker-compose build

@@ -12,25 +12,46 @@ config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__)
 abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
 require_relative '../config/config'
 
+require 'optparse'
+options = {}
+options[:force_archiving] = false
+
+opt_parser = OptionParser.new do |opts|
+  options[:ontology] = false
+  opts.on('-f', '--force-re-archiving', 'Force to re-archive already archived submissions.') do
+    options[:force_archiving] = true
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+
+opt_parser.parse!
+
 logfile = 'archive_old_submissions.log'
-if File.file?(logfile); File.delete(logfile); end
+if File.file?(logfile);
+  File.delete(logfile);
+end
 logger = Logger.new(logfile)
 options = { process_rdf: false, index_search: false, index_commit: false,
             run_metrics: false, reasoning: false, archive: true }
 onts = LinkedData::Models::Ontology.all
 onts.each { |ont| ont.bring(:acronym, :submissions) }
-onts.sort! { |a,b| a.acronym <=> b.acronym }
-
+onts.sort! { |a, b| a.acronym <=> b.acronym }
+force_archiving = options[:force_archiving]
 onts.each do |ont|
   latest_sub = ont.latest_submission
-  if not latest_sub.nil?
+  unless latest_sub.nil?
     id = latest_sub.submissionId
     subs = ont.submissions
     old_subs = subs.reject { |sub| sub.submissionId >= id }
-    old_subs.sort! { |a,b| a.submissionId <=> b.submissionId }
+    old_subs.sort! { |a, b| a.submissionId <=> b.submissionId }
     old_subs.each do |sub|
-      if not sub.archived?
-        msg = "#{ont.acronym}: found un-archived old submission with ID #{sub.submissionId}."
+      if !sub.archived? || force_archiving
+        msg = "#{ont.acronym}: archive old submission with ID #{sub.submissionId}."
         puts msg
         logger.info msg
         NcboCron::Models::OntologySubmissionParser.new.process_submission(logger, sub.id.to_s, options)

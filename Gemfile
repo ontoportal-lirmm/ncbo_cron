@@ -16,13 +16,14 @@ gem 'rake'
 gem 'redis'
 gem 'rest-client'
 gem 'sys-proctable'
+gem 'request_store'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'
 
-gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'master'
+gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'development'
 gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'master'
-gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'master'
+gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'development'
 gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'master'
 # Testing
 group :test do
@@ -32,3 +33,4 @@ group :test do
   gem 'test-unit-minitest'
 end
 
+gem "binding_of_caller", "~> 1.0"
