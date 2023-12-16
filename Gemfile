@@ -21,9 +21,9 @@ gem 'request_store'
 # Monitoring
 gem 'cube-ruby', require: 'cube'
 
-gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'development'
+gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'master'
 gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'master'
-gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'development'
+gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'master'
 gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'master'
 # Testing
 group :test do

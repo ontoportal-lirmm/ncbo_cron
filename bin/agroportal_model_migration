@@ -80,12 +80,6 @@ class AgroPortalMigrator
         sub.modificationDate = sub.creationDate
       end
 
-      if attribute_error?(sub, :naturalLanguage, :lexvo_language)
-        sub.naturalLanguage = Array(sub.naturalLanguage).map do |lang|
-          RDF::URI.new("http://lexvo.org/id/iso639-1/#{lang.split('/').last}")
-        end
-      end
-
       if attribute_error?(sub, :isOfType, :uri)
         unless sub.isOfType.nil?
           is_of_type = RDF::URI.new(sub.isOfType)
@@ -99,6 +93,13 @@ class AgroPortalMigrator
 
 
     end
+
+    if attribute_error?(sub, :naturalLanguage, :lexvo_language) || Array(sub.naturalLanguage).any?{|x| x.to_s['iso639-3']}
+      sub.naturalLanguage = Array(sub.naturalLanguage).map do |lang|
+        RDF::URI.new("http://lexvo.org/id/iso639-1/#{lang.split('/').last}")
+      end
+    end
+
     # Delete old string attributes that will be converted to Agents
     agent_values = {}
     LinkedData::Models::OntologySubmission.agents_attrs.each do |key|
@@ -129,8 +130,8 @@ class AgroPortalMigrator
 
       sub.send("#{key}=", is_array ? [] : nil)
       values.each do |val|
-        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(attr), RDF::Literal.new(val)], graph: sub.graph)
-        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(attr), RDF::Literal.new(val, datatype: RDF::XSD.string)], graph: sub.graph)
+        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(key), RDF::Literal.new(val)], graph: sub.graph)
+        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(key), RDF::Literal.new(val, datatype: RDF::XSD.string)], graph: sub.graph)
       end
       agent_values[key] = is_array ? values : values.first
     end
