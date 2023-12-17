@@ -29,6 +29,8 @@ module NcboCron
           redis.hdel(QUEUE_HOLDER, key)
 
           # if :remote_pull is one of the actions, pull the ontology and halt if no new submission is found
+          # if a new submission is found, replace the submission ID with the new one and proceed with
+          # processing the remaining actions on the new submission
           if actions.key?(:remote_pull) && actions[:remote_pull]
             acronym = NcboCron::Helpers::OntologyHelper.acronym_from_submission_id(realKey)
             new_submission = NcboCron::Helpers::OntologyHelper.do_ontology_pull(acronym, enable_pull_umls: false,
