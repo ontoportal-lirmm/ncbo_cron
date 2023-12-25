@@ -1,6 +1,5 @@
-require 'open-uri'
 require 'logger'
-require_relative 'ontology_submission_parser'
+require_relative 'ontology_helper'
 
 module NcboCron
   module Models
