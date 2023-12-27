@@ -17,14 +17,12 @@ module NcboCron
         @redis_port = LinkedData.settings.ontology_analytics_redis_port
 
         @data_file =  NcboCron.settings.analytics_path_to_ga_data_file
-        @ua_data_file = NcboCron.settings.analytics_path_to_ua_data_file
 
-        @ga_conn = GoogleAnalyticsConnector.new
-        @ua_conn = GoogleAnalyticsUAConnector.new
+
 
         @logger = logger
         @logger.info "Authenticating with the Google Analytics Endpoint..."
-        @logger.flush
+        @ga_conn = GoogleAnalyticsConnector.new
 
         @analytics_objects = [
           NcboCron::Models::OntologyVisitsAnalytics,
@@ -33,23 +31,22 @@ module NcboCron
         ]
       end
 
-      # @param analytics_objects ObjectAnalytics[]
       def run
         redis = Redis.new(:host => @redis_host, :port => @redis_port)
         @logger.info "Starting Google Analytics refresh..."
-        @logger.flush
         time = Benchmark.realtime do
-          @logger.info "Fetching all ontology acronyms from backend..."
-          @logger.flush
+          @logger.info "Fetching saved analytics data..."
           save = {}
           @old_data = read_old_data
           @analytics_objects.each do |analytic_object|
             analytic_object = analytic_object.new(start_date: detect_latest_date, old_data: @old_data)
-            new_data = analytic_object.full_data(@logger, @ga_conn, @ua_conn)
+            @logger.info "Start fetching new #{analytic_object.redis_field}  data..."
+            new_data = analytic_object.full_data(@logger, @ga_conn)
             save[analytic_object.redis_field] = new_data
             redis.set(analytic_object.redis_field, Marshal.dump(new_data))
+            @logger.info "Completed fetching #{analytic_object.redis_field}  data..."
           end
-          save_data(save)
+          save_data_in_file(save)
         end
         @logger.info "Completed Google Analytics refresh in #{(time / 60).round(1)} minutes."
         @logger.flush
@@ -72,12 +69,12 @@ module NcboCron
 
       end
 
-      def save_data(new_data)
-        new_data["latest_date_save"] =  Date.today.to_s
+      def save_data_in_file(new_data, saved_date =  Date.today.to_s, data_file =  @data_file)
+        new_data["latest_date_save"] =  saved_date
         # Ensure the directory exists before creating the file
-        FileUtils.mkdir_p(File.dirname(@data_file))
+        FileUtils.mkdir_p(File.dirname(data_file))
         # Open the file with 'w+' mode to create if not exist and write
-        File.open(@data_file, 'w+') do |f|
+        File.open(data_file, 'w+') do |f|
           f.write(new_data.to_json)
         end
       end

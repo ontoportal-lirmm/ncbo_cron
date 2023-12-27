@@ -79,12 +79,11 @@ NcboCron.config do |config|
   # Google Analytics GA4 config
   config.analytics_path_to_key_file     = "config/your_analytics_key.json"
   config.analytics_property_id          = "123456789"
-  # path to the Universal Analytics data, which stopped collecting on June 1st, 2023
-  config.analytics_path_to_ua_data_file = "data/your_ua_data.json"
+
   # path to the file that will hold your Google Analytics data
   # this is in addition to storing it in Redis
   config.analytics_path_to_ga_data_file = "data/your_ga_data.json"
-
+  config.analytics_start_date                    = '2015-01-01'
   # this is a Base64.encode64 encoded personal access token
   # you need to run Base64.decode64 on it before using it in your code
   # this is a workaround because Github does not allow storing access tokens in a repo

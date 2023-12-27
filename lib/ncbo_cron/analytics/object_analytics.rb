@@ -7,16 +7,14 @@ require 'google/api_client/auth/key_utils'
 
 module NcboCron
   module Models
-    UA_START_DATE = '2013-10-01'
-    GA4_START_DATE = '2023-06-01'
+
+
 
     class GoogleAnalyticsConnector
 
       attr_reader :ga_client
 
       def initialize
-        @ga_data_file = NcboCron.settings.analytics_path_to_ga_data_file
-        @ua_data_file = NcboCron.settings.analytics_path_to_ua_data_file
         @app_id = NcboCron.settings.analytics_property_id
         @app_key_file = NcboCron.settings.analytics_path_to_key_file
         @ga_client = analytics_data_client
@@ -89,63 +87,8 @@ module NcboCron
 
     end
 
-    # Old version of Google Analytics
-    class GoogleAnalyticsUAConnector
-      def initialize
-        @app_id = NcboCron.settings.analytics_profile_id
-        @app_name = NcboCron.settings.analytics_app_name
-        @app_version = NcboCron.settings.analytics_app_version
-        @analytics_key_file = NcboCron.settings.ua_analytics_path_to_key_file
-        @app_user = NcboCron.settings.analytics_service_account_email_address
-        @generated_file_path = NcboCron.settings.analytics_path_to_ua_data_file
-        @start_date = NcboCron.settings.analytics_start_date
-        @analytics_filter = NcboCron.settings.analytics_filter_str
-        @ga_client = authenticate_google
-      end
-
-      def run_request(metrics:, dimensions:, filters:, start_index:, max_results:, dates_ranges:, sort:)
-        @ga_client.get_ga_data(
-          ids = @app_id,
-          start_date = dates_ranges.first,
-          end_date = dates_ranges.last,
-          metrics = metrics.map { |m| "ga:#{m}" }.join(','),
-          {
-            dimensions: dimensions.map { |d| "ga:#{d}" }.join(','),
-            filters: filters.empty? ? nil : filters.map { |f, v| "ga:#{f}=#{v}" }.join(','),
-            start_index: start_index,
-            max_results: max_results,
-            sort: sort.map { |d| "ga:#{d}" }.join(',')
-          }
-        )
-      end
-
-      private
-
-      def authenticate_google
-        Google::Apis::ClientOptions.default.application_name = @app_name
-        Google::Apis::ClientOptions.default.application_version = @app_version
-        # enable google api call retries in order to
-        # minigate analytics processing failure due to occasional google api timeouts and other outages
-        Google::Apis::RequestOptions.default.retries = 5
-        # uncoment to enable logging for debugging purposes
-        # Google::Apis.logger.level = Logger::DEBUG
-        # Google::Apis.logger = @logger
-        client = Google::Apis::AnalyticsV3::AnalyticsService.new
-        key = Google::APIClient::KeyUtils::load_from_pkcs12(@analytics_key_file, 'notasecret')
-        client.authorization = Signet::OAuth2::Client.new(
-          :token_credential_uri => 'https://accounts.google.com/o/oauth2/token',
-          :audience => 'https://accounts.google.com/o/oauth2/token',
-          :scope => 'https://www.googleapis.com/auth/analytics.readonly',
-          :issuer => @app_user,
-          :signing_key => key
-        ).tap { |auth| auth.fetch_access_token! }
-        client
-      end
-
-    end
-
     class ObjectAnalytics
-
+      GA4_START_DATE = '2023-06-01'
       attr_reader :redis_field
 
       def initialize(redis_field:, start_date:, old_data: {})
@@ -154,21 +97,12 @@ module NcboCron
         @old_data = old_data[@redis_field] || {}
       end
 
-      def full_data(logger, ga_conn, ua_conn)
+      def full_data(logger, ga_conn)
 
-        logger.info "Fetching GA4 analytics for all ontologies from #{@start_date} to today..."
+        logger.info "Fetching GA4 analytics for #{@redis_field} from #{@start_date} to today..."
         logger.flush
         new_ga_data = fetch_object_analytics(logger, ga_conn)
 
-        if @start_date < Date.parse(GA4_START_DATE)
-          @old_data = {}
-          logger.info "Fetching UA analytics for all ontologies from #{@start_date} to today..."
-          logger.flush
-          ua_data = fetch_ua_object_analytics(logger, ua_conn)
-          logger.info "Completed Universal Analytics pull..."
-          logger.flush
-          new_ga_data = merge_and_fill_missing_data(new_ga_data, ua_data, logger)
-        end
         merge_and_fill_missing_data(new_ga_data, @old_data, logger)
       end
 
@@ -177,47 +111,41 @@ module NcboCron
         raise NotImplementedError, "Subclasses must implement this method"
       end
 
-      # @param ua_conn GoogleAnalyticsUAConnector
-      def fetch_ua_object_analytics(logger, ua_conn)
-        raise NotImplementedError, "Subclasses must implement this method"
-      end
-
       private
 
       def merge_and_fill_missing_data(new_data, old_data,logger, start_date = @start_date)
-        if !old_data.empty?
-          logger.info "Merging GA4 and UA data..."
+        if !new_data.empty?
+          logger.info "Merging old Google Analytics and the new data..."
           logger.flush
-          old_data.keys.each do |acronym|
-            (start_date.year..Date.today.year).each do |year|
-              year = year.to_s
-              # add up hits for June of 2023 (the only intersecting month between UA and GA4)
-              if old_data[acronym].has_key?(year)
-                next unless new_data[acronym].has_key?(year)
-
-                (1..Date.today.month).each do |month|
-                  month = month.to_s
-                  old_data[acronym][year][month] ||= 0
-                  unless old_data[acronym][year][month].eql?(new_data[acronym][year][month])
-                    old_data[acronym][year][month] += (new_data[acronym][year][month] || 0)
+          new_data.keys.each do |acronym|
+            if old_data.has_key?(acronym)
+              (start_date.year..Date.today.year).each do |year|
+                year = year.to_s
+                if new_data[acronym].has_key?(year)
+                  if old_data[acronym].has_key?(year)
+                    (1..Date.today.month).each do |month|
+                      month = month.to_s
+                      old_data[acronym][year][month] ||= 0
+                      unless old_data[acronym][year][month].eql?(new_data[acronym][year][month])
+                        old_data[acronym][year][month] += (new_data[acronym][year][month] || 0)
+                      end
+                    end
+                  else
+                    old_data[acronym][year] = new_data[acronym][year]
                   end
                 end
-
-              elsif new_data[acronym][year]
-                old_data[acronym][year] = new_data[acronym][year]
               end
+            else
+              old_data[acronym]= new_data[acronym]
             end
           end
+          # fill missing years and months
+          logger.info "Filling in missing years data..."
           old_data = fill_missing_data(old_data)
-        else
-          old_data = new_data
         end
 
-        # fill missing years and months
-        logger.info "Filling in missing years data..."
-        logger.flush
-        old_data
         # sort_ga_data(old_data)
+        old_data
       end
 
       def aggregate_results(aggregated_results, results)
@@ -244,7 +172,7 @@ module NcboCron
 
       def fill_missing_data(ga_data)
         # fill up non existent years
-        start_year = Date.parse(UA_START_DATE).year
+        start_year = @start_date.year
 
         ga_data.each do |acronym, _|
           (start_year..Date.today.year).each do |y|

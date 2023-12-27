@@ -51,43 +51,7 @@ module NcboCron
         {"all_users" => aggregated_results}
       end
 
-      def fetch_ua_object_analytics(logger, ua_conn)
 
-        aggregated_results = Hash.new
-        start_year = Date.parse(UA_START_DATE).year || 2013
-
-        max_results = 10000
-        start_index = 1
-        loop do
-          results = ua_conn.run_request(
-            metrics: ['newUsers'],
-            dimensions: %w[year month],
-            filters: [],
-            start_index: start_index,
-            max_results: max_results,
-            dates_ranges: [UA_START_DATE, Date.today.to_s],
-            sort: %w[year month]
-          )
-          results.rows ||= []
-          start_index += max_results
-          num_results = results.rows.length
-          logger.info "Results: #{num_results}, Start Index: #{start_index}"
-          logger.flush
-          aggregate_results(aggregated_results, results.rows.map{|row| [-1] + row})
-
-          if num_results < max_results
-            # fill up non existent years
-            (start_year..Date.today.year).each do |y|
-              aggregated_results = Hash.new if aggregated_results.nil?
-              aggregated_results[y.to_s] = Hash.new unless aggregated_results.has_key?(y.to_s)
-            end
-            # fill up non existent months with zeros
-            (1..12).each { |n| aggregated_results.values.each { |v| v[n.to_s] = 0 unless v.has_key?(n.to_s) } }
-            break
-          end
-        end
-        { "all_users" => aggregated_results}
-      end
     end
   end
 end

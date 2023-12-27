@@ -7,7 +7,7 @@ module NcboCron
   module Models
     class PageVisitsAnalytics < ObjectAnalytics
       def initialize(start_date: Date.today.prev_month, old_data: {})
-        super(redis_field: 'pages_analytics', start_date: start_date, old_data: { })
+        super(redis_field: 'pages_analytics', start_date: Date.today.prev_month, old_data: { })
       end
 
       private
@@ -56,8 +56,9 @@ module NcboCron
         {"all_pages" => aggregated_results }
       end
 
-      def fetch_ua_object_analytics(logger, ua_conn)
-        {"all_pages" => {} } # we fetch only the current month views UA is at least 6 month past
+      # we don't the missing data in this case
+      def fill_missing_data(ga_data)
+        ga_data
       end
     end
   end
