@@ -95,6 +95,8 @@ services:
       && 4s-httpd -D -s-1 -p 9000 ontoportal_kb"
     profiles:
       - 4store
+    ports:
+      - 9000:9000
 
   solr-ut:
     image: solr:8
@@ -122,6 +124,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    ports:
+      - 55556:55555
 
   agraph-ut:
     image: franzinc/agraph:v8.0.0
