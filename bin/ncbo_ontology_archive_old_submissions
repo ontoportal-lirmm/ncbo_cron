@@ -13,10 +13,14 @@ abort("Please create a config/config.rb file using the config/config.rb.sample a
 require_relative '../config/config'
 require 'optparse'
 
-options = { delete: false }
+options = { delete: false , force_archiving: false}
 opt_parser = OptionParser.new do |opts|
   # Set a banner, displayed at the top of the help screen.
   opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
+
+  opts.on('-f', '--force-re-archiving', 'Force to re-archive already archived submissions.') do
+    options[:force_archiving] = true
+  end
 
   options[:logfile] = STDOUT
   opts.on( '-l', '--logfile FILE', "Write log to FILE (default is STDOUT)" ) do |filename|
@@ -40,12 +44,12 @@ logfile = options[:logfile]
 if File.file?(logfile); File.delete(logfile); end
 logger = Logger.new(logfile)
 process_actions = { process_rdf: false, generate_labels: false, index_search: false, index_commit: false,
-            process_annotator: false, diff: false, run_metrics: false, archive: true }
+                    process_annotator: false, diff: false, run_metrics: false, archive: true }
 onts = LinkedData::Models::Ontology.all
 onts.each { |ont| ont.bring(:acronym, :submissions) }
 onts.sort! { |a, b| a.acronym <=> b.acronym }
 bad_submissions = {}
-
+force_archiving = options[:force_archiving]
 onts.each do |ont|
   latest_sub = ont.latest_submission
 
@@ -73,7 +77,7 @@ onts.each do |ont|
     }
     old_subs.sort! { |a, b| a.submissionId <=> b.submissionId }
     old_subs.each do |sub|
-      unless sub.archived?
+      unless sub.archived? || force_archiving
         msg = "#{ont.acronym}: found un-archived old submission with ID #{sub.submissionId}."
         puts msg
         logger.info msg
@@ -118,6 +122,7 @@ onts.each do |ont|
     end
   end
 end
+
 
 puts
 
