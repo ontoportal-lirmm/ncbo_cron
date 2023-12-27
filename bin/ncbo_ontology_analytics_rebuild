@@ -52,7 +52,7 @@ begin
   logger.info(msg)
 
   time = Benchmark.realtime do
-    NcboCron::Models::OntologyAnalytics.new(logger).run
+    NcboCron::Models::ObjectAnalyticsJob.new(logger).run
   end
   msg = "Completed rebuilding ontology analytics repository in #{(time/60).round(1)} minutes."
   puts msg
