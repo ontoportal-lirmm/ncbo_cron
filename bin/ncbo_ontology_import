@@ -76,6 +76,21 @@ def create_ontology(ont_info)
     new_ontology.viewingRestriction = 'private'
     new_ontology.acl = [USER]
   end
+
+  groups = []
+  has_domains = []
+  Array(ont_info['group']).each do |group|
+    group = LinkedData::Models::Group.find(group.split("/").last).first
+    groups << group if group
+  end
+
+  Array(ont_info['hasDomain']).each do |category|
+    category = LinkedData::Models::Category.find(category.split("/").last).first
+    has_domains << category if category
+  end
+
+  new_ontology.groups = groups
+  new_ontology.hasDomain = has_domains
   new_ontology
 end
 

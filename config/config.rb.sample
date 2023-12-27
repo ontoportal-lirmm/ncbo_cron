@@ -54,9 +54,6 @@ LinkedData.config do |config|
   config.smtp_auth_type          = :none
   config.smtp_domain             = "localhost.localhost"
 end
-rescue NameError
-  puts "(CNFG) >> LinkedData not available, cannot load config"
-end
 
 Annotator.config do |config|
   config.mgrep_host              ||= "localhost"
@@ -65,9 +62,6 @@ Annotator.config do |config|
   config.mgrep_host            = MGREP_HOST.to_s
   config.mgrep_port            = MGREP_PORT.to_i
   config.mgrep_dictionary_file = MGREP_DICT_PATH.to_s
-end
-rescue NameError
-  puts "(CNFG) >> Annotator not available, cannot load config"
 end
 
 NcboCron.config do |config|

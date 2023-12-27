@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: copy config.rb file from template
-      run:  cp config/config.test.rb config/config.rb
+      run:  cp config/config.rb.sample config/config.rb
     - name: Build docker-compose
       run: docker-compose build
     - name: Run unit tests

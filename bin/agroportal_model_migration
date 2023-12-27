@@ -54,10 +54,8 @@ class AgroPortalMigrator
 
     log_info "Start submission #{sub.id} migration"
     sub.class.model_settings[:attributes][:keyClasses][:enforce].delete(:class)
-    LinkedData::Models::OntologySubmission.agents_attrs.each do |key|
-      sub.class.model_settings[:attributes][key][:enforce].delete(:is_person)
-      sub.class.model_settings[:attributes][key][:enforce].delete(:is_organization)
-    end
+    sub.class.model_settings[:attributes][:mailingList][:enforce].delete(:email)
+
 
     if not_valid?(sub, "submission not valid")
       sub.valid = nil if attribute_error?(sub, :valid)
@@ -75,22 +73,18 @@ class AgroPortalMigrator
       end
 
       if attribute_error?(sub, :designedForOntologyTask)
-        sub.designedForOntologyTask = sub.designedForOntologyTask.map { |x| RDF::URI.new("http://omv.ontoware.org/2005/05/ontology##{x..split(' ').collect(&:capitalize).join}") }
+        sub.designedForOntologyTask = sub.designedForOntologyTask.map { |x| RDF::URI.new(x.to_s) }
       end
 
       if attribute_error?(sub, :modificationDate, :superior_equal_to_creationDate)
         sub.modificationDate = sub.creationDate
       end
 
-      if attribute_error?(sub, :naturalLanguage, :lexvo_language)
-        sub.naturalLanguage = Array(sub.naturalLanguage).map do |lang|
-          next lang if lang.to_s.start_with?('http://lexvo.org/id/iso')
-          RDF::URI.new("http://lexvo.org/id/iso639-1/#{lang}")
-        end
-      end
-
       if attribute_error?(sub, :isOfType, :uri)
-        sub.isOfType = RDF::URI.new("http://omv.ontoware.org/2005/05/ontology##{sub.isOfType.to_s.capitalize}")
+        unless sub.isOfType.nil?
+          is_of_type = RDF::URI.new(sub.isOfType)
+          sub.isOfType = is_of_type.valid? ?  is_of_type : RDF::URI.new("http://omv.ontoware.org/2005/05/ontology##{sub.isOfType.split('/').last.capitalize}")
+        end
       end
 
       if attribute_error?(sub, :description)
@@ -100,8 +94,19 @@ class AgroPortalMigrator
 
     end
 
+    if attribute_error?(sub, :naturalLanguage, :lexvo_language) || Array(sub.naturalLanguage).any?{|x| x.to_s['iso639-3']}
+      sub.naturalLanguage = Array(sub.naturalLanguage).map do |lang|
+        RDF::URI.new("http://lexvo.org/id/iso639-1/#{lang.split('/').last}")
+      end
+    end
 
+    # Delete old string attributes that will be converted to Agents
+    agent_values = {}
     LinkedData::Models::OntologySubmission.agents_attrs.each do |key|
+      sub.class.model_settings[:attributes][key][:enforce].delete(:is_person)
+      is_organization = sub.class.model_settings[:attributes][key][:enforce].delete(:is_organization)
+      sub.class.model_settings[:attributes][key][:enforce].delete(:Agent)
+
       values = sub.send(key)
       is_array = values.is_a?(Array)
       next if values.nil? || values.empty?
@@ -113,7 +118,7 @@ class AgroPortalMigrator
         string_values = string_values.to_s.split(',').map do |value|
           creator = LinkedData::Models::Agent.where(name: value).first
           unless creator
-            creator = LinkedData::Models::Agent.new(name: value, agentType: 'person', creator: admin_user)
+            creator = LinkedData::Models::Agent.new(name: value, agentType: is_organization ? 'organization' : 'person', creator: admin_user)
             stop_to_fix('creator not valid') unless creator.valid?
             creator.save
           end
@@ -123,9 +128,16 @@ class AgroPortalMigrator
         string_values
       end.flatten.compact
 
-      sub.send("#{key}=", is_array ? values : values.first)
+      sub.send("#{key}=", is_array ? [] : nil)
+      values.each do |val|
+        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(key), RDF::Literal.new(val)], graph: sub.graph)
+        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(key), RDF::Literal.new(val, datatype: RDF::XSD.string)], graph: sub.graph)
+      end
+      agent_values[key] = is_array ? values : values.first
     end
 
+    # Delete old string attributes that will be converted to URI
+    uri_values = {}
     sub.errors.each do |key, errors|
       next unless errors.keys.include?(:uri)
 
@@ -139,10 +151,35 @@ class AgroPortalMigrator
 
       sub.class.model_settings[:attributes][key.to_sym][:enforce].delete(:uri)
       sub.send("#{key}=", is_array ? [] : nil)
-      sub.save rescue stop_to_fix('not valid submission')
-      sub.class.model_settings[:attributes][key.to_sym][:enforce].push(:uri)
-      sub.send("#{key}=", is_array ? values : values.first)
+      uri_values[key]=  is_array ? values : values.first
     end
+
+
+    sub.class.model_settings[:attributes][:URI][:enforce].delete(:existence)
+    sub.save rescue stop_to_fix('not valid submission')
+
+    # Save converted strings to URIs
+    begin
+      uri_values.each do |k, v|
+        sub.class.model_settings[:attributes][k.to_sym][:enforce].push(:uri)
+        sub.send("#{k}=",v)
+      end
+      sub.save rescue stop_to_fix('not valid submission')
+    rescue
+      stop_to_fix('URI values migration failed')
+    end
+
+    # Save converted strings to Agents
+    begin
+      agent_values.each do |k, v|
+        sub.class.model_settings[:attributes][k.to_sym][:enforce].push(:Agent)
+        sub.send("#{k}=",v)
+      end
+      sub.save rescue stop_to_fix('not valid submission')
+    rescue
+      stop_to_fix('Agent values migration failed')
+    end
+
 
     if sub.valid?
       sub.save rescue stop_to_fix('not valid submission')
