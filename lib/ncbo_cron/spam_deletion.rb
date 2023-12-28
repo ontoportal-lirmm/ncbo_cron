@@ -25,8 +25,18 @@ module NcboCron
       end
 
       def run
-        auth_token = Base64.decode64(NcboCron.settings.git_repo_access_token)
+        auth_token = NcboCron.settings.git_repo_access_token
         res = `curl --header 'Authorization: token #{auth_token}' --header 'Accept: application/vnd.github.v3.raw' --location #{FULL_FILE_PATH}`
+
+        begin
+          error_json = JSON.parse(res)
+          msg = "\nError while fetching the SPAM user list from #{FULL_FILE_PATH}: #{error_json}"
+          @logger.error(msg)
+          puts msg
+          exit
+        rescue JSON::ParserError
+          @logger.info("Successfully downloaded the SPAM user list from #{FULL_FILE_PATH}")
+        end
         usernames = res.split(",").map(&:strip)
         delete_spam(usernames)
       end

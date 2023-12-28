@@ -2,13 +2,17 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'faraday', '~> 1.9'
 gem 'ffi'
+
+# This is needed temporarily to pull the Google Universal Analytics (UA)
+# data and store it in a file. See (bin/import_google_ua_analytics_data)
+# The ability to pull this data from Google will cease on July 1, 2024
 gem "google-apis-analytics_v3"
+
+gem 'google-analytics-data'
 gem 'mail', '2.6.6'
-gem 'minitest', '< 5.0'
 gem 'multi_json'
-gem 'oj', '~> 2.0'
+gem 'oj', '~> 3.0'
 gem 'parseconfig'
 gem 'pony'
 gem 'pry'
@@ -28,6 +32,7 @@ gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'master
 # Testing
 group :test do
   gem 'email_spec'
+  gem 'minitest', '< 5.0'
   gem 'simplecov'
   gem 'simplecov-cobertura' # for codecov.io
   gem 'test-unit-minitest'

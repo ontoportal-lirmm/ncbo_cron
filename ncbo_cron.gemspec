@@ -8,7 +8,7 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{}
   gem.homepage      = "https://github.com/ncbo/ncbo_cron"
 
-  gem.files         = `git ls-files`.split($\)
+  gem.files         = Dir['**/*']
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "ncbo_cron"
@@ -16,7 +16,7 @@ Gem::Specification.new do |gem|
 
   gem.add_dependency("dante")
   gem.add_dependency("goo")
-  gem.add_dependency("google-apis-analytics_v3")
+  gem.add_dependency("google-analytics-data")
   gem.add_dependency("mlanett-redis-lock")
   gem.add_dependency("multi_json")
   gem.add_dependency("ncbo_annotator")
