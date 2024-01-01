@@ -41,9 +41,10 @@ module NcboCron
               (start_year..Date.today.year).each do |y|
                 aggregated_results[acronym] = Hash.new if aggregated_results[acronym].nil?
                 aggregated_results[acronym][y.to_s] = Hash.new unless aggregated_results[acronym].has_key?(y.to_s)
+                # fill up non existent months with zeros
+                last_month = y.eql?(Date.today.year) ? Date.today.month : 12
+                (1..last_month).each { |n|  aggregated_results[acronym][y.to_s][n.to_s] = 0 if aggregated_results[acronym][y.to_s].is_a?(Hash) && !aggregated_results[acronym][y.to_s].has_key?(n.to_s)}
               end
-              # fill up non existent months with zeros
-              (1..12).each { |n| aggregated_results[acronym].values.each { |v| v[n.to_s] = 0 unless v.has_key?(n.to_s) } }
               break
             end
           end
@@ -82,9 +83,12 @@ module NcboCron
             (start_year..Date.today.year).each do |y|
               aggregated_results = Hash.new if aggregated_results.nil?
               aggregated_results[y.to_s] = Hash.new unless aggregated_results.has_key?(y.to_s)
+
+              # fill up non existent months with zeros
+              last_month = y.eql?(Date.today.year) ? Date.today.month.to_i : 12
+              (1..last_month).each { |n|  aggregated_results[y.to_s][n.to_s] = 0 if aggregated_results[y.to_s].is_a?(Hash) && !aggregated_results[y.to_s].has_key?(n.to_s)}
             end
-            # fill up non existent months with zeros
-            (1..12).each { |n| aggregated_results.values.each { |v| v[n.to_s] = 0 unless v.has_key?(n.to_s) } }
+
             break
           end
         end
