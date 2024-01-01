@@ -113,7 +113,7 @@ module NcboCron
 
       private
 
-      def merge_and_fill_missing_data(new_data, old_data,logger, start_date = @start_date)
+      def merge_and_fill_missing_data(new_data, old_data, logger, start_date = @start_date)
         if !new_data.empty?
           logger.info "Merging old Google Analytics and the new data..."
           logger.flush
@@ -123,7 +123,8 @@ module NcboCron
                 year = year.to_s
                 if new_data[acronym].has_key?(year)
                   if old_data[acronym].has_key?(year)
-                    (1..Date.today.month).each do |month|
+                    last_month = year.eql?(Date.today.year) ? Date.today.month : 12
+                    (1..last_month).each do |month|
                       month = month.to_s
                       old_data[acronym][year][month] ||= 0
                       unless old_data[acronym][year][month].eql?(new_data[acronym][year][month])
@@ -136,16 +137,14 @@ module NcboCron
                 end
               end
             else
-              old_data[acronym]= new_data[acronym]
+              old_data[acronym] = new_data[acronym]
             end
           end
           # fill missing years and months
           logger.info "Filling in missing years data..."
           old_data = fill_missing_data(old_data)
         end
-
-        # sort_ga_data(old_data)
-        old_data
+        sort_ga_data(old_data)
       end
 
       def aggregate_results(aggregated_results, results)
@@ -178,16 +177,22 @@ module NcboCron
           (start_year..Date.today.year).each do |y|
             ga_data[acronym] = Hash.new if ga_data[acronym].nil?
             ga_data[acronym][y.to_s] = Hash.new unless ga_data[acronym].has_key?(y.to_s)
+
+            # fill up non existent months with zeros
+            last_month = y.eql?(Date.today.year) ? Date.today.month.to_i : 12
+            (1..last_month).each { |n| ga_data[acronym][y.to_s][n.to_s] = 0 if ga_data[acronym][y.to_s].is_a?(Hash) && !ga_data[acronym][y.to_s].has_key?(n.to_s) }
           end
-          # fill up non existent months with zeros
-          (1..12).each { |n| ga_data[acronym].values.each { |v| v[n.to_s] = 0 if v.is_a?(Hash) && !v.has_key?(n.to_s) } }
         end
       end
 
       def sort_ga_data(ga_data)
         ga_data.transform_values { |value|
           value.transform_values { |val|
-            val.sort_by { |key, _| key.to_i }.to_h
+            if val.is_a?(Hash)
+              val.sort_by { |key, _| key.to_i }.to_h
+            else
+              val
+            end
           }.sort_by { |k, _| k.to_i }.to_h
         }.sort.to_h
       end

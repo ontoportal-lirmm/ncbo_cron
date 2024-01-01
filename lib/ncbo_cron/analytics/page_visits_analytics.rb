@@ -6,8 +6,8 @@ require_relative 'object_analytics'
 module NcboCron
   module Models
     class PageVisitsAnalytics < ObjectAnalytics
-      def initialize(start_date: Date.today.prev_month, old_data: {})
-        super(redis_field: 'pages_analytics', start_date: Date.today.prev_month, old_data: { })
+      def initialize(start_date: Date.today.prev_month.to_s, old_data: {})
+        super(redis_field: 'pages_analytics', start_date: Date.today.prev_month.to_s, old_data: { })
       end
 
       private
