@@ -7,10 +7,11 @@ namespace :purl do
   require_relative '../lib/ncbo_cron'
   config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
   abort('Please create a config/config.rb file using the config/config.rb.sample as a template') unless config_exists
-  require_relative '../config/config'
+
 
   desc 'update purl for all ontologies'
   task :update_all do
+    require_relative '../config/config'
     purl_client = LinkedData::Purl::Client.new
     LinkedData::Models::Ontology.all.each do |ont|
       ont.bring(:acronym)
