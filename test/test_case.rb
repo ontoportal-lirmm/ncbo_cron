@@ -60,10 +60,11 @@ class CronUnit < MiniTest::Unit
     raise StandardError, 'Too many triples in KB, does not seem right to run tests' unless
           count_pattern('?s ?p ?o') < 400000
 
-    LinkedData::Models::Ontology.where.include(:acronym).each do |o|
-      query = "submissionAcronym:#{o.acronym}"
-      LinkedData::Models::Ontology.unindexByQuery(query)
-    end
+    # LinkedData::Models::Ontology.where.include(:acronym).each do |o|
+    #   query = "submissionAcronym:#{o.acronym}"
+    #   LinkedData::Models::Ontology.unindexByQuery(query)
+    # end
+    #
     LinkedData::Models::Ontology.indexCommit
     Goo.sparql_update_client.update('DELETE {?s ?p ?o } WHERE { ?s ?p ?o }')
     LinkedData::Models::SubmissionStatus.init_enum

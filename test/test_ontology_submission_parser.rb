@@ -40,7 +40,7 @@ class TestOntologySubmissionParser < TestCase
     assert_nil val
 
     parser.queue_submission(o1.submissions[0], {
-        dummy_action: true, index_search: false, metrics: true,
+        dummy_action: true, index_all_data: false, index_search: false, metrics: true,
         process_annotator: true, another_dummy_action: true, all: true})
     val = @@redis.hget(NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER, parser.get_prefixed_id(o1.submissions[0].id.to_s))
     options = MultiJson.load(val, symbolize_keys: true)
@@ -49,11 +49,11 @@ class TestOntologySubmissionParser < TestCase
     o2 = @@ontologies[1]
     o2.bring(:submissions) if o2.bring?(:submissions)
     parser.queue_submission(o2.submissions[0], {
-        :process_rdf => false, :index_search => true, :metrics => true,
+        :process_rdf => false, :index_search => true, index_all_data: true, :metrics => true,
         :process_annotator => false})
     val = @@redis.hget(NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER, parser.get_prefixed_id(o2.submissions[0].id.to_s))
     options = MultiJson.load(val, symbolize_keys: true)
-    assert_equal({:process_rdf => false, :index_search => true, :process_annotator => false}, options)
+    assert_equal({:process_rdf => false, :index_search => true, index_all_data: true,  :process_annotator => false}, options)
   end
 
   def test_parse_submissions
@@ -76,13 +76,13 @@ class TestOntologySubmissionParser < TestCase
     o2_sub2.bring(:submissionStatus)
 
     options_o1 = {
-      :dummy_action => true, :process_rdf => true, :index_search => true, :index_properties => true, :diff => true,
+      :dummy_action => true, :process_rdf => true, :index_all_data => true, :index_search => true, :index_properties => true, :diff => true,
       :dummy_metrics => false, :run_metrics => false, :process_annotator => false,
       :another_dummy_action => false, :all => false
     }
 
     options_o2 = {
-      dummy_action: false, process_rdf: true, index_search: false, index_properties: false, :diff => true,
+      dummy_action: false, process_rdf: true, index_search: false, :index_all_data => false, index_properties: false, :diff => true,
       dummy_metrics: true, run_metrics: false, process_annotator: true,
       another_dummy_action: true, all: false
     }
