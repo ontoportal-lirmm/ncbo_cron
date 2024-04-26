@@ -7,7 +7,7 @@ GOO_PATH_QUERY        = ENV.include?("GOO_PATH_QUERY")        ? ENV["GOO_PATH_QU
 GOO_PATH_UPDATE       = ENV.include?("GOO_PATH_UPDATE")       ? ENV["GOO_PATH_UPDATE"]       : "/update/"
 GOO_PORT              = ENV.include?("GOO_PORT")              ? ENV["GOO_PORT"]              : 9000
 MGREP_HOST            = ENV.include?("MGREP_HOST")            ? ENV["MGREP_HOST"]            : "localhost"
-MGREP_PORT            = ENV.include?("MGREP_PORT")            ? ENV["MGREP_PORT"]            : 55555
+MGREP_PORT            = ENV.include?("MGREP_PORT")            ? ENV["MGREP_PORT"]            : 55556
 MGREP_DICT_PATH       = ENV.include?("MGREP_DICT_PATH")       ? ENV["MGREP_DICT_PATH"]       : "./test/data/dictionary.txt"
 REDIS_GOO_CACHE_HOST  = ENV.include?("REDIS_GOO_CACHE_HOST")  ? ENV["REDIS_GOO_CACHE_HOST"]  : "localhost"
 REDIS_HTTP_CACHE_HOST = ENV.include?("REDIS_HTTP_CACHE_HOST") ? ENV["REDIS_HTTP_CACHE_HOST"] : "localhost"
@@ -16,8 +16,9 @@ REDIS_PORT            = ENV.include?("REDIS_PORT")            ? ENV["REDIS_PORT"
 REPORT_PATH           = ENV.include?("REPORT_PATH")           ? ENV["REPORT_PATH"]           : "./test/tmp/ontologies_report.json"
 REPOSITORY_FOLDER     = ENV.include?("REPOSITORY_FOLDER")     ? ENV["REPOSITORY_FOLDER"]     : "./test/data/ontology_files/repo"
 REST_URL_PREFIX       = ENV.include?("REST_URL_PREFIX")       ? ENV["REST_URL_PREFIX"]       : "http://localhost:9393"
-SOLR_PROP_SEARCH_URL  = ENV.include?("SOLR_PROP_SEARCH_URL")  ? ENV["SOLR_PROP_SEARCH_URL"]  : "http://localhost:8983/solr/prop_search_core1"
-SOLR_TERM_SEARCH_URL  = ENV.include?("SOLR_TERM_SEARCH_URL")  ? ENV["SOLR_TERM_SEARCH_URL"]  : "http://localhost:8983/solr/term_search_core1"
+SOLR_PROP_SEARCH_URL  = ENV.include?("SOLR_PROP_SEARCH_URL")  ? ENV["SOLR_PROP_SEARCH_URL"]  : "http://localhost:8983/solr"
+SOLR_TERM_SEARCH_URL  = ENV.include?("SOLR_TERM_SEARCH_URL")  ? ENV["SOLR_TERM_SEARCH_URL"]  : "http://localhost:8983/solr"
+GOO_SLICES = ENV["GOO_SLICES"] || 500
 
 LinkedData.config do |config|
   config.goo_backend_name              = GOO_BACKEND_NAME.to_s
@@ -73,8 +74,8 @@ NcboCron.config do |config|
   # do not deaemonize in docker
   config.daemonize  = false
 
-  config.search_index_all_url = "http://localhost:8983/solr/term_search_core2"
-  config.property_search_index_all_url = "http://localhost:8983/solr/prop_search_core2"
+  config.search_index_all_url = "http://localhost:8983/solr"
+  config.property_search_index_all_url = "http://localhost:8983/solr"
 
   # Google Analytics GA4 config
   config.analytics_path_to_key_file     = "config/your_analytics_key.json"
