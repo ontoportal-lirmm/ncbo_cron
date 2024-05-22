@@ -28,7 +28,7 @@ gem 'json-ld'
 gem 'cube-ruby', require: 'cube'
 
 gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'development'
-gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'master'
+gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'development'
 gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'development'
 gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'development'
 # Testing
