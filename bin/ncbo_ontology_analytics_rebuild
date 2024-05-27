@@ -51,12 +51,8 @@ begin
   puts msg
   logger.info(msg)
 
-  time = Benchmark.realtime do
-    NcboCron::Models::OntologyAnalytics.new(logger).run
-  end
-  msg = "Completed rebuilding ontology analytics repository in #{(time/60).round(1)} minutes."
-  puts msg
-  logger.info(msg)
+  NcboCron::Models::ObjectAnalyticsJob.new(logger).run
+
 rescue Exception => e
   msg = "Failed rebuilding ontology analytics repository with exception: #{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
   logger.error(msg)

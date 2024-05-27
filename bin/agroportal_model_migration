@@ -1,0 +1,269 @@
+#!/usr/bin/env ruby
+
+# Exit cleanly from an early interrupt
+Signal.trap("INT") { exit 1 }
+
+# Setup the bundled gems in our environment
+require 'bundler/setup'
+require 'binding_of_caller'
+# Configure the process for the current cron configuration.
+require_relative '../lib/ncbo_cron'
+config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
+abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
+require_relative '../config/config'
+
+require 'optparse'
+options = {}
+opt_parser = OptionParser.new do |opts|
+  # Set a banner, displayed at the top of the help screen.
+  # opts.banner = "Usage: ncbo_ontology_process [options]"
+  opts.separator 'A script that migrate data from old EcoPortal model to the new (AgroPortal) model'
+  opts.on('-o', '--ontologies ACRONYM[,ACRONYM,...]', 'Migrate submission model of the  of this ontology acronym(s).') do |acronym|
+    options[:ontologies] = acronym.split(',')
+  end
+  opts.on('--migrate-all', 'Migrate all submission models') do |d|
+    options[:migrate_all] = true
+  end
+
+  options[:logfile] = "ecoportal_migration.log"
+  opts.on('-l', '--logfile FILE', "Write log to FILE (default is 'deletions.log')") do |filename|
+    options[:logfile] = filename
+  end
+
+  # Display the help screen, all programs are assumed to have this option.
+  opts.on('-h', '--help', 'Display this screen') do
+    puts opts
+    exit
+  end
+end
+# Parse the command-line. The 'parse' method simply parses ARGV, while the 'parse!' method parses ARGV and removes
+# any options found there, as well as any parameters for the options.
+opt_parser.parse!
+
+# Migrator class
+class AgroPortalMigrator
+
+  def initialize(submission:, logger:)
+    @submission = submission
+    @logger = logger
+  end
+
+  def migrate_submission
+    sub = @submission
+    sub.bring_remaining
+
+    log_info "Start submission #{sub.id} migration"
+    sub.class.model_settings[:attributes][:keyClasses][:enforce].delete(:class)
+    sub.class.model_settings[:attributes][:mailingList][:enforce].delete(:email)
+
+
+    if not_valid?(sub, "submission not valid")
+      sub.valid = nil if attribute_error?(sub, :valid)
+      sub.curatedOn = sub.creationDate if attribute_error?(sub, :curatedOn)
+
+      sub.hasPart = Array(sub.hasPart) + Array(sub.ontology.views.map { |x| x.id }) if attribute_error?(sub,:hasPart)
+
+
+      if attribute_error?(sub, :URI, :existence)
+        sub.URI = sub.id
+      end
+
+      if attribute_error?(sub, :URI, :distinct_of_identifier)
+        sub.identifier = sub.identifier.reject { |x| x.to_s.eql?(sub.URI.to_s) }
+      end
+
+      if attribute_error?(sub, :designedForOntologyTask)
+        sub.designedForOntologyTask = sub.designedForOntologyTask.map { |x| RDF::URI.new(x.to_s) }
+      end
+
+      if attribute_error?(sub, :modificationDate, :superior_equal_to_creationDate)
+        sub.modificationDate = sub.creationDate
+      end
+
+      if attribute_error?(sub, :isOfType, :uri)
+        unless sub.isOfType.nil?
+          is_of_type = RDF::URI.new(sub.isOfType)
+          sub.isOfType = is_of_type.valid? ?  is_of_type : RDF::URI.new("http://omv.ontoware.org/2005/05/ontology##{sub.isOfType.split('/').last.capitalize}")
+        end
+      end
+
+      if attribute_error?(sub, :description)
+        sub.description = "#{sub.ontology.id.to_s.split('/').last} description"
+      end
+
+
+    end
+
+    if attribute_error?(sub, :naturalLanguage, :lexvo_language) || Array(sub.naturalLanguage).any?{|x| x.to_s['iso639-3']}
+      sub.naturalLanguage = Array(sub.naturalLanguage).map do |lang|
+        RDF::URI.new("http://lexvo.org/id/iso639-1/#{lang.split('/').last}")
+      end
+    end
+
+    # Delete old string attributes that will be converted to Agents
+    agent_values = {}
+    LinkedData::Models::OntologySubmission.agents_attrs.each do |key|
+      sub.class.model_settings[:attributes][key][:enforce].delete(:is_person)
+      is_organization = sub.class.model_settings[:attributes][key][:enforce].delete(:is_organization)
+      sub.class.model_settings[:attributes][key][:enforce].delete(:Agent)
+
+      values = sub.send(key)
+      is_array = values.is_a?(Array)
+      next if values.nil? || values.empty?
+
+      values = Array(values).map do |string_values|
+        next string_values unless string_values.nil? || string_values.is_a?(String)
+        next nil if string_values.empty?
+
+        string_values = string_values.to_s.split(',').map do |value|
+          creator = LinkedData::Models::Agent.where(name: value).first
+          unless creator
+            creator = LinkedData::Models::Agent.new(name: value, agentType: is_organization ? 'organization' : 'person', creator: admin_user)
+            stop_to_fix('creator not valid') unless creator.valid?
+            creator.save
+          end
+          creator
+        end
+
+        string_values
+      end.flatten.compact
+
+      sub.send("#{key}=", is_array ? [] : nil)
+      values.each do |val|
+        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(key), RDF::Literal.new(val)], graph: sub.graph)
+        Goo.sparql_update_client.delete_data([sub.id, LinkedData::Models::OntologySubmission.attribute_uri(key), RDF::Literal.new(val, datatype: RDF::XSD.string)], graph: sub.graph)
+      end
+      agent_values[key] = is_array ? values : values.first
+    end
+
+    # Delete old string attributes that will be converted to URI
+    uri_values = {}
+    sub.errors.each do |key, errors|
+      next unless errors.keys.include?(:uri)
+
+      log_info "Fix submission #{sub.id} #{key} URL values"
+      values = sub.send(key)
+      next if values.nil? || values.empty?
+
+      is_array = values.is_a?(Array)
+
+      values = Array(values).map { |x| RDF::URI.new(x) }
+
+      sub.class.model_settings[:attributes][key.to_sym][:enforce].delete(:uri)
+      sub.send("#{key}=", is_array ? [] : nil)
+      uri_values[key]=  is_array ? values : values.first
+    end
+
+
+    sub.class.model_settings[:attributes][:URI][:enforce].delete(:existence)
+    sub.save rescue stop_to_fix('not valid submission')
+
+    # Save converted strings to URIs
+    begin
+      uri_values.each do |k, v|
+        sub.class.model_settings[:attributes][k.to_sym][:enforce].push(:uri)
+        sub.send("#{k}=",v)
+      end
+      sub.save rescue stop_to_fix('not valid submission')
+    rescue
+      stop_to_fix('URI values migration failed')
+    end
+
+    # Save converted strings to Agents
+    begin
+      agent_values.each do |k, v|
+        sub.class.model_settings[:attributes][k.to_sym][:enforce].push(:Agent)
+        sub.send("#{k}=",v)
+      end
+      sub.save rescue stop_to_fix('not valid submission')
+    rescue
+      stop_to_fix('Agent values migration failed')
+    end
+
+
+    if sub.valid?
+      sub.save rescue stop_to_fix('not valid submission')
+      log_info ">> #{sub.id} migrated successfully"
+    else
+      stop_to_fix "#{sub.id} migration failed submission not valid"
+    end
+
+    log_info "> Submission #{sub.id} migration ended"
+  end
+
+  private
+
+  def attribute_error?(sub, attr, error_type = nil)
+    sub.errors.keys.include?(attr) && (error_type.nil? || sub.errors[attr].keys.include?(error_type))
+  end
+
+  def logger
+    @logger
+  end
+
+  def admin_user(username = 'admin')
+    user = LinkedData::Models::User.find(username).first
+    raise "The user #{username} does not exist" if user.nil?
+    user.bring_remaining
+  end
+
+  def array_migrate(sub, attr, new_val)
+    old_val = sub.send(attr.to_s)
+    sub.send("#{attr}=", (Array(old_val) + [new_val]).uniq) if new_val
+  end
+
+  def not_valid?(sub, msg)
+    unless sub.valid?
+      log_error msg
+      log_error "Submission #{sub.id} errors: #{sub.errors}"
+      true
+    end
+  end
+
+  def stop_to_fix(msg)
+    log_error "Stop to fix #{msg}"
+    caller_binding = binding.of_caller(1)
+    binding.pry(caller_binding)
+    log_error "End stop to fix"
+  end
+
+  def log_error(msg)
+    logger.error "> #{msg}"
+  end
+
+  def log_info(msg)
+    logger.info "> #{msg}"
+  end
+
+end
+
+logger = Logger.new(options[:logfile])
+# a formatter to write simultaneously into a file and stout
+logger.formatter = proc do |severity, datetime, progname, msg|
+  out = "#{severity} [#{datetime}] #{msg} \n"
+  puts out
+  out
+end
+
+begin
+  puts "AgroPortal migration details are logged to #{options[:logfile]}"
+
+  if options[:migrate_all]
+    submissions = LinkedData::Models::Ontology.all.each { |o| o.latest_submission }
+  else
+    submissions = options[:ontologies].map do |acronym|
+      ont = LinkedData::Models::Ontology.find(acronym).first
+      ont.latest_submission(status: :any)
+    end
+  end
+
+  submissions.each do |sub|
+    AgroPortalMigrator.new(submission: sub, logger: logger).migrate_submission
+  end
+
+rescue Exception => e
+  logger.error "Failed, exception: #{e.to_json}."
+  binding.pry
+  exit(1)
+end
+
