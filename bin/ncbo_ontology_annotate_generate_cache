@@ -49,7 +49,7 @@ opt_parser = OptionParser.new do |opts|
     options[:generate_dictionary] = true
   end
 
-  options[:logfile] = "logs/annotator_cache.log"
+  options[:logfile] = STDOUT
   opts.on('-l', '--logfile FILE', "Write log to FILE (default is 'logs/annotator_cache.log').") do |filename|
     options[:logfile] = filename
   end

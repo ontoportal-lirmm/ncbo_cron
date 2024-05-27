@@ -20,27 +20,27 @@ require 'net/http'
 require 'optparse'
 ontologies_acronyms = ''
 ontology_source = ''
-source_api = ''
+source_apikey = ''
 username = ''
 opt_parser = OptionParser.new do |opts|
   opts.banner = 'Usage: ncbo_ontology_import [options]'
-  opts.on('-o', '--ontology ACRONYM', 'Ontologies acronyms which we want to import (separated by comma)') do |acronym|
+  opts.on('-o', '--ontologies ACRONYM1,ACRONYM2', 'Comma-separated list of ontologies to import') do |acronym|
     ontologies_acronyms = acronym
   end
 
-  opts.on('--from url', 'The ontoportal api url source of the ontology') do |url|
+  opts.on('--from URL', 'The ontoportal api url source of the ontology') do |url|
     ontology_source = url.to_s
   end
 
-  opts.on('--from-api api', 'An apikey to acces the ontoportal api') do |api|
-    source_api = api.to_s
+  opts.on('--from-apikey APIKEY', 'An apikey to acces the ontoportal api') do |apikey|
+    source_apikey = apikey.to_s
   end
 
-  opts.on('--admin-user username', 'The target admin user that will submit the ontology') do |user|
+  opts.on('--admin-user USERNAME', 'The target admin user that will submit the ontology') do |user|
     username = user.to_s
   end
   # Display the help screen, all programs are assumed to have this option.
-  opts.on( '-h', '--help', 'Display this screen') do
+  opts.on('-h', '--help', 'Display this screen') do
     puts opts
     exit
   end
@@ -48,9 +48,8 @@ end
 opt_parser.parse!
 
 # URL of the API and APIKEY of the Ontoportal  we want to import data FROM
-SOURCE_API =  ontology_source
-SOURCE_APIKEY =  source_api
-
+SOURCE_API = ontology_source
+SOURCE_APIKEY = source_apikey
 
 # The username of the user that will have the administration rights on the ontology on the target portal
 TARGETED_PORTAL_USER = username
@@ -58,17 +57,15 @@ TARGETED_PORTAL_USER = username
 # The list of acronyms of ontologies to import
 ONTOLOGIES_TO_IMPORT = ontologies_acronyms.split(',') || []
 
-
 def get_user(username)
   user = LinkedData::Models::User.find(username).first
   raise "The user #{username} does not exist" if user.nil?
+
   user.bring_remaining
 end
 
-
 # A function to create a new ontology (if already Acronym already existing on the portal it will return HTTPConflict)
 def create_ontology(ont_info)
-
   new_ontology = LinkedData::Models::Ontology.new
 
   new_ontology.acronym = ont_info['acronym']
@@ -79,6 +76,21 @@ def create_ontology(ont_info)
     new_ontology.viewingRestriction = 'private'
     new_ontology.acl = [USER]
   end
+
+  groups = []
+  has_domains = []
+  Array(ont_info['group']).each do |group|
+    group = LinkedData::Models::Group.find(group.split("/").last).first
+    groups << group if group
+  end
+
+  Array(ont_info['hasDomain']).each do |category|
+    category = LinkedData::Models::Category.find(category.split("/").last).first
+    has_domains << category if category
+  end
+
+  new_ontology.groups = groups
+  new_ontology.hasDomain = has_domains
   new_ontology
 end
 
@@ -97,23 +109,30 @@ def upload_submission(sub_info, ontology)
   # Build the json body
   # hasOntologyLanguage options: OWL, UMLS, SKOS, OBO
   # status: alpha, beta, production, retired
-  attr_to_reject = %w[id submissionStatus hasOntologyLanguage metrics ontology @id @type contact]
-  to_copy = sub_info.select do |k,v|
+  attr_to_reject = %w[id submissionStatus hasOntologyLanguage metrics ontology @id @type contact uploadFilePath diffFilePath]
+  to_copy = sub_info.select do |k, v|
     !v.nil? && !v.is_a?(Hash) && !v.to_s.empty? && !attr_to_reject.include?(k)
   end
   to_copy["ontology"] = ontology
-  to_copy["contact"] =  [LinkedData::Models::Contact.where(email: USER.email).first]
-  to_copy["hasOntologyLanguage"] =  LinkedData::Models::OntologyFormat.where(acronym: sub_info["hasOntologyLanguage"]).first
+
+  contact = LinkedData::Models::Contact.where(email: USER.email).first
+  unless contact
+    contact = LinkedData::Models::Contact.new(name: USER.username, email: USER.email).save
+    puts "created a new contact; name: #{USER.username}, email: #{USER.email}"
+  end
+
+  to_copy["contact"] = [contact]
+  to_copy["hasOntologyLanguage"] = LinkedData::Models::OntologyFormat.where(acronym: sub_info["hasOntologyLanguage"]).first
 
   to_copy.each do |key, value|
     attribute_settings = new_submission.class.attribute_settings(key.to_sym)
 
     if attribute_settings
-      if  attribute_settings[:enforce]&.include?(:date_time)
+      if attribute_settings[:enforce]&.include?(:date_time)
         value = DateTime.parse(value)
       elsif attribute_settings[:enforce]&.include?(:uri) && attribute_settings[:enforce]&.include?(:list)
         value = value.map { |v| RDF::IRI.new(v) }
-      elsif  attribute_settings[:enforce]&.include?(:uri)
+      elsif attribute_settings[:enforce]&.include?(:uri)
         value = RDF::IRI.new(value)
       end
     end
@@ -124,12 +143,11 @@ def upload_submission(sub_info, ontology)
   new_submission
 end
 
-
 USER = get_user username
-#get apikey for admin user
+# get apikey for admin user
 TARGET_APIKEY = USER.apikey
 
-SOURCE_APIKEY == '' && abort('--from-api has to be set')
+SOURCE_APIKEY == '' && abort('--from-apikey has to be set')
 SOURCE_API == '' && abort('--from has to be set')
 
 def result_log(ressource, errors)
@@ -143,10 +161,11 @@ end
 # Go through all ontologies acronym and get their latest_submission informations
 ONTOLOGIES_TO_IMPORT.each do |ont|
   sub_info = JSON.parse(Net::HTTP.get(URI.parse("#{SOURCE_API}/ontologies/#{ont}/latest_submission?apikey=#{SOURCE_APIKEY}&display=all")))
-  puts "Import #{ont} " ,
+  puts "Import #{ont} ",
        "From #{SOURCE_API}"
   # if the ontology is already created then it will return HTTPConflict, no consequences
   raise "The ontology #{ont} does not exist" if sub_info['ontology'].nil?
+
   new_ontology = create_ontology(sub_info['ontology'])
   errors = nil
   if new_ontology.valid?
@@ -159,6 +178,7 @@ ONTOLOGIES_TO_IMPORT.each do |ont|
 
   new_ontology ||= LinkedData::Models::Ontology.where(acronym: ont).first
   new_submission = upload_submission(sub_info, new_ontology)
+
   if new_submission.valid?
     new_submission.save
     errors = nil
@@ -167,6 +187,3 @@ ONTOLOGIES_TO_IMPORT.each do |ont|
   end
   result_log(sub_info["id"], errors)
 end
-
-
-
