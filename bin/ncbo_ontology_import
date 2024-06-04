@@ -89,7 +89,7 @@ def create_ontology(ont_info)
     has_domains << category if category
   end
 
-  new_ontology.groups = groups
+  new_ontology.group = groups
   new_ontology.hasDomain = has_domains
   new_ontology
 end
@@ -104,6 +104,10 @@ def upload_submission(sub_info, ontology)
   # If yes then we will pull the ontology from this place (allow auto update of the ontology when the ontology is changed in its source URL)
   if sub_info['pullLocation'].nil?
     sub_info['pullLocation'] = "#{sub_info['ontology']['links']['download']}?apikey=#{SOURCE_APIKEY}"
+  end
+
+  if sub_info['URI'].blank?
+    sub_info['URI'] = "#{sub_info['id']}"
   end
 
   # Build the json body
@@ -128,12 +132,16 @@ def upload_submission(sub_info, ontology)
     attribute_settings = new_submission.class.attribute_settings(key.to_sym)
 
     if attribute_settings
-      if attribute_settings[:enforce]&.include?(:date_time)
-        value = DateTime.parse(value)
+      if attribute_settings[:enforce]&.include?(:date_time) && attribute_settings[:enforce]&.include?(:list)
+        value = value.map { |v|  DateTime.parse(v) rescue DateTime.now }.uniq
+      elsif attribute_settings[:enforce]&.include?(:date_time)
+        value = DateTime.parse(value) rescue  DateTime.now
       elsif attribute_settings[:enforce]&.include?(:uri) && attribute_settings[:enforce]&.include?(:list)
         value = value.map { |v| RDF::IRI.new(v) }
       elsif attribute_settings[:enforce]&.include?(:uri)
         value = RDF::IRI.new(value)
+      elsif attribute_settings[:enforce]&.include?(:Agent)
+        next #TODO implement agent auto-creation
       end
     end
 
