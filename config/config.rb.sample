@@ -1,164 +1,94 @@
-# Sample for Bioportal (with the good subdomain created: sparql.bioportal.lirmm.fr, data.bioportal.lirmm.fr)
+# This file is designed to be used for unit testing with docker-compose
 
-$SITE_URL = "bioportal.lirmm.fr"
+GOO_BACKEND_NAME      = ENV.include?("GOO_BACKEND_NAME")      ? ENV["GOO_BACKEND_NAME"]      : "4store"
+GOO_HOST              = ENV.include?("GOO_HOST")              ? ENV["GOO_HOST"]              : "localhost"
+GOO_PATH_DATA         = ENV.include?("GOO_PATH_DATA")         ? ENV["GOO_PATH_DATA"]         : "/data/"
+GOO_PATH_QUERY        = ENV.include?("GOO_PATH_QUERY")        ? ENV["GOO_PATH_QUERY"]        : "/sparql/"
+GOO_PATH_UPDATE       = ENV.include?("GOO_PATH_UPDATE")       ? ENV["GOO_PATH_UPDATE"]       : "/update/"
+GOO_PORT              = ENV.include?("GOO_PORT")              ? ENV["GOO_PORT"]              : 9000
+MGREP_HOST            = ENV.include?("MGREP_HOST")            ? ENV["MGREP_HOST"]            : "localhost"
+MGREP_PORT            = ENV.include?("MGREP_PORT")            ? ENV["MGREP_PORT"]            : 55556
+MGREP_DICT_PATH       = ENV.include?("MGREP_DICT_PATH")       ? ENV["MGREP_DICT_PATH"]       : "./test/data/dictionary.txt"
+REDIS_GOO_CACHE_HOST  = ENV.include?("REDIS_GOO_CACHE_HOST")  ? ENV["REDIS_GOO_CACHE_HOST"]  : "localhost"
+REDIS_HTTP_CACHE_HOST = ENV.include?("REDIS_HTTP_CACHE_HOST") ? ENV["REDIS_HTTP_CACHE_HOST"] : "localhost"
+REDIS_PERSISTENT_HOST = ENV.include?("REDIS_PERSISTENT_HOST") ? ENV["REDIS_PERSISTENT_HOST"] : "localhost"
+REDIS_PORT            = ENV.include?("REDIS_PORT")            ? ENV["REDIS_PORT"]            : 6379
+REPORT_PATH           = ENV.include?("REPORT_PATH")           ? ENV["REPORT_PATH"]           : "./test/tmp/ontologies_report.json"
+REPOSITORY_FOLDER     = ENV.include?("REPOSITORY_FOLDER")     ? ENV["REPOSITORY_FOLDER"]     : "./test/data/ontology_files/repo"
+REST_URL_PREFIX       = ENV.include?("REST_URL_PREFIX")       ? ENV["REST_URL_PREFIX"]       : "http://localhost:9393"
+SOLR_PROP_SEARCH_URL  = ENV.include?("SOLR_PROP_SEARCH_URL")  ? ENV["SOLR_PROP_SEARCH_URL"]  : "http://localhost:8983/solr"
+SOLR_TERM_SEARCH_URL  = ENV.include?("SOLR_TERM_SEARCH_URL")  ? ENV["SOLR_TERM_SEARCH_URL"]  : "http://localhost:8983/solr"
+GOO_SLICES = ENV["GOO_SLICES"] || 500
 
-begin
-  LinkedData.config do |config|
-    config.repository_folder  = "/srv/ncbo/repository"
-    config.goo_host           = "localhost"
-    config.goo_port           = 8081
-    config.search_server_url = "http://localhost:8082/solr/term_search_core1"
-    config.property_search_server_url = "http://localhost:8082/solr/prop_search_core1"
-    config.rest_url_prefix    = "http://data.#{$SITE_URL}/"
-    config.replace_url_prefix = true
-    config.id_url_prefix      = "http://data.bioontology.org/"
-    config.enable_security    = true    # enable private ontologies hiding
-    config.apikey             = ""
-    config.ui_host            = "#{$SITE_URL}"
-    config.sparql_endpoint_url = "http://sparql.#{$SITE_URL}/test"
-    config.enable_monitoring  = false
-    config.cube_host          = "localhost"
-    config.enable_slices      = true
-    config.enable_resource_index  = false
+LinkedData.config do |config|
+  config.goo_backend_name              = GOO_BACKEND_NAME.to_s
+  config.goo_host                      = GOO_HOST.to_s
+  config.goo_port                      = GOO_PORT.to_i
+  config.goo_path_query                = GOO_PATH_QUERY.to_s
+  config.goo_path_data                 = GOO_PATH_DATA.to_s
+  config.goo_path_update               = GOO_PATH_UPDATE.to_s
+  config.goo_redis_host                = REDIS_GOO_CACHE_HOST.to_s
+  config.goo_redis_port                = REDIS_PORT.to_i
+  config.http_redis_host               = REDIS_HTTP_CACHE_HOST.to_s
+  config.http_redis_port               = REDIS_PORT.to_i
+  config.ontology_analytics_redis_host = REDIS_PERSISTENT_HOST.to_s
+  config.ontology_analytics_redis_port = REDIS_PORT.to_i
+  config.repository_folder             = REPOSITORY_FOLDER.to_s
+  config.search_server_url             = SOLR_TERM_SEARCH_URL.to_s
+  config.property_search_server_url    = SOLR_PROP_SEARCH_URL.to_s
+#  config.replace_url_prefix            = false
+#  config.rest_url_prefix               = REST_URL_PREFIX.to_s
+   # Used to define other bioportal that can be mapped to
+   # Example to map to ncbo bioportal : {"ncbo" => {"api" => "http://data.bioontology.org", "ui" => "http://bioportal.bioontology.org", "apikey" => ""}
+   # Then create the mapping using the following class in JSON : "http://purl.bioontology.org/ontology/MESH/C585345": "ncbo:MESH"
+   # Where "ncbo" is the namespace used as key in the interportal_hash
+   config.interportal_hash   = {"ncbo" => {"api" => "http://data.bioontology.org", "ui" => "http://bioportal.bioontology.org", "apikey" => ""},
+                                   "agroportal" => {"api" => "http://data.agroportal.lirmm.fr", "ui" => "http://agroportal.lirmm.fr", "apikey" => ""}}
 
-    # Used to define other bioportal that can be mapped to
-    # Example to map to ncbo bioportal : {"ncbo" => {"api" => "http://data.bioontology.org", "ui" => "http://bioportal.bioontology.org", "apikey" => ""}
-    # Then create the mapping using the following class in JSON : "http://purl.bioontology.org/ontology/MESH/C585345": "ncbo:MESH"
-    # Where "ncbo" is the namespace used as key in the interportal_hash
-    config.interportal_hash   = {"ncbo" => {"api" => "http://data.bioontology.org", "ui" => "http://bioportal.bioontology.org", "apikey" => ""},
-                                 "agroportal" => {"api" => "http://data.agroportal.lirmm.fr", "ui" => "http://agroportal.lirmm.fr", "apikey" => ""}}
-
-    # Caches
-    config.http_redis_host    = "localhost"
-    config.http_redis_port    = 6380
-    config.enable_http_cache  = true
-    config.goo_redis_host     = "localhost"
-    config.goo_redis_port     = 6382
-
-    # Email notifications
-    config.enable_notifications   = true
-    config.email_sender           = "notifications@#{$SITE_URL}" # Default sender for emails
-    config.email_override         = "override@example.org" # all email gets sent here. Disable with email_override_disable.
-    config.email_disable_override = true
-    config.smtp_host              = "smtp.lirmm.fr"
-    config.smtp_port              = 25
-    config.smtp_auth_type         = :none # :none, :plain, :login, :cram_md5
-    config.smtp_domain            = "lirmm.fr"
-    # Emails of the instance administrators to get mail notifications when new user or new ontology
-    config.admin_emails           = ["my.mail@example.org"]
-
-    # PURL server config parameters
-    config.enable_purl            = false
-    config.purl_host              = "purl.example.org"
-    config.purl_port              = 80
-    config.purl_username          = "admin"
-    config.purl_password          = "password"
-    config.purl_maintainers       = "admin"
-    config.purl_target_url_prefix = "http://example.org"
-
-    # Ontology Google Analytics Redis
-    # disabled
-    config.ontology_analytics_redis_host = "localhost"
-    config.enable_ontology_analytics = true
-    config.ontology_analytics_redis_port = 6379
-end
-rescue NameError
-  puts "(CNFG) >> LinkedData not available, cannot load config"
+  # Email notifications.
+  config.enable_notifications    = true
+  config.email_sender            = "sender@domain.com" # Default sender for emails
+  config.email_override          = "test@domain.com" # By default, all email gets sent here.  Disable with email_override_disable.
+  config.smtp_host               = "smtp-unencrypted.stanford.edu"
+  config.smtp_user               = nil
+  config.smtp_password           = nil
+  config.smtp_auth_type          = :none
+  config.smtp_domain             = "localhost.localhost"
 end
 
-begin
-  Annotator.config do |config|
-    config.mgrep_dictionary_file   = "/srv/mgrep/dictionary/dictionary.txt"
-    config.stop_words_default_file = "/srv/ncbo/ncbo_cron/config/default_stop_words.txt"
-    config.mgrep_host              = "localhost"
-    config.mgrep_port              = 55555
-    config.mgrep_alt_host          = "localhost"
-    config.mgrep_alt_port          = 55555
-    config.annotator_redis_host    = "localhost"
-    config.annotator_redis_port    = 6379
-    config.annotator_redis_prefix  = ""
-    config.annotator_redis_alt_prefix  = "c2"
-    config.enable_recognizer_param = true
-    # This setting allows you to ask for other recognizer in URL params (if installed and class with "annotate_direct" created). Example: ?recognizer=alvis or mallet
-end
-rescue NameError
-  puts "(CNFG) >> Annotator not available, cannot load config"
+Annotator.config do |config|
+  config.mgrep_host              ||= "localhost"
+  config.annotator_redis_host  = REDIS_PERSISTENT_HOST.to_s
+  config.annotator_redis_port  = REDIS_PORT.to_i
+  config.mgrep_host            = MGREP_HOST.to_s
+  config.mgrep_port            = MGREP_PORT.to_i
+  config.mgrep_dictionary_file = MGREP_DICT_PATH.to_s
 end
 
-begin
-  OntologyRecommender.config do |config|
-end
-rescue NameError
-  puts "(CNFG) >> OntologyRecommender not available, cannot load config"
-end
+NcboCron.config do |config|
+  config.redis_host = REDIS_PERSISTENT_HOST.to_s
+  config.redis_port = REDIS_PORT.to_i
+  # Ontologies Report config
+  config.ontology_report_path = REPORT_PATH
 
-begin
-  LinkedData::OntologiesAPI.config do |config|
-    config.enable_unicorn_workerkiller = true
-    config.enable_throttling           = false
-    config.enable_monitoring           = false
-    config.cube_host                   = "localhost"
-    config.http_redis_host             = "localhost"
-    config.http_redis_port             = 6380
-    config.ontology_rank               = ""
-end
-rescue NameError
-    puts "(CNFG) >> OntologiesAPI not available, cannot load config"
-end
+  # do not deaemonize in docker
+  config.daemonize  = false
 
-begin
-  NcboCron.config do |config|
-    config.redis_host                = Annotator.settings.annotator_redis_host
-    config.redis_port                = Annotator.settings.annotator_redis_port
-    # If no URL has been specified when reindexing ontologies, use the following
-    config.search_index_all_url      = "http://localhost:8082/solr/term_search_core2"
-    config.property_search_index_all_url = "http://localhost:8082/solr/prop_search_core2"
+  config.search_index_all_url = "http://localhost:8983/solr"
+  config.property_search_index_all_url = "http://localhost:8983/solr"
 
-    # Minutes between every process new ontologies check
-    config.minutes_between    = 3
-    
-    # Schedules: run every 4 hours, starting at 00:30
-    config.cron_schedule                            = "30 */4 * * *"
-    # Pull schedule: run daily at 6 a.m. (18:00)
-    config.pull_schedule                            = "00 18 * * *"
-    # Pull long schedule for ontology that are pulled less frequently: run weekly on monday at 11 a.m. (23:00)
-    config.pull_schedule_long                       = "00 23 * * 1"
-    config.pull_long_ontologies                     = ["BIOREFINERY", "TRANSMAT", "GO"]
-    # Delete class graphs of archive submissions: run twice per week on tuesday and friday at 10 a.m. (22:00)
-    config.cron_flush                               = "00 22 * * 2,5"
-    # Remove graphs from deleted ontologies when flushing class graphs
-    config.remove_zombie_graphs                     = true
-    # Warmup long time running queries: run every 3 hours (beginning at 00:00)
-    config.cron_warmq                               = "00 */3 * * *"
-    # Create mapping counts schedule: run twice per week on Wednesday and Saturday at 12:30AM
-    config.cron_mapping_counts                      = "30 0 * * 3,6"
-    
-    config.enable_ontologies_report                 = true
-    # Ontologies report generation schedule: run daily at 1:30 a.m.
-    config.cron_ontologies_report                   = "30 1 * * *"
-    # Ontologies Report file location
-    config.ontology_report_path = "/srv/ncbo/reports/ontologies_report.json"
-    
-  # Ontology analytics refresh schedule: run daily at 4:30 a.m.
-    config.cron_ontology_analytics                  = "30 4 * * *"
-    config.enable_ontology_analytics                = true
-    config.analytics_service_account_email_address  = "account-1@bioportal.iam.gserviceaccount.com"
-    config.analytics_path_to_key_file               = "/srv/bioportal-ff92c5b03b63.p12" # you have to get this file from Google
-    config.analytics_profile_id                     = "ga:111823321" # replace with your ga view id
-    config.analytics_app_name                       = "bioportal"
-    config.analytics_app_version                    = "1.0.0"
-    config.analytics_start_date                     = "2015-11-13"
-    # To filter connexions coming from Stanford
-    config.analytics_filter_str                     = "ga:networkLocation!@stanford;ga:networkLocation!@amazon"
+  # Google Analytics GA4 config
+  config.analytics_path_to_key_file     = "config/your_analytics_key.json"
+  config.analytics_property_id          = "123456789"
 
-    # this is a Base64.encode64 encoded personal access token
-    # you need to run Base64.decode64 on it before using it in your code
-    # this is a workaround because Github does not allow storing access tokens in a repo
-    config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN, encoded using Base64"
-  end
-rescue NameError
-  #binding.pry
-  puts "(CNFG) >> NcboCron not available, cannot load config"
+  # path to the file that will hold your Google Analytics data
+  # this is in addition to storing it in Redis
+  config.analytics_path_to_ga_data_file = "data/your_ga_data.json"
+  config.analytics_start_date                    = '2015-01-01'
+  # this is a Base64.encode64 encoded personal access token
+  # you need to run Base64.decode64 on it before using it in your code
+  # this is a workaround because Github does not allow storing access tokens in a repo
+  config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN, encoded using Base64"
 end
 
 Goo.use_cache = true
