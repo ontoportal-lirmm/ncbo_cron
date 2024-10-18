@@ -26,3 +26,40 @@ end.parse!
 
 raise OptionParser::MissingArgument if options[:vocabs].nil?
 
+require 'rdf'
+require 'rdf/n3'
+
+
+def parse_n3_file(file_path)
+  graph = RDF::Graph.new
+  RDF::N3::Reader.open(file_path) do |reader|
+    reader.each_statement do |statement|
+      graph << statement
+    end
+  end
+  graph
+end
+
+
+def find_vocabularies(graph)
+  vocab_type = RDF::URI("http://purl.org/vocommons/voaf#Vocabulary")
+  graph.query([nil, RDF.type, vocab_type]).map(&:subject)
+end
+
+
+def main
+  graph = parse_n3_file('lov.n3')
+  
+  vocab_uris = find_vocabularies(graph)
+  
+  if vocab_uris.empty?
+    puts "No vocabularies found in the file."
+  else
+    puts "Found #{vocab_uris.size} vocabularies:\n\n"
+    vocab_uris.each do |vocab_uri|
+      puts vocab_uri
+    end
+  end  
+end
+
+main
