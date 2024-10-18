@@ -30,6 +30,10 @@ require 'rdf'
 require 'rdf/n3'
 require 'csv'
 
+require 'open-uri'
+require 'digest'
+
+
 CSV_MAIN_ATTRS = [:prefix, :title, :description, :keyword, :uri, :modified]
 CSV_FILENAME = "vocabs.csv"
 
@@ -45,6 +49,44 @@ def parse_n3_file(file_path)
   graph
 end
 
+def download_file(url, destination)
+  URI.open(url) do |file|
+    File.open(destination, 'wb') do |output|
+      output.write(file.read)
+    end
+  end
+  puts "File downloaded successfully as #{destination}"
+end
+
+def file_hash(file_path)
+  Digest::SHA256.file(file_path).hexdigest
+end
+
+def files_identical?(file1, file2)
+  File.exist?(file2) && file_hash(file1) == file_hash(file2)
+end
+
+# Updates the local file if the downloaded file is different
+def update_local_file(url, local_file_path)
+  downloaded_file_name = 'lov.n3.gz.tmp'
+  
+  download_file(url, downloaded_file_name)
+
+  if files_identical?(downloaded_file_name, local_file_path)
+    File.delete(downloaded_file_name) # Clean up the temporary file
+    return false
+  else
+    File.rename(downloaded_file_name, local_file_path) # Replace the old file with the new one
+    # decompress the doanloaded zip    
+    Zlib::GzipReader.open(local_file_path) do |gzip|
+      File.open('lov.n3', 'w') do |file|
+        file.write(gzip.read)
+      end
+    end
+
+    return true
+  end
+end
 
 def initialize_csv(filename)
   CSV.open(filename, "w", force_quotes: true) do |csv|
@@ -164,6 +206,12 @@ end
 
 def main
 
+  if update_local_file("https://lov.linkeddata.es/lov.n3.gz","lov.n3.gz")
+    puts "The local file was updated."
+  else
+    puts "The local file remains unchanged."
+    exit
+  end
 
   initialize_csv(CSV_FILENAME)
 
