@@ -28,6 +28,11 @@ raise OptionParser::MissingArgument if options[:vocabs].nil?
 
 require 'rdf'
 require 'rdf/n3'
+require 'csv'
+
+CSV_MAIN_ATTRS = [:prefix, :title, :description, :keyword, :uri, :modified]
+CSV_FILENAME = "vocabs.csv"
+
 
 
 def parse_n3_file(file_path)
@@ -38,6 +43,20 @@ def parse_n3_file(file_path)
     end
   end
   graph
+end
+
+
+def initialize_csv(filename)
+  CSV.open(filename, "w", force_quotes: true) do |csv|
+    csv << CSV_MAIN_ATTRS  # Write header row
+  end
+end
+
+def append_to_csv(obj, filename)
+  CSV.open(filename, "a", force_quotes: true) do |csv|
+    filtered_row = CSV_MAIN_ATTRS.map { |attr| format_value(obj[attr]) }
+    csv << filtered_row
+  end
 end
 
 
@@ -144,6 +163,10 @@ def print_vocabulary_info(info)
 end
 
 def main
+
+
+  initialize_csv(CSV_FILENAME)
+
   graph = parse_n3_file('lov.n3')
   
   vocab_uris = find_vocabularies(graph)
@@ -154,6 +177,8 @@ def main
     puts "Found #{vocab_uris.size} vocabularies:\n\n"
     vocab_uris.each do |vocab_uri|
       vocab_info = extract_vocabulary_info(graph, vocab_uri)
+      append_to_csv(vocab_info, CSV_FILENAME)
+
       print_vocabulary_info(vocab_info)
     end
   end  
