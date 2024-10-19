@@ -50,6 +50,7 @@ def parse_n3_file(file_path)
   graph
 end
 
+
 def download_file(url, destination)
   URI.open(url) do |file|
     File.open(destination, 'wb') do |output|
@@ -205,32 +206,31 @@ def print_vocabulary_info(info)
   puts "\n"
 end
 
-def main
+# Start of the script
 
-  if update_local_file("https://lov.linkeddata.es/lov.n3.gz","lov.n3.gz")
-    puts "The local file was updated."
-  else
-    puts "The local file remains unchanged."
-    exit
-  end
+if update_local_file("https://lov.linkeddata.es/lov.n3.gz","lov.n3.gz")
+  puts "The local file was updated."
+else
+  puts "The local file remains unchanged."
+  exit
+end
 
-  initialize_csv(CSV_FILENAME)
+initialize_csv(CSV_FILENAME)
 
-  graph = parse_n3_file('lov.n3')
-  
-  vocab_uris = find_vocabularies(graph)
-  
-  if vocab_uris.empty?
-    puts "No vocabularies found in the file."
-  else
+graph = parse_n3_file('lov.n3')
+
+vocab_uris = find_vocabularies(graph)
+
+if vocab_uris.empty?
+  puts "No vocabularies found in the file."
+else
+  if options[:vocabs].first == :all
     puts "Found #{vocab_uris.size} vocabularies:\n\n"
     vocab_uris.each do |vocab_uri|
       vocab_info = extract_vocabulary_info(graph, vocab_uri)
       append_to_csv(vocab_info, CSV_FILENAME)
-
-      print_vocabulary_info(vocab_info)
+      #print_vocabulary_info(vocab_info)
     end
-  end  
-end
+  end
+end  
 
-main
