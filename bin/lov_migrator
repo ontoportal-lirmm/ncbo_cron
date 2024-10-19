@@ -36,6 +36,8 @@ require 'digest'
 
 
 CSV_MAIN_ATTRS = [ :prefix, :title, :description, :keyword, :creator, :uri, :modified ]
+CSV_ADDED_ATTRS = [ :destination, :who, :comment ]
+CSV_DISPATCH_FILENAME = 'LOV_vocabularies_dispatch.csv'
 CSV_FILENAME = "vocabs.csv"
 
 
@@ -50,6 +52,14 @@ def parse_n3_file(file_path)
   graph
 end
 
+def find_csv_row_by_prefix(file_path, prefix_value)
+  CSV.foreach(file_path, headers: true, header_converters: :symbol) do |row|
+    if row[:prefix] == prefix_value
+      return row 
+    end
+  end
+  nil 
+end
 
 def download_file(url, destination)
   URI.open(url) do |file|
@@ -92,16 +102,27 @@ end
 
 def initialize_csv(filename)
   CSV.open(filename, "w", force_quotes: true) do |csv|
-    csv << CSV_MAIN_ATTRS  # Write header row
+    csv << CSV_MAIN_ATTRS + CSV_ADDED_ATTRS # Write header row
   end
 end
 
-def append_to_csv(obj, filename)
+# We copy the added attributes from dispatch csv
+def copy_added_values_to_csv(vocab)
+  csv_vocab = find_csv_row_by_prefix(CSV_DISPATCH_FILENAME, vocab[:prefix]).to_h
+  CSV_ADDED_ATTRS.each do |attr|
+    vocab[attr] = csv_vocab[attr]
+  end
+  vocab
+end
+
+def append_to_csv(vocab, filename)
+  vocab = copy_added_values_to_csv(vocab)
   CSV.open(filename, "a", force_quotes: true) do |csv|
-    filtered_row = CSV_MAIN_ATTRS.map { |attr| format_value(obj[attr]) }
+    filtered_row = (CSV_MAIN_ATTRS + CSV_ADDED_ATTRS).map { |attr| format_value(vocab[attr]) }
     csv << filtered_row
   end
 end
+
 
 
 def extract_uri_or_value(node)
@@ -225,7 +246,7 @@ if update_local_file("https://lov.linkeddata.es/lov.n3.gz","lov.n3.gz")
   puts "The local file was updated."
 else
   puts "The local file remains unchanged."
-  end
+end
 
 initialize_csv(CSV_FILENAME)
 
@@ -241,7 +262,7 @@ else
     puts "Found #{vocab_uris.size} vocabularies:\n\n"
     vocab_uris.each do |vocab_uri|
       vocab_info = extract_vocabulary_info(graph, vocab_uri)
-      append_to_csv(vocab_info, CSV_FILENAME)
+      append_to_csv(vocab_info, CSV_FILENAME)      
       print_vocabulary_info(vocab_info)
     end
     agent_uris.each do |agent_uri|
