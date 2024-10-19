@@ -34,7 +34,8 @@ require 'open-uri'
 require 'digest'
 
 
-CSV_MAIN_ATTRS = [:prefix, :title, :description, :keyword, :uri, :modified]
+
+CSV_MAIN_ATTRS = [ :prefix, :title, :description, :keyword, :creator, :uri, :modified ]
 CSV_FILENAME = "vocabs.csv"
 
 
