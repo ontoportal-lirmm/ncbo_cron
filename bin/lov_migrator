@@ -149,7 +149,7 @@ def extract_vocabulary_info(graph, vocab_uri)
     modified: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/modified"), nil]).first&.object,
     isDefinedBy: graph.query([vocab_uri, RDF::URI("http://www.w3.org/2000/01/rdf-schema#isDefinedBy"), nil]).first&.object,
     homepage: graph.query([vocab_uri, RDF::URI("http://xmlns.com/foaf/0.1/homepage"), nil]).first&.object,
-    creator: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/creator"), nil]).first&.object,
+    creator: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/creator"), nil]).map { |statement| extract_uri_or_value(statement.object) },
     contributor: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/contributor"), nil]).map { |statement| extract_uri_or_value(statement.object) },
     publisher: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/publisher"), nil]).first&.object,
     language: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/language"), nil]).map { |statement| extract_uri_or_value(statement.object) },
