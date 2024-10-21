@@ -35,7 +35,7 @@ require 'digest'
 
 
 
-CSV_MAIN_ATTRS = [ :prefix, :title, :description, :keyword, :creator, :uri, :modified ]
+CSV_MAIN_ATTRS = [ :prefix, :title, :description, :keyword, :creator, :uri, :lastModifiedInLOVAt ]
 CSV_ADDED_ATTRS = [ :destination, :who, :comment ]
 CSV_DISPATCH_FILENAME = 'LOV_vocabularies_dispatch.csv'
 CSV_FILENAME = "vocabs.csv"
@@ -193,6 +193,8 @@ def extract_vocabulary_info(graph, vocab_uri)
     }
   end
 
+  info[:lastModifiedInLOVAt] = graph.query([RDF::URI("https://lov.linkeddata.es/dataset/lov/vocabs/#{info[:prefix]}"), RDF::URI("http://purl.org/dc/terms/modified") , nil]).first&.object
+
   info
 end
 
@@ -241,12 +243,12 @@ def print_vocabulary_info(info)
 end
 
 # Start of the script
-
+'''
 if update_local_file("https://lov.linkeddata.es/lov.n3.gz","lov.n3.gz")
   puts "The local file was updated."
 else
   puts "The local file remains unchanged."
-end
+end'''
 
 initialize_csv(CSV_FILENAME)
 
