@@ -40,27 +40,110 @@ CSV_ADDED_ATTRS = [ :destination, :who, :comment ]
 CSV_DISPATCH_FILENAME = 'LOV_vocabularies_dispatch.csv'
 CSV_FILENAME = "vocabs.csv"
 
+module LOVMigrator
 
 
-def parse_n3_file(file_path)
-  graph = RDF::Graph.new
-  RDF::N3::Reader.open(file_path) do |reader|
-    reader.each_statement do |statement|
-      graph << statement
+  module Models
+    class Model
+      def extract_uri_or_value(node)
+        case node
+        when RDF::URI
+          node.to_s
+        when RDF::Literal
+          if node.has_language?
+            { value: node.object, language: node.language.to_s }
+          else
+            node.object
+          end
+        else
+          node.to_s
+        end
+      end
+
+      def get_value(vocab, predicate, list: false)
+        values = Array(vocab[RDF::URI.new(predicate)])
+                   .map { |value| extract_uri_or_value(value) }
+        list ? values : values.first
+      end
+    end
+    class Vocabulary < Model
+
+      def extract_vocabulary_info(graph, vocab_uri, vocab)
+        return unless vocab
+
+        info = {
+          uri: vocab_uri,
+          namespace: get_value(vocab, "http://purl.org/vocab/vann/preferredNamespaceUri"),
+          prefix: get_value(vocab, "http://purl.org/vocab/vann/preferredNamespacePrefix"),
+          title: get_value(vocab, "http://purl.org/dc/terms/title", list: true),
+          description: get_value(vocab, "http://purl.org/dc/terms/description", list: true),
+          keyword: get_value(vocab, "http://www.w3.org/ns/dcat#keyword", list: true),
+          issued: get_value(vocab, "http://purl.org/dc/terms/issued"),
+          modified: get_value(vocab, "http://purl.org/dc/terms/modified"),
+
+          isDefinedBy: get_value(vocab, "http://www.w3.org/2000/01/rdf-schema#isDefinedBy"),
+          homepage: get_value(vocab, "http://xmlns.com/foaf/0.1/homepage"),
+          creator: get_value(vocab, "http://purl.org/dc/terms/creator", list: true),
+          contributor: get_value(vocab, "http://purl.org/dc/terms/contributor", list: true),
+          publisher: get_value(vocab, "http://purl.org/dc/terms/publisher"),
+          language: get_value(vocab, "http://purl.org/dc/terms/language", list: true),
+          type: get_value(vocab, RDF.type),
+          occurrences: get_value(vocab, "http://purl.org/vocommons/voaf#occurrencesInDatasets"),
+          reused_by_datasets: get_value(vocab, "http://purl.org/vocommons/voaf#reusedByDatasets"),
+          reused_by_vocabs: get_value(vocab, "http://purl.org/vocommons/voaf#reusedByVocabularies"),
+          distribution: get_value(vocab, "http://www.w3.org/ns/dcat#distribution"),
+        }
+
+        review = get_value(vocab, "http://purl.org/stuff/rev#hasReview")
+        review = graph.dig(review)
+        if review
+          info[:review] = {
+            creator: get_value(review, "http://purl.org/dc/terms/creator"),
+            date: get_value(review, "http://purl.org/dc/terms/date"),
+            text: get_value(review, "http://purl.org/stuff/rev#text")
+          }
+        end
+
+        info[:lastModifiedInLOVAt] = get_value(vocab, "http://purl.org/dc/terms/modified")
+
+        info
+      end
+
+    end
+
+    class Agent
+
+      def extract_agent_info(graph, agent_uri)
+        info = {
+          name: graph.query([agent_uri, RDF::URI("http://xmlns.com/foaf/0.1/name"), nil]).first&.object,
+          sameAs: graph.query([agent_uri, RDF::URI("http://www.w3.org/2002/07/owl#sameAs"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+        }
+      end
+
+    end
+
+    class Distribution
+
+      def extract_distribution_info(graph, distribution_uri)
+        info_distribution = {
+          uri: distribution_uri,
+          issued: graph.query([distribution_uri, RDF::URI("http://purl.org/dc/terms/issued"), nil]).first&.object,
+          language: graph.query([distribution_uri, RDF::URI("http://purl.org/dc/terms/language"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          title: graph.query([distribution_uri, RDF::URI("http://purl.org/dc/terms/title"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          # Relations
+          extends: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#extends"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          specializes: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#specializes"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          generalizes: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#generalizes"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          hasEquivalencesWith: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#hasEquivalencesWith"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          hasDisjunctionsWith: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#hasDisjunctionsWith"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          metadataVoc: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#metadataVoc"), nil]).map { |statement| extract_uri_or_value(statement.object) },
+          imports: graph.query([distribution_uri, RDF::URI("http://www.w3.org/2002/07/owl#imports"), nil]).map { |statement| extract_uri_or_value(statement.object) }
+        }
+        info_distribution
+      end
+
     end
   end
-  graph
-end
-
-def find_csv_row_by_prefix(file_path, prefix_value)
-  CSV.foreach(file_path, headers: true, header_converters: :symbol) do |row|
-    if row[:prefix] == prefix_value
-      return row 
-      end
-      end
-  nil 
-end
-
 def download_file(url, destination)
   URI.open(url) do |file|
     File.open(destination, 'wb') do |output|
