@@ -56,8 +56,8 @@ def find_csv_row_by_prefix(file_path, prefix_value)
   CSV.foreach(file_path, headers: true, header_converters: :symbol) do |row|
     if row[:prefix] == prefix_value
       return row 
-    end
-  end
+      end
+      end
   nil 
 end
 
@@ -99,6 +99,43 @@ def update_local_file(url, local_file_path)
     return true
   end
 end
+
+    def parse_n3_file(file_path)
+      # The RDF type you want to filter for
+      vocabulary_type = RDF::URI("http://purl.org/vocommons/voaf#Vocabulary")
+
+      vocabularies_hash = {}
+      vocabulary_subjects = Set.new
+
+      # Single-pass to read the Turtle file without breaking syntax
+      RDF::Turtle::Reader.open(file_path) do |reader|
+        # Collect all statements in an array (could be large, but streaming the file)
+        reader.each_statement do |statement|
+          subject = statement.subject
+
+          # If the statement is of type `voaf:Vocabulary`, track the subject
+          if statement.predicate == RDF.type && statement.object == vocabulary_type
+            vocabulary_subjects.add(subject)
+            vocabularies_hash[subject] ||= {}
+          end
+
+          # Collect all triples related to the subject if it's identified as a vocabulary
+          if vocabulary_subjects.include?(subject)
+            vocabularies_hash[subject] ||= {}
+            old_value = vocabularies_hash[subject][statement.predicate]
+            if old_value.nil?
+              vocabularies_hash[subject][statement.predicate] = statement.object
+            else
+              vocabularies_hash[subject][statement.predicate] = Array(old_value) + [statement.object]
+            end
+          end
+        end
+
+      end
+      vocabularies_hash
+
+    end
+  end
 
 def initialize_csv(filename)
   CSV.open(filename, "w", force_quotes: true) do |csv|
