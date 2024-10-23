@@ -5,7 +5,6 @@ Signal.trap("INT") { exit 1 }
 
 require 'optparse'
 
-
 options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: lov_migrator [options]"
@@ -23,17 +22,16 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-
 raise OptionParser::MissingArgument if options[:vocabs].nil?
 
+require 'bundler/setup'
 require 'rdf'
 require 'rdf/n3'
 require 'csv'
-
 require 'open-uri'
 require 'digest'
-
-
+require 'benchmark'
+require 'parallel'
 
 CSV_MAIN_ATTRS = [ :prefix, :title, :description, :keyword, :creator, :uri, :lastModifiedInLOVAt ]
 CSV_ADDED_ATTRS = [ :destination, :who, :comment ]
@@ -144,44 +142,46 @@ module LOVMigrator
 
     end
   end
-def download_file(url, destination)
-  URI.open(url) do |file|
-    File.open(destination, 'wb') do |output|
-      output.write(file.read)
+
+  class DumpParser
+    def download_file(url, destination)
+      URI.open(url) do |file|
+        File.open(destination, 'wb') do |output|
+          output.write(file.read)
+        end
+      end
+      puts "File downloaded successfully as #{destination}"
     end
-  end
-  puts "File downloaded successfully as #{destination}"
-end
 
-def file_hash(file_path)
-  Digest::SHA256.file(file_path).hexdigest
-end
+    def file_hash(file_path)
+      Digest::SHA256.file(file_path).hexdigest
+    end
 
-def files_identical?(file1, file2)
-  File.exist?(file2) && file_hash(file1) == file_hash(file2)
-end
+    def files_identical?(file1, file2)
+      File.exist?(file2) && file_hash(file1) == file_hash(file2)
+    end
 
-# Updates the local file if the downloaded file is different
-def update_local_file(url, local_file_path)
-  downloaded_file_name = 'lov.n3.gz.tmp'
-  
-  download_file(url, downloaded_file_name)
+    # Updates the local file if the downloaded file is different
+    def update_local_file(url, local_file_path)
+      downloaded_file_name = 'lov.n3.gz.tmp'
 
-  if files_identical?(downloaded_file_name, local_file_path)
-    File.delete(downloaded_file_name) # Clean up the temporary file
-    return false
-  else
-    File.rename(downloaded_file_name, local_file_path) # Replace the old file with the new one
-    # decompress the doanloaded zip    
-    Zlib::GzipReader.open(local_file_path) do |gzip|
-      File.open('lov.n3', 'w') do |file|
-        file.write(gzip.read)
+      download_file(url, downloaded_file_name)
+
+      if files_identical?(downloaded_file_name, local_file_path)
+        File.delete(downloaded_file_name) # Clean up the temporary file
+        return false
+      else
+        File.rename(downloaded_file_name, local_file_path) # Replace the old file with the new one
+        # decompress the doanloaded zip
+        Zlib::GzipReader.open(local_file_path) do |gzip|
+          File.open('lov.n3', 'w') do |file|
+            file.write(gzip.read)
+          end
+        end
+
+        return true
       end
     end
-
-    return true
-  end
-end
 
     def parse_n3_file(file_path)
       # The RDF type you want to filter for
@@ -220,138 +220,58 @@ end
     end
   end
 
-def initialize_csv(filename)
-  CSV.open(filename, "w", force_quotes: true) do |csv|
-    csv << CSV_MAIN_ATTRS + CSV_ADDED_ATTRS # Write header row
-  end
-end
+  class CSVGenerator
 
-# We copy the added attributes from dispatch csv
-def copy_added_values_to_csv(vocab)
-  csv_vocab = find_csv_row_by_prefix(CSV_DISPATCH_FILENAME, vocab[:prefix]).to_h
-  CSV_ADDED_ATTRS.each do |attr|
-    vocab[attr] = csv_vocab[attr]
-  end
-  vocab
-end
-
-def append_to_csv(vocab, filename)
-  vocab = copy_added_values_to_csv(vocab)
-  CSV.open(filename, "a", force_quotes: true) do |csv|
-    filtered_row = (CSV_MAIN_ATTRS + CSV_ADDED_ATTRS).map { |attr| format_value(vocab[attr]) }
-    csv << filtered_row
-  end
-end
-
-
-
-def extract_uri_or_value(node)
-  case node
-  when RDF::URI
-    node.to_s
-  when RDF::Literal
-    if node.has_language?
-      { value: node.object, language: node.language.to_s }
-    else
-      node.object
+    def initialize_csv(filename)
+      CSV.open(filename, "w", force_quotes: true) do |csv|
+        csv << CSV_MAIN_ATTRS + CSV_ADDED_ATTRS # Write header row
+      end
     end
-  else
-    node.to_s
-  end      
-end
 
-def extract_distribution_info(graph, distribution_uri)
-  info_distribution = {
-    uri: distribution_uri,
-    issued: graph.query([distribution_uri, RDF::URI("http://purl.org/dc/terms/issued"), nil]).first&.object,
-    language: graph.query([distribution_uri, RDF::URI("http://purl.org/dc/terms/language"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    title: graph.query([distribution_uri, RDF::URI("http://purl.org/dc/terms/title"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    # Relations
-    extends: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#extends"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    specializes: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#specializes"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    generalizes: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#generalizes"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    hasEquivalencesWith: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#hasEquivalencesWith"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    hasDisjunctionsWith: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#hasDisjunctionsWith"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    metadataVoc: graph.query([distribution_uri, RDF::URI("http://purl.org/vocommons/voaf#metadataVoc"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    imports: graph.query([distribution_uri, RDF::URI("http://www.w3.org/2002/07/owl#imports"), nil]).map { |statement| extract_uri_or_value(statement.object) }
-  }
-  info_distribution
-end
-
-
-def extract_vocabulary_info(graph, vocab_uri)
-  info = {
-    uri: vocab_uri,
-    namespace: graph.query([vocab_uri, RDF::URI("http://purl.org/vocab/vann/preferredNamespaceUri"), nil]).first&.object, 
-    prefix: graph.query([vocab_uri, RDF::URI("http://purl.org/vocab/vann/preferredNamespacePrefix"), nil]).first&.object,
-    title: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/title"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    description: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/description"), nil]).map { |statement| extract_uri_or_value(statement.object) }, 
-    keyword: graph.query([vocab_uri, RDF::URI("http://www.w3.org/ns/dcat#keyword"), nil]).map(&:object),
-    issued: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/issued"), nil]).first&.object,
-    modified: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/modified"), nil]).first&.object,
-    isDefinedBy: graph.query([vocab_uri, RDF::URI("http://www.w3.org/2000/01/rdf-schema#isDefinedBy"), nil]).first&.object,
-    homepage: graph.query([vocab_uri, RDF::URI("http://xmlns.com/foaf/0.1/homepage"), nil]).first&.object,
-    creator: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/creator"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    contributor: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/contributor"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-    publisher: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/publisher"), nil]).first&.object,
-    language: graph.query([vocab_uri, RDF::URI("http://purl.org/dc/terms/language"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-
-    type: graph.query([vocab_uri, RDF.type, nil]).first&.object,
-
-    occurrences: graph.query([vocab_uri, RDF::URI("http://purl.org/vocommons/voaf#occurrencesInDatasets"), nil]).first&.object,
-    reused_by_datasets: graph.query([vocab_uri, RDF::URI("http://purl.org/vocommons/voaf#reusedByDatasets"), nil]).first&.object,
-    reused_by_vocabs: graph.query([vocab_uri, RDF::URI("http://purl.org/vocommons/voaf#reusedByVocabularies"), nil]).first&.object,
-    distribution: graph.query([vocab_uri, RDF::URI("http://www.w3.org/ns/dcat#distribution"), nil]).first&.object,
-  }
-
-  review = graph.query([vocab_uri, RDF::URI("http://purl.org/stuff/rev#hasReview"), nil]).first&.object
-  if review
-    info[:review] = {
-      creator: graph.query([review, RDF::URI("http://purl.org/dc/terms/creator"), nil]).first&.object,
-      date: graph.query([review, RDF::URI("http://purl.org/dc/terms/date"), nil]).first&.object,
-      text: graph.query([review, RDF::URI("http://purl.org/stuff/rev#text"), nil]).first&.object
-    }
-  end
-
-  info[:lastModifiedInLOVAt] = graph.query([RDF::URI("https://lov.linkeddata.es/dataset/lov/vocabs/#{info[:prefix]}"), RDF::URI("http://purl.org/dc/terms/modified") , nil]).first&.object
-
-  info
-end
-
-def extract_agent_info(graph, agent_uri)
-  info = {
-    name: graph.query([agent_uri, RDF::URI("http://xmlns.com/foaf/0.1/name"), nil]).first&.object, 
-    sameAs: graph.query([agent_uri, RDF::URI("http://www.w3.org/2002/07/owl#sameAs"), nil]).map { |statement| extract_uri_or_value(statement.object) },
-  }
-end
-
-def find_vocabularies(graph)
-  vocab_type = RDF::URI("http://purl.org/vocommons/voaf#Vocabulary")
-  graph.query([nil, RDF.type, vocab_type]).map(&:subject)
-end
-
-def find_agents(graph)
-  agent_type = RDF::URI("http://xmlns.com/foaf/0.1/Person")
-  graph.query([nil, RDF.type, agent_type]).map(&:subject)
-end
-
-
-
-def format_value(value)
-  case value
-  when Array
-    value.map { |v| format_value(v) }.join("\n")
-  when Hash
-    if value[:language]
-      "\"#{value[:value]}\"@#{value[:language]}"
-    else
-      value.to_s
+    # We copy the added attributes from dispatch csv
+    def copy_added_values_to_csv(vocab)
+      csv_vocab = find_csv_row_by_prefix(CSV_DISPATCH_FILENAME, vocab[:prefix]).to_h
+      CSV_ADDED_ATTRS.each do |attr|
+        vocab[attr] = csv_vocab[attr]
+      end
+      vocab
     end
-  else
-    value.to_s.empty? ? "None" : value.to_s
+
+    def append_to_csv(vocab, filename)
+      vocab = copy_added_values_to_csv(vocab) if File.exist?(CSV_DISPATCH_FILENAME)
+      CSV.open(filename, "a", force_quotes: true) do |csv|
+        filtered_row = (CSV_MAIN_ATTRS + CSV_ADDED_ATTRS).map { |attr| format_value(vocab[attr]) }
+        csv << filtered_row
+      end
+    end
+
+    def find_csv_row_by_prefix(file_path, prefix_value)
+      CSV.foreach(file_path, headers: true, header_converters: :symbol) do |row|
+        if row[:prefix] == prefix_value
+          return row
+        end
+      end
+      nil
+    end
+
+
+    def format_value(value)
+      case value
+      when Array
+        value.map { |v| format_value(v) }.join("\n")
+      when Hash
+        if value[:language]
+          "\"#{value[:value]}\"@#{value[:language]}"
+        else
+          value.to_s
+        end
+      else
+        value.to_s.empty? ? "None" : value.to_s
+      end
+    end
+
   end
 end
-
 
 def print_vocabulary_info(info)
   puts "-------------------------------------------------------------------"
@@ -362,36 +282,47 @@ def print_vocabulary_info(info)
   puts "\n"
 end
 
+def logger(text, &block)
+  puts ">> #{text} starting..."
+  time = Benchmark.realtime do
+    block.call
+  end
+  puts "#{text} finished in #{time} seconds"
+end
+
 # Start of the script
-'''
-if update_local_file("https://lov.linkeddata.es/lov.n3.gz","lov.n3.gz")
-  puts "The local file was updated."
-else
-  puts "The local file remains unchanged."
-end'''
+def main
+  parser = LOVMigrator::DumpParser.new
+  updated = false
+  logger("Download dump file from LOV") do
+    updated = parser.update_local_file("https://lov.linkeddata.es/lov.n3.gz", "lov.n3.gz")
+  end
+  if updated
+    puts "The local file was updated."
+  else
+    puts "The local file remains unchanged."
+  end
 
-initialize_csv(CSV_FILENAME)
+  csv_generator = LOVMigrator::CSVGenerator.new
+  logger("Initialize CSV #{CSV_FILENAME}") do
+    csv_generator.initialize_csv(CSV_FILENAME)
+  end
 
-graph = parse_n3_file('test.n3')
-
-vocab_uris = find_vocabularies(graph)
-agent_uris = find_agents(graph)
-
-if vocab_uris.empty?
-  puts "No vocabularies found in the file."
-else
-  if options[:vocabs].first == :all
-    puts "Found #{vocab_uris.size} vocabularies:\n\n"
-    vocab_uris.each do |vocab_uri|
-      vocab_info = extract_vocabulary_info(graph, vocab_uri)
-      append_to_csv(vocab_info, CSV_FILENAME)      
-      print_vocabulary_info(vocab_info)
-    end
-    agent_uris.each do |agent_uri|
-      
-      puts extract_agent_info(graph, agent_uri)
-    
+  graph = []
+  logger('Parsing the n3 in memory') do
+    graph = parser.parse_n3_file('lov.n3')
+  end
+  puts "Found #{graph.size} vocabularies"
+  if graph.empty?
+    puts "No vocabularies found in the file."
+  else
+    logger("Start creating CSV #{CSV_FILENAME}") do
+      graph.each do |vocab_uri, vocab_data|
+        vocab_info = LOVMigrator::Models::Vocabulary.new.extract_vocabulary_info(graph, vocab_uri, vocab_data)
+        csv_generator.append_to_csv(vocab_info, CSV_FILENAME)
+      end
     end
   end
-end  
+end
 
+main
