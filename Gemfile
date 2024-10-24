@@ -23,6 +23,8 @@ gem 'sys-proctable'
 gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
+gem 'rdf'
+gem 'rdf-n3'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'
