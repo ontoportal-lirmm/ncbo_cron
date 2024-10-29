@@ -37,8 +37,8 @@ CSV_ADDED_ATTRS = [ 'destination', 'who', 'comment' ]
 CSV_DISPATCH_FILENAME = 'LOV_vocabularies.csv'
 CSV_FILENAME = "vocabs.csv"
 
+module LOVMigrator
 
-class LOVMigrator
   attr_accessor :lov_endpoint
   class SparqlParser
     def initialize(endpoint = LOV_ENDPOINT)
