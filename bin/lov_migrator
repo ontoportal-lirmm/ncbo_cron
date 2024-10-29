@@ -41,10 +41,15 @@ module LOVMigrator
 
   attr_accessor :lov_endpoint
   class SparqlParser
+    attr_accessor :last_processed_date
     def initialize(endpoint = LOV_ENDPOINT)
       @lov_endpoint = endpoint
       _last_processed_date_file = ".last_processed_date.txt"
       @last_processed_date = File.exist?(_last_processed_date_file) ?  Date.parse(File.read(_last_processed_date_file).strip) : nil
+    end
+
+    def remote_changes?
+      @last_processed_date && @last_processed_date < latest_remote_modification_date
     end
 
     def sparql_query(query, accept_format = 'application/sparql-results+json')
