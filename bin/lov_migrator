@@ -14,7 +14,9 @@ OptionParser.new do |opts|
   opts.on('-v', '--vocabularies PREFIX1, PREFIX2', 'Comma-separated list of vocabularies to update or import') do |acronym|
     ontologies_acronyms = acronym
   end
-
+  opts.on('--dispatch-csv') do |csv|
+    options[:csv_dispatch_filename] = csv
+  end
   # Display the help screen, all programs are assumed to have this option.
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -24,15 +26,112 @@ end.parse!
 
 raise OptionParser::MissingArgument if options[:vocabs].nil?
 
+require 'open-uri'
+require 'net/http'
+require 'json'
+require 'date'
+require 'benchmark'
+
+LOV_ENDPOINT = "http://localhost:3030/lov"
+
+
+class LOVMigrator
+  attr_accessor :lov_endpoint
+  class SparqlParser
+    def initialize(endpoint = LOV_ENDPOINT)
+      @lov_endpoint = endpoint
+      _last_processed_date_file = ".last_processed_date.txt"
+      @last_processed_date = File.exist?(_last_processed_date_file) ?  Date.parse(File.read(_last_processed_date_file).strip) : nil
+    end
+
+    def sparql_query(query, accept_format = 'application/sparql-results+json')
+      uri = URI.parse("#{@lov_endpoint}/sparql")
+
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = (uri.scheme == 'https')
+      http.verify_mode = OpenSSL::SSL::VERIFY_NONE if uri.scheme == 'https'
+
+      request = Net::HTTP::Post.new(uri.request_uri)
+      request.set_form_data('query' => query)
+      request['Accept'] = accept_format
+
+      response = http.request(request)
+
+      case response
+      when Net::HTTPSuccess
+        accept_format == 'application/sparql-results+json' ? parse_json_response(response.body) : response.body
+      else
+        raise "SPARQL query failed: #{response.code} #{response.message}"
+      end
+    end
+
+    def latest_remote_modification_date
+      query = <<~SPARQL
+        SELECT (MAX(?modified) AS ?lastModifiedInLOVAt)
+        WHERE {
+            ?catalog a <http://www.w3.org/ns/dcat#Catalog> .
+            ?catalog <http://purl.org/dc/terms/modified> ?modified
+        }    
+        ORDER BY DESC(?lastModifiedInLOVAt)
+      SPARQL
+      result = sparql_query(query).first
+      Date.parse(result["lastModifiedInLOVAt"]["value"])
+    end
+
+    def fetch_all_vocabs
+      query = <<~SPARQL
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX dct: <http://purl.org/dc/terms/>
+
+        SELECT DISTINCT 
+            (GROUP_CONCAT(DISTINCT ?_prefix; separator="\\n") AS ?prefix)
+            (GROUP_CONCAT(DISTINCT ?_title; separator="\\n") AS ?title)
+            (GROUP_CONCAT(DISTINCT ?_description; separator="\\n") AS ?description)
+            (GROUP_CONCAT(DISTINCT ?_keyword; separator="\\n") AS ?keyword)
+            (GROUP_CONCAT(DISTINCT ?_creatorName; separator="\\n") AS ?creator)
+            ?uri
+            (GROUP_CONCAT(DISTINCT ?_lastModifiedInLOVAt; separator="\\n") AS ?lastModifiedInLOVAt)  
+
+        {
+            ?uri a <http://purl.org/vocommons/voaf#Vocabulary> .
+            ?catalog a <http://www.w3.org/ns/dcat#CatalogRecord> . 
+            ?catalog foaf:primaryTopic ?uri .
+
+            ?uri <http://purl.org/vocab/vann/preferredNamespacePrefix> ?_prefix.
+            ?uri <http://purl.org/dc/terms/title> ?_title. 	
+            ?uri <http://purl.org/dc/terms/description> ?_description.
+            ?uri <http://www.w3.org/ns/dcat#keyword> ?_keyword.
+            OPTIONAL { 
+              ?uri dct:creator ?_creator .
+              ?_creator foaf:name ?_creatorName
+            }
+            ?catalog <http://purl.org/dc/terms/modified> ?_lastModifiedInLOVAt
+        }
+        GROUP BY ?uri ?catalog
+      SPARQL
+      response = sparql_query(query, 'text/csv')
+    end
+    private
+
+    def parse_json_response(response_body)
+      JSON.parse(response_body)["results"]["bindings"]
+    end
+  end
+end
+
 def logger(text, &block)
-  puts ">> #{text} starting..."
+    puts ">> #{text} starting..."
   time = Benchmark.realtime do
     block.call
   end
   puts "#{text} finished in #{time} seconds"
 end
-
+  
 def main
+  parser = LOVMigrator::SparqlParser.new()
 end
 
 main  
+
