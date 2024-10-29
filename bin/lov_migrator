@@ -32,7 +32,7 @@ require 'json'
 require 'date'
 require 'benchmark'
 require 'csv'
-LOV_ENDPOINT = "http://localhost:3030/lov"
+LOV_ENDPOINT = "https://lov.linkeddata.es/dataset/lov"
 CSV_ADDED_ATTRS = [ 'destination', 'who', 'comment' ]
 CSV_DISPATCH_FILENAME = 'LOV_vocabularies.csv'
 CSV_FILENAME = "vocabs.csv"
