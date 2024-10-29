@@ -49,7 +49,8 @@ module LOVMigrator
     end
 
     def remote_changes?
-      @last_processed_date && @last_processed_date < latest_remote_modification_date
+      return true unless @last_processed_date
+      @last_processed_date < latest_remote_modification_date
     end
 
     def sparql_query(query, accept_format = 'application/sparql-results+json')
@@ -134,7 +135,7 @@ module LOVMigrator
     def initialize(csv_content)
       @csv_file_path = CSV_DISPATCH_FILENAME
       @csv_content = csv_content
-      @csv_file_data = load_csv_file
+      @csv_file_data = load_csv_file if File.exist?(@csv_file_path)
     end
   
     # Load CSV file into a hash for easy lookups
@@ -154,12 +155,14 @@ module LOVMigrator
     # Modify CSV string data based on values in the file data
     def copy_added_values_to_csv
       csv_data = parse_csv_content
+      if File.exist?(@csv_file_path)
       csv_data.each do |row|
         if @csv_file_data.key?(row['prefix'])
           CSV_ADDED_ATTRS.each do |attr|
             row[attr] = @csv_file_data[row['prefix']][attr]
           end
         end
+      end
       end
       csv_data
     end
