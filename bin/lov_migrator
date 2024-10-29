@@ -31,8 +31,11 @@ require 'net/http'
 require 'json'
 require 'date'
 require 'benchmark'
-
+require 'csv'
 LOV_ENDPOINT = "http://localhost:3030/lov"
+CSV_ADDED_ATTRS = [ 'destination', 'who', 'comment' ]
+CSV_DISPATCH_FILENAME = 'LOV_vocabularies.csv'
+CSV_FILENAME = "vocabs.csv"
 
 
 class LOVMigrator
@@ -119,6 +122,56 @@ class LOVMigrator
       JSON.parse(response_body)["results"]["bindings"]
     end
   end
+
+  class CSVGenerator
+    attr_reader :csv_file_path, :csv_content
+  
+    def initialize(csv_content)
+      @csv_file_path = CSV_DISPATCH_FILENAME
+      @csv_content = csv_content
+      @csv_file_data = load_csv_file
+    end
+  
+    # Load CSV file into a hash for easy lookups
+    def load_csv_file
+      data = {}
+      CSV.foreach(@csv_file_path, headers: true) do |row|
+        data[row['prefix']] = row.to_h # assuming 'prefix' is a unique prefixentifier
+      end
+      data
+    end
+  
+    # Parse CSV string
+    def parse_csv_content
+      CSV.parse(@csv_content, headers: true)
+    end
+  
+    # Modify CSV string data based on values in the file data
+    def copy_added_values_to_csv
+      csv_data = parse_csv_content
+      csv_data.each do |row|
+        if @csv_file_data.key?(row['prefix'])
+          CSV_ADDED_ATTRS.each do |attr|
+            row[attr] = @csv_file_data[row['prefix']][attr]
+          end
+        end
+      end
+      csv_data
+    end
+  
+    # Save modified CSV data to a new file
+    def save_to_csv(csv_file_path = CSV_FILENAME)
+      modified_data = copy_added_values_to_csv
+      CSV.open(csv_file_path, 'w', write_headers: true, headers: modified_data.headers) do |csv|
+        modified_data.each do |row|
+          csv << row
+        end
+      end
+      puts "Modifications saved to #{csv_file_path}"
+    end
+  end
+
+
 end
 
 def logger(text, &block)
