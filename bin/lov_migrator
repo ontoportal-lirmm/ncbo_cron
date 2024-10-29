@@ -193,7 +193,7 @@ end
 def main
   parser = LOVMigrator::SparqlParser.new()
   
-  logger("Checking for new cahnges") do
+  logger("Checking for new changes") do
     if not parser.remote_changes?
       puts "No changes occured since #{parser.last_processed_date}"
       exit  
