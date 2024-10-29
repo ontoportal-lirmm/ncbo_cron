@@ -189,6 +189,23 @@ end
   
 def main
   parser = LOVMigrator::SparqlParser.new()
+  
+  logger("Checking for new cahnges") do
+    if not parser.remote_changes?
+      puts "No changes occured since #{parser.last_processed_date}"
+      exit  
+    end
+  end
+  vocabularies = ""
+  logger("Start fetching Vocabularies ...") do
+    vocabularies = parser.fetch_all_vocabs
+  end
+  logger("Start creating CSV #{CSV_FILENAME}") do
+    csvGen = LOVMigrator::CSVGenerator.new(vocabularies)
+    csvGen.save_to_csv
+  end
+
+
 end
 
 main  
