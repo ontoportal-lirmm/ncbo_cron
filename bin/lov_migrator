@@ -127,6 +127,20 @@ module LOVMigrator
         file.puts Date.today
       end
     end
+    
+    def fetch_latest_changed_vocabs
+      query = <<~SPARQL
+      SELECT ?catalogRecord
+      WHERE {
+          ?catalogRecord a <http://www.w3.org/ns/dcat#CatalogRecord> .
+          ?catalogRecord <http://purl.org/dc/terms/modified> ?modified.
+          FILTER(?modified > "#{@last_processed_date}"^^<http://www.w3.org/2001/XMLSchema#date>)
+      }
+      ORDER BY DESC(?modified)
+      SPARQL
+      response = sparql_query(query)
+      response.map.with_index {|response, index| "[#{index+1}] #{response['catalogRecord']['value']}"}
+    end
     private
 
     def parse_json_response(response_body)
@@ -202,6 +216,11 @@ def main
     if not parser.remote_changes?
       puts "No changes occured since #{parser.last_processed_date}"
       exit  
+    else
+      if parser.last_processed_date
+        puts "The following vocabs were changed since #{parser.last_processed_date}"
+        puts parser.fetch_latest_changed_vocabs
+      end
     end
   end
   vocabularies = ""
