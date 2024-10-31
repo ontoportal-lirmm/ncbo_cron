@@ -122,6 +122,11 @@ module LOVMigrator
       SPARQL
       response = sparql_query(query, 'text/csv')
     end
+    def update_latest_modification_date
+      File.open(@last_processed_date_file, "w") do |file|
+        file.puts Date.today
+      end
+    end
     private
 
     def parse_json_response(response_body)
@@ -207,8 +212,7 @@ def main
     csvGen = LOVMigrator::CSVGenerator.new(vocabularies)
     csvGen.save_to_csv
   end
-
-
+  parser.update_latest_modification_date
 end
 
 main  
