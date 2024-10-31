@@ -2,17 +2,16 @@ source 'https://rubygems.org'
 
 gemspec
 
-gem 'ffi'
 
 # This is needed temporarily to pull the Google Universal Analytics (UA)
 # data and store it in a file. See (bin/import_google_ua_analytics_data)
 # The ability to pull this data from Google will cease on July 1, 2024
 gem "google-apis-analytics_v3"
-
-gem 'google-analytics-data'
+gem 'google-analytics-data', '0.6.0'
+gem 'google-protobuf', '3.25.3'
 gem 'mail', '2.6.6'
 gem 'multi_json'
-gem 'oj', '~> 3.0'
+gem 'oj'
 gem 'parseconfig'
 gem 'pony'
 gem 'pry'
@@ -23,6 +22,7 @@ gem 'sys-proctable'
 gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
+gem 'ffi', '~> 1.16.3'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'

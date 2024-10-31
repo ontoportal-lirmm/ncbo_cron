@@ -132,12 +132,16 @@ def upload_submission(sub_info, ontology)
     attribute_settings = new_submission.class.attribute_settings(key.to_sym)
 
     if attribute_settings
-      if attribute_settings[:enforce]&.include?(:date_time)
-        value = DateTime.parse(value)
+      if attribute_settings[:enforce]&.include?(:date_time) && attribute_settings[:enforce]&.include?(:list)
+        value = value.map { |v|  DateTime.parse(v) rescue DateTime.now }.uniq
+      elsif attribute_settings[:enforce]&.include?(:date_time)
+        value = DateTime.parse(value) rescue  DateTime.now
       elsif attribute_settings[:enforce]&.include?(:uri) && attribute_settings[:enforce]&.include?(:list)
         value = value.map { |v| RDF::IRI.new(v) }
       elsif attribute_settings[:enforce]&.include?(:uri)
         value = RDF::IRI.new(value)
+      elsif attribute_settings[:enforce]&.include?(:Agent)
+        next #TODO implement agent auto-creation
       end
     end
 
