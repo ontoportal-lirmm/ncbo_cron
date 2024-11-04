@@ -14,8 +14,8 @@ OptionParser.new do |opts|
   opts.on('-v', '--vocabularies PREFIX1, PREFIX2', 'Comma-separated list of vocabularies to update or import') do |acronym|
     ontologies_acronyms = acronym
   end
-  opts.on('--dispatch-csv') do |csv|
-    options[:csv_dispatch_filename] = csv
+  opts.on('--dispatch-csv FILENAME', 'Specify the CSV file to dispatch') do |csv_file|
+    options[:csv_dispatch_filename] = csv_file
   end
   # Display the help screen, all programs are assumed to have this option.
   opts.on( '-h', '--help', 'Display this screen' ) do
@@ -151,8 +151,8 @@ module LOVMigrator
   class CSVGenerator
     attr_reader :csv_file_path, :csv_content
   
-    def initialize(csv_content)
-      @csv_file_path = CSV_DISPATCH_FILENAME
+    def initialize(csv_content, csv_file_path = nil)
+      @csv_file_path = csv_file_path
       @csv_content = csv_content
       @csv_file_data = load_csv_file if File.exist?(@csv_file_path)
     end
@@ -209,7 +209,7 @@ def logger(text, &block)
   puts "#{text} finished in #{time} seconds"
 end
   
-def main
+def main(options)
   parser = LOVMigrator::SparqlParser.new()
   
   logger("Checking for new changes") do
@@ -228,11 +228,11 @@ def main
     vocabularies = parser.fetch_all_vocabs
   end
   logger("Start creating CSV #{CSV_FILENAME}") do
-    csvGen = LOVMigrator::CSVGenerator.new(vocabularies)
+    csvGen = LOVMigrator::CSVGenerator.new(vocabularies, options[:csv_dispatch_filename])
     csvGen.save_to_csv
   end
   parser.update_latest_modification_date
 end
 
-main  
+main(options)
 
