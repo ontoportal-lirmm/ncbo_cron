@@ -29,7 +29,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: c0f8697529ebfca2c3fe90d46d9482ac72f13362
+  revision: 312ef426eeaa461e88fa23124ea5fd531f4276ba
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -105,7 +105,7 @@ GEM
     faraday-net_http (3.0.2)
     faraday-retry (2.2.1)
       faraday (~> 2.0)
-    ffi (1.17.0)
+    ffi (1.16.3)
     gapic-common (0.21.1)
       faraday (>= 1.9, < 3.a)
       faraday-retry (>= 1.0, < 3.a)
@@ -114,7 +114,7 @@ GEM
       googleapis-common-protos-types (>= 1.11.0, < 2.a)
       googleauth (~> 1.9)
       grpc (~> 1.59)
-    google-analytics-data (0.6.1)
+    google-analytics-data (0.6.0)
       google-analytics-data-v1beta (>= 0.11, < 2.a)
       google-cloud-core (~> 1.6)
     google-analytics-data-v1beta (0.13.1)
@@ -136,7 +136,7 @@ GEM
     google-cloud-env (2.1.1)
       faraday (>= 1.0, < 3.a)
     google-cloud-errors (1.4.0)
-    google-protobuf (3.25.5-x86_64-linux)
+    google-protobuf (3.25.3-x86_64-linux)
     googleapis-common-protos (1.6.0)
       google-protobuf (>= 3.18, < 5.a)
       googleapis-common-protos-types (~> 1.7)
@@ -160,7 +160,7 @@ GEM
     httpclient (2.8.3)
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
-    json (2.7.4)
+    json (2.7.6)
     json-canonicalization (0.4.0)
     json-ld (3.2.5)
       htmlentities (~> 4.3)
@@ -194,7 +194,7 @@ GEM
     net-http-persistent (4.0.4)
       connection_pool (~> 2.2)
     netrc (0.11.0)
-    oj (3.16.6)
+    oj (3.16.7)
       bigdecimal (>= 3.0)
       ostruct (>= 0.2)
     omni_logger (0.1.4)
@@ -314,4 +314,4 @@ DEPENDENCIES
   test-unit-minitest
 
 BUNDLED WITH
-   2.3.15
+   2.3.23
