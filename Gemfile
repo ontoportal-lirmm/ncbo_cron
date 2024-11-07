@@ -23,13 +23,14 @@ gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
 gem 'ffi', '~> 1.16.3'
+gem 'activesupport', '~> 3.2.22.5'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'
 
-gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'master'
+gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'development'
 gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'development'
-gem 'ontologies_linked_data', github: 'BiodivPortal/ontologies_linked_data', branch: 'master'
+gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'development'
 gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'development'
 # Testing
 group :test do
