@@ -189,7 +189,7 @@ module LOVMigrator
     # Save modified CSV data to a new file
     def save_to_csv(csv_file_path = CSV_FILENAME)
       modified_data = copy_added_values_to_csv
-      CSV.open(csv_file_path, 'w', write_headers: true, headers: modified_data.headers) do |csv|
+      CSV.open(csv_file_path, 'w', write_headers: true, headers: modified_data.headers, force_quotes: true) do |csv|
         modified_data.each do |row|
           csv << row
         end
