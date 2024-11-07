@@ -44,7 +44,7 @@ module LOVMigrator
     attr_accessor :last_processed_date
     def initialize(endpoint = LOV_ENDPOINT)
       @lov_endpoint = endpoint
-      @last_processed_date_file = ".last_processed_date.txt"
+      @last_processed_date_file = "/var/tmp/.lov_last_processed_date.txt"
       @last_processed_date = File.exist?(@last_processed_date_file) ?  Date.parse(File.read(@last_processed_date_file).strip) : nil
     end
 
