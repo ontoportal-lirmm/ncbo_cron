@@ -40,4 +40,8 @@ group :test do
   gem 'test-unit-minitest'
 end
 
+gem 'capistrano-bundler', require: false
+gem 'capistrano-locally', require: false
+gem 'capistrano-rbenv', require: false
+
 gem "binding_of_caller", "~> 1.0"
