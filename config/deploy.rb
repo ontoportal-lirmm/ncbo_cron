@@ -1,6 +1,3 @@
-# config valid for current version and patch releases of Capistrano
-lock "~> 3.19.2"
-
 set :author, "imadbourouche"
 set :application, "ncbo_cron"
 set :repo_url, "https://github.com/#{fetch(:author)}/#{fetch(:application)}.git"
