@@ -17,6 +17,14 @@ OptionParser.new do |opts|
   opts.on('--dispatch-csv FILENAME', 'Specify the CSV file to dispatch') do |csv_file|
     options[:csv_dispatch_filename] = csv_file
   end
+  opts.on('--date DATE', 'Fetch vocabularies changed since this date (YYYY-MM-DD)') do |date|
+    begin
+      options[:date] = Date.parse(date).to_s
+    rescue ArgumentError
+      puts "Invalid date format. Please use YYYY-MM-DD."
+      exit 1
+    end
+  end
   # Display the help screen, all programs are assumed to have this option.
   opts.on( '-h', '--help', 'Display this screen' ) do
     puts opts
@@ -42,10 +50,18 @@ module LOVMigrator
   attr_accessor :lov_endpoint
   class SparqlParser
     attr_accessor :last_processed_date
-    def initialize(endpoint = LOV_ENDPOINT)
+    
+    def initialize(endpoint, date_arg = nil)
       @lov_endpoint = endpoint
       @last_processed_date_file = "/var/tmp/.lov_last_processed_date.txt"
-      @last_processed_date = File.exist?(@last_processed_date_file) ?  Date.parse(File.read(@last_processed_date_file).strip) : nil
+      # Determine the last processed date
+      if date_arg
+        @last_processed_date = Date.parse(date_arg) # Use the argument if provided
+      elsif File.exist?(@last_processed_date_file)
+        @last_processed_date = Date.parse(File.read(@last_processed_date_file).strip) # Fallback to the file value
+      else
+        @last_processed_date = nil # No date available
+      end
     end
 
     def remote_changes?
@@ -210,8 +226,7 @@ def logger(text, &block)
 end
   
 def main(options)
-  parser = LOVMigrator::SparqlParser.new()
-  
+  parser = LOVMigrator::SparqlParser.new(endpoint = LOV_ENDPOINT, date_arg = options[:date])
   logger("Checking for new changes") do
     if not parser.remote_changes?
       puts "No changes occured since #{parser.last_processed_date}"
