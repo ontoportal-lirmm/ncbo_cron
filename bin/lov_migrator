@@ -111,8 +111,8 @@ module LOVMigrator
         PREFIX dct: <http://purl.org/dc/terms/>
 
         SELECT DISTINCT 
-            (GROUP_CONCAT(DISTINCT ?_prefix; separator="\\n") AS ?prefix)
-            (GROUP_CONCAT(DISTINCT ?_title; separator="\\n") AS ?title)
+            (GROUP_CONCAT(DISTINCT STR(?_prefix); separator="\\n") AS ?prefix)
+            (GROUP_CONCAT(DISTINCT STR(?_title); separator="\\n") AS ?title)
             (GROUP_CONCAT(DISTINCT ?_description; separator="\\n") AS ?description)
             (GROUP_CONCAT(DISTINCT ?_keyword; separator="\\n") AS ?keyword)
             (GROUP_CONCAT(DISTINCT ?_creatorName; separator="\\n") AS ?creator)
@@ -133,6 +133,7 @@ module LOVMigrator
               ?_creator foaf:name ?_creatorName
             }
             ?catalog <http://purl.org/dc/terms/modified> ?_lastModifiedInLOVAt
+            FILTER(lang(?_title) = "en") 
         }
         GROUP BY ?uri ?catalog
       SPARQL
