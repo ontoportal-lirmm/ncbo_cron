@@ -4,11 +4,11 @@
 # server in each group is considered to be the first
 # unless any hosts have the primary property set.
 # Don't declare `role :all`, it's a meta role
-# role :app, %w{stageportal.lirmm.fr}
-# role :db, %w{stageportal.lirmm.fr} # sufficient to run db:migrate only on one system
+# role :app, %w{testportal.lirmm.fr}
+# role :db, %w{testportal.lirmm.fr} # sufficient to run db:migrate only on one system
 role :app, %w{127.0.0.1}
 role :db, %w{127.0.0.1}
-set :branch, ENV.include?('BRANCH') ? ENV['BRANCH'] : 'development'
+set :branch, ENV.include?('BRANCH') ? ENV['BRANCH'] : 'feature/add-capistrano-deployment'
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server
