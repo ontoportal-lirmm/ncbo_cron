@@ -29,7 +29,7 @@ GIT
 
 GIT
   remote: https://github.com/ontoportal-lirmm/ontologies_linked_data.git
-  revision: aff7843c7f2d8b2334a21e0f05599494ffde1427
+  revision: 6fd6960a1f134ec8c8aff07a5897bb0da12bcc8d
   branch: development
   specs:
     ontologies_linked_data (0.0.1)
@@ -254,7 +254,7 @@ GEM
       rexml (~> 3.2)
     redis (5.3.0)
       redis-client (>= 0.22.0)
-    redis-client (0.22.2)
+    redis-client (0.23.0)
       connection_pool
     representable (3.2.0)
       declarative (< 0.1.0)
