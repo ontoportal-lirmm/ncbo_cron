@@ -1,4 +1,4 @@
-set :author, "imadbourouche"
+set :author, "ontoportal-lirmm"
 set :application, "ncbo_cron"
 set :repo_url, "https://github.com/#{fetch(:author)}/#{fetch(:application)}.git"
 
@@ -18,7 +18,7 @@ set :log_level, :debug
 
 # Default value for linked_dirs is []
 # set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
-set :linked_dirs, %w{log logs vendor/bundle tmp/pids tmp/sockets public/system}
+set :linked_dirs, %w{log vendor/bundle tmp/pids tmp/sockets public/system}
 
 
 # Default value for keep_releases is 5
@@ -33,12 +33,12 @@ SSH_JUMPHOST_USER = ENV.include?('SSH_JUMPHOST_USER') ? ENV['SSH_JUMPHOST_USER']
 
 JUMPBOX_PROXY = "#{SSH_JUMPHOST_USER}@#{SSH_JUMPHOST}"
 set :ssh_options, {
-  user: 'bourouch',
+  user: 'ontoportal',
   forward_agent: 'true',
   keys: %w(config/deploy_id_rsa),
   auth_methods: %w(publickey),
   # use ssh proxy if API servers are on a private network
-  #proxy: Net::SSH::Proxy::Command.new("ssh #{JUMPBOX_PROXY} -W %h:%p")
+  proxy: Net::SSH::Proxy::Command.new("ssh #{JUMPBOX_PROXY} -W %h:%p")
 }
 
 # private git repo for configuraiton
@@ -93,8 +93,7 @@ namespace :deploy do
     on roles(:app), in: :sequence, wait: 5 do
       # Your restart mechanism here, for example:
       # execute :touch, release_path.join('tmp/restart.txt')
-      #execute 'sudo systemctl restart ncbo_cron'
-      execute 'ls /srv/ontoportal/ncbo_cron'
+      execute 'sudo systemctl restart ncbo_cron'
       execute 'sleep 5'
     end
   end
