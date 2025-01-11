@@ -3,14 +3,23 @@ require 'logger'
 require 'optparse'
 
 module NcboCron
-  module GraphsCounts
+  class GraphsCounts
     SUBMISSION_DATA_GRAPH = 'http://data\.bioontology\.org/ontologies/[^/]+/submissions/\d+'
+    DATA_SAVE = '/srv/ontoportal/data/reports/graph_counts.json'
 
-    def run(logger, file_path)
+    def read_graph_counts(file_path = nil)
+      file_path ||= DATA_SAVE
+      return {} unless File.exist?(file_path)
+
+      JSON.parse(File.read(file_path))
+    end
+
+    def run(logger, file_path = nil)
+      file_path ||= DATA_SAVE
       logger.info('Start generating graphs counts')
       logger.info('Fetch ontologies data graphs')
       @all_ontologies = LinkedData::Models::Ontology.all
-      @all_subs = all_ontologies.map{|x| x.latest_submission(status: any)}
+      @all_subs = @all_ontologies.map{|x| x.latest_submission(status: :any)}.compact
 
       logger.info('Fetch all graphs URIs')
       graphs = graphs_list
@@ -35,7 +44,7 @@ module NcboCron
 
     def zombie_graph?(graph)
       regex = Regexp.new(SUBMISSION_DATA_GRAPH)
-      return false unless regex.match?(url)
+      return false unless regex.match?(graph)
 
       !@all_subs.find{ |x| x.id.to_s == graph.to_s }.present?
     end
@@ -43,13 +52,13 @@ module NcboCron
     def graph_count_triples(graph)
       query = <<-eos
             SELECT (COUNT(?s) as ?count) WHERE {
-            GRAPH #{graph.to_ntriples} {
+            GRAPH <#{graph}> {
               ?s ?p ?v
             }}
           eos
       rs = Goo.sparql_query_client.query(query)
       count = 0
-      rs.each do |sol|
+      rs.each_solution do |sol|
         count = sol[:count].object
       end
       count
@@ -63,7 +72,7 @@ module NcboCron
             }}
       eos
       rs = Goo.sparql_query_client.query(query)
-      rs.solutions.map { |x| x[:g].to_s }
+      rs.each_solution.map { |x| x[:g].to_s }
     end
   end
 end

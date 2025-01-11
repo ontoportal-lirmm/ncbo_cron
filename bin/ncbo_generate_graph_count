@@ -11,6 +11,7 @@ require_relative '../lib/ncbo_cron'
 config_exists = File.exist?(File.expand_path('../../config/config.rb', __FILE__))
 abort("Please create a config/config.rb file using the config/config.rb.sample as a template") unless config_exists
 require_relative '../config/config'
+require_relative '../lib/ncbo_cron/graphs_counts'
 
 require 'optparse'
 options = {}
@@ -18,7 +19,7 @@ opt_parser = OptionParser.new do |opts|
   opts.on('--store FILEPATH', 'save the results in this file') do |filepath|
     options[:savefile] = filepath
   end
-  options[:logfile] = "logs/graph_counts_generation.log"
+  options[:logfile] = STDOUT
   opts.on( '-l', '--logfile FILE', "Write log to FILE (default is 'bulk_load_mapping.log')" ) do |filename|
     options[:logfile] = filename
   end
@@ -31,10 +32,5 @@ opt_parser.parse!
 
 logger = Logger.new(options[:logfile])
 puts "Processing details are logged to #{options[:logfile]}"
-unless options[:savefile]
-  logger.error "Please provide a file to save the results"
-  exit
-end
 
-generator = NcboCron::GraphsCounts.new
-generator.run(logger, options[:savefile])
+NcboCron::GraphsCounts.new.run(logger, options[:savefile])
