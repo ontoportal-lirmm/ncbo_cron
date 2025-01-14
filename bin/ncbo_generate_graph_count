@@ -16,6 +16,7 @@ require_relative '../lib/ncbo_cron/graphs_counts'
 require 'optparse'
 options = {}
 opt_parser = OptionParser.new do |opts|
+  options[:savefile] = NcboCron.settings.graphs_counts_report_path
   opts.on('--store FILEPATH', 'save the results in this file') do |filepath|
     options[:savefile] = filepath
   end
@@ -33,4 +34,4 @@ opt_parser.parse!
 logger = Logger.new(options[:logfile])
 puts "Processing details are logged to #{options[:logfile]}"
 
-NcboCron::GraphsCounts.new.run(logger, options[:savefile])
+NcboCron::GraphsCounts.new(logger, options[:savefile]).run

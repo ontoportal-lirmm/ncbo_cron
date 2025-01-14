@@ -7,15 +7,20 @@ module NcboCron
     SUBMISSION_DATA_GRAPH = 'http://data\.bioontology\.org/ontologies/[^/]+/submissions/\d+'
     DATA_SAVE = '/srv/ontoportal/data/reports/graph_counts.json'
 
-    def read_graph_counts(file_path = nil)
-      file_path ||= DATA_SAVE
+    attr_reader :logger, :file_path
+
+    def initialize(logger = nil, file_path = nil)
+      @file_path ||= DATA_SAVE
+      @logger = logger || Logger.new(STDOUT)
+    end
+
+    def read_graph_counts
       return {} unless File.exist?(file_path)
 
       JSON.parse(File.read(file_path))
     end
 
-    def run(logger, file_path = nil)
-      file_path ||= DATA_SAVE
+    def run
       logger.info('Start generating graphs counts')
       logger.info('Fetch ontologies data graphs')
       @all_ontologies = LinkedData::Models::Ontology.all
@@ -55,7 +60,7 @@ module NcboCron
             GRAPH <#{graph}> {
               ?s ?p ?v
             }}
-          eos
+      eos
       rs = Goo.sparql_query_client.query(query)
       count = 0
       rs.each_solution do |sol|
