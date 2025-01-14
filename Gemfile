@@ -23,6 +23,7 @@ gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
 gem 'ffi', '~> 1.16.3'
+gem 'activesupport', '~> 3.2'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'
