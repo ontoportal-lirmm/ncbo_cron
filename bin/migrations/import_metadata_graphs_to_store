@@ -14,6 +14,15 @@ begin
   # Optional profile to use for the import (vo: virtruoso, fs: 4store, gb: GraphDB)
   profile = ARGV[1]
 
+  docker = ARGV[2] == "docker"
+
+  if docker
+    result = system("./start_ontoportal_services.sh #{profile}")
+    unless result
+      puts "Error starting services"
+      exit 1
+    end
+  end
   # Check if processed_files directory exists
   unless Dir.exist?(processed_dir)
     puts "Processed files directory #{processed_dir} does not exist!"

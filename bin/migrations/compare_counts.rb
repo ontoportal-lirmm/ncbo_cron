@@ -173,6 +173,12 @@ puts "MappingsCount count: #{count} with display=all in #{format("%.4f", time)}s
 
 count = 0
 time = Benchmark.realtime do
+  count += LinkedData::Models::RestBackupMapping.where.all.count
+end
+puts "RestMappings count: #{count} with no display in #{format("%.4f", time)}s"
+
+count = 0
+time = Benchmark.realtime do
   attr = LinkedData::Models::RestBackupMapping.attributes(:all) + LinkedData::Models::MappingProcess.attributes(:all)
   count += LinkedData::Models::RestBackupMapping.where.include(attr).all.count
 end

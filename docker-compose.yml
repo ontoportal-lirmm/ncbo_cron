@@ -50,10 +50,10 @@ services:
     ports:
       - "9393:9393"
 
-  mgrep-ut:
-    image: ontoportal/mgrep-ncbo:0.1
-    ports:
-      - "55556:55555"
+#  mgrep-ut:
+#    image: ontoportal/mgrep-ncbo:0.1
+#    ports:
+#      - "55556:55555"
 
   redis-ut:
     image: redis
@@ -117,20 +117,23 @@ services:
       - ag
 
   virtuoso-ut:
-    image: openlink/virtuoso-opensource-7:7.2
+    image: tenforce/virtuoso:virtuoso7.2.5
     platform: linux/amd64
+    environment:
+      - SPARQL_UPDATE=true
+      - VIRT_Parameters_NumberOfBuffers=2450000
+      - VIRT_Parameters_MaxDirtyBuffers=1837500
+      - VIRT_Parameters_NumOfThreads=100
+      - VIRT_Parameters_MaxMem=20000000000
+      - VIRT_Parameters_LogEnable=2
+      - VIRT_SPARQL_ResultSetMaxRows=1000000000000
+      - VIRT_SPARQL_MaxQueryExecutionTime=6000
+      - VIRT_SPARQL_MaxQueryCostEstimationTime=6000
+    profiles:
+      - vo
     ports:
       - 1111:1111
       - 8890:8890
-    environment:
-      - DBA_PASSWORD=dba
-    profiles:
-      - vo
-    volumes:
-      - ./test/data/virtuoso.ini:/opt/virtuoso-opensource/database/virtuoso.ini
-      - ./test/data/virtuso_grant_write_permission.sh:/opt/virtuoso-opensource/initdb.d/virtuso_grant_write_permission.sh
-    entrypoint: >
-      bash -c "cd ..; ./bin/virtuoso-t -c ./database/virtuoso.ini ; ./initdb.d/virtuso_grant_write_permission.sh ; tail -f database/virtuoso.log"
     healthcheck:
       test: [ "CMD-SHELL", "curl -sf  http://localhost:8890/sparql  || exit 1" ]
       start_period: 10s
@@ -150,11 +153,10 @@ services:
       - 7200:7200
       - 7300:7300
     volumes:
-      - ./test/data/graphdb-repo-config.ttl:/opt/graphdb/dist/configs/templates/data/graphdb-repo-config.ttl
+      - ./test/data/graphdb-repo-config.ttl:/opt/graphdb/dist/configs/templates/graphdb.ttl
       - ./test/data/graphdb-test-load.nt:/opt/graphdb/dist/configs/templates/data/graphdb-test-load.nt
-
     entrypoint: >
-      bash -c " importrdf load -f -c /opt/graphdb/dist/configs/templates/data/graphdb-repo-config.ttl -m parallel /opt/graphdb/dist/configs/templates/data/graphdb-test-load.nt ; graphdb -Ddefault.min.distinct.threshold=3000 "
+      bash -c " importrdf load -f -c /opt/graphdb/dist/configs/templates/graphdb.ttl -m parallel /opt/graphdb/dist/configs/templates/data/graphdb-test-load.nt ; graphdb "
     profiles:
       - gb
 
