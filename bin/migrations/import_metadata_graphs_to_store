@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+require 'benchmark'
+# Stop the script at the first error
+begin
+  # Check if the correct number of arguments are provided
+  if ARGV.size < 1
+    puts "Usage: #{$PROGRAM_NAME} <processed_directory>"
+    exit 1
+  end
+
+  # Directory containing .n3 files and Virtuoso installation path
+  processed_dir = ARGV[0]
+  # Optional profile to use for the import (vo: virtruoso, fs: 4store, gb: GraphDB)
+  profile = ARGV[1]
+
+  # Check if processed_files directory exists
+  unless Dir.exist?(processed_dir)
+    puts "Processed files directory #{processed_dir} does not exist!"
+    exit 1
+  end
+
+  total_time = 0
+  import_count = 0
+  file_count = 0
+  # Loop through all .n3 files in the processed_files directory
+  Dir.glob(File.join(processed_dir, '*.n3')).each do |file|
+    # Extract the associated .graph file (contains graph URI)
+    graph_file = "#{file}.graph"
+
+    # Check if graph file exists
+    unless File.exist?(graph_file)
+      puts "Graph file #{graph_file} not found. Skipping import of #{file}."
+      next
+    end
+
+    # Extract the graph URI from the graph file
+    graph_uri = File.read(graph_file).strip
+    line_count = `wc -l #{file}`.to_i
+    puts "Start importing #{file} into graph <#{graph_uri}> of line count #{line_count}"
+    result = false
+    time = Benchmark.realtime do
+      result = system("ruby bin/migrations/import_nt_file.rb #{file} #{graph_uri} #{profile} > /dev/null 2>&1")
+    end
+
+    file_count += 1
+    total_time += time
+
+    if !result
+      puts "Error importing #{file} into graph <#{graph_uri}>"
+    else
+      import_count += 1
+      puts "Imported <#{graph_uri}> successfully in #{time.round(2)} seconds"
+    end
+    puts "#############################################################"
+  end
+  puts "#{import_count}/#{file_count} files imported in #{total_time.round(2)} seconds"
+rescue => e
+  puts "Error: #{e.message}"
+  exit 1
+end
