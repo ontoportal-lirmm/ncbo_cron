@@ -130,7 +130,7 @@ services:
       - ./test/data/virtuoso.ini:/opt/virtuoso-opensource/database/virtuoso.ini
       - ./test/data/virtuso_grant_write_permission.sh:/opt/virtuoso-opensource/initdb.d/virtuso_grant_write_permission.sh
     entrypoint: >
-      bash -c "cd ..; ./bin/virtuoso-t -c ./database/virtuoso.ini ; ./initdb.d/virtuso_grant_write_permission.sh ; tail -f database/virtuoso.log"
+      bash -c "cd ..;./bin/virtuoso-t +wait +configfile ./database/virtuoso.ini ; ./initdb.d/virtuso_grant_write_permission.sh ; tail -f ./database/virtuoso.log"
     healthcheck:
       test: [ "CMD-SHELL", "curl -sf  http://localhost:8890/sparql  || exit 1" ]
       start_period: 10s

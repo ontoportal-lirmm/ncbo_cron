@@ -31,3 +31,5 @@ logs/
 
 # Ignore jEnv files
 .java-version
+
+processed_files/
