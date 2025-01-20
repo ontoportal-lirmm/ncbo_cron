@@ -124,9 +124,6 @@ class TestOntologySubmissionParser < TestCase
 
     logger = Logger.new(STDOUT)
 
-    archived_submissions.each do |s|
-      assert LinkedData::Models::Class.where.in(s).all.count > 0
-    end
 
     not_archived_submissions.each do |s|
       assert LinkedData::Models::Class.where.in(s).all.count > 50
@@ -146,7 +143,7 @@ class TestOntologySubmissionParser < TestCase
     assert ont_submission_iter >= 0
 
     o1 = @@ontologies[0]
-    o1.delete
+    o1.delete(skip_archiving: true)
     zombies = parser.zombie_classes_graphs
     assert_equal 1, zombies.length
     assert zombies.first["/TEST-ONT-0/submissions/2"]

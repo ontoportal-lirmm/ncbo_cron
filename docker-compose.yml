@@ -84,7 +84,7 @@ services:
     ports:
       - 8983:8983
     command: bin/solr start -cloud -f
-      # volumes:
+    # volumes:
     #- solr_data:/var/solr/data
   agraph-ut:
     image: franzinc/agraph:v8.1.0
@@ -111,19 +111,26 @@ services:
     #   interval: 10s
     #   timeout: 5s
     #   retries: 5
+    networks:
+      - app
     profiles:
       - ag
 
   virtuoso-ut:
-    image: tenforce/virtuoso:virtuoso7.2.5
+    image: openlink/virtuoso-opensource-7:7.2
     platform: linux/amd64
-    environment:
-      - SPARQL_UPDATE=true
     ports:
       - 1111:1111
       - 8890:8890
+    environment:
+      - DBA_PASSWORD=dba
     profiles:
       - vo
+    volumes:
+      - ./test/data/virtuoso.ini:/opt/virtuoso-opensource/database/virtuoso.ini
+      - ./test/data/virtuso_grant_write_permission.sh:/opt/virtuoso-opensource/initdb.d/virtuso_grant_write_permission.sh
+    entrypoint: >
+      bash -c "cd ..;./bin/virtuoso-t +wait +configfile ./database/virtuoso.ini ; ./initdb.d/virtuso_grant_write_permission.sh ; tail -f ./database/virtuoso.log"
     healthcheck:
       test: [ "CMD-SHELL", "curl -sf  http://localhost:8890/sparql  || exit 1" ]
       start_period: 10s
@@ -156,3 +163,6 @@ volumes:
   agdata:
   4store:
   #solr_data:
+networks:
+  app:
+    driver: bridge

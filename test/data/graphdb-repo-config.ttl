@@ -13,20 +13,20 @@
           <http://www.ontotext.com/trree/owlim#defaultNS> "";
           <http://www.ontotext.com/trree/owlim#disable-sameAs> "true";
           <http://www.ontotext.com/trree/owlim#enable-context-index> "false";
-          <http://www.ontotext.com/trree/owlim#enable-literal-index> "true";
+          <http://www.ontotext.com/trree/owlim#enable-literal-index> "false";
           <http://www.ontotext.com/trree/owlim#enablePredicateList> "true";
-          <http://www.ontotext.com/trree/owlim#entity-id-size> "32";
-          <http://www.ontotext.com/trree/owlim#entity-index-size> "10000000";
+          <http://www.ontotext.com/trree/owlim#entity-id-size> "64";
+          <http://www.ontotext.com/trree/owlim#entity-index-size> "100000000000000000";
           <http://www.ontotext.com/trree/owlim#imports> "";
-          <http://www.ontotext.com/trree/owlim#in-memory-literal-properties> "true";
+          <http://www.ontotext.com/trree/owlim#in-memory-literal-properties> "false";
           <http://www.ontotext.com/trree/owlim#owlim-license> "";
           <http://www.ontotext.com/trree/owlim#query-limit-results> "0";
-          <http://www.ontotext.com/trree/owlim#query-timeout> "0";
+          <http://www.ontotext.com/trree/owlim#query-timeout> "600";
           <http://www.ontotext.com/trree/owlim#read-only> "false";
           <http://www.ontotext.com/trree/owlim#repository-type> "file-repository";
           <http://www.ontotext.com/trree/owlim#ruleset> "rdfsplus-optimized";
           <http://www.ontotext.com/trree/owlim#storage-folder> "storage";
-          <http://www.ontotext.com/trree/owlim#throw-QueryEvaluationException-on-timeout> "false";
+          <http://www.ontotext.com/trree/owlim#throw-QueryEvaluationException-on-timeout> "true";
           sail:sailType "owlim:Sail"
         ]
     ];
