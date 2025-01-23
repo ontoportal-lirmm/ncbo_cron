@@ -31,3 +31,9 @@ logs/
 
 # Ignore jEnv files
 .java-version
+
+processed_files/
+
+queries.txt
+
+graph_comparison.csv

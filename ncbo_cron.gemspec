@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-
 Gem::Specification.new do |gem|
   gem.version       = "0.0.1"
   gem.authors       = [""]
@@ -8,8 +7,9 @@ Gem::Specification.new do |gem|
   gem.summary       = %q{}
   gem.homepage      = "https://github.com/ncbo/ncbo_cron"
 
-  gem.files         = Dir['**/*']
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  gem.files         = Dir['**/*'] - Dir['bin/migrations']
+  # binding.pry
+  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) rescue nil}.compact
   gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
   gem.name          = "ncbo_cron"
   gem.require_paths = ["lib"]
