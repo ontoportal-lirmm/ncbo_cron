@@ -14,4 +14,4 @@ echo "##########################################################################
 echo 'All metadata graphs imported successfully.'
 echo "###########################################################################"
 
-ruby bin/migrations/compare_counts.rb "$path_graphs_files" "$profile"
+bundle exec ruby bin/migrations/compare_counts.rb "$path_graphs_files" "$profile"

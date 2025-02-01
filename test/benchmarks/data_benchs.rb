@@ -61,6 +61,7 @@ module Benchmarks
     puts "Time to load roots: " + time.round(2).to_s
     Goo.log_debug_file('roots')
     puts "Roots count: " + roots.length.to_s
+    puts "Roots total triples: " + roots.map { |r| r.properties.values.flatten.size}.sum.to_s
   end
 
   def self.concept_children(uri, sub)

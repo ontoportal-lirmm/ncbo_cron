@@ -1,6 +1,10 @@
 # Benchmarks
-## Import all portal metadata
+## Import all AgroPortal metadata
+test/benchmarks/import_all_metadata_file.sh ./processed_files gb
+ruby test/benchmarks/run_metadata_benchs.rb gb
 
-## Import AGROVOC and query all triples by pages
+## Parse INRAETHES and do ontoportal operations
+ruby test/benchmarks/parse_and_do_ontoportal_operations.rb INRAETHES fs 
+
 ## Parse ITIS and do ontoportal operations
-ruby test/benchmarks/parse_and_do_ontoportal_operations.rb ITIS fs 47a57aa3-7b54-4f34-b695-dbb5f5b7363e https://data.biodivportal.gfbio.dev 
+ruby test/benchmarks/parse_and_do_ontoportal_operations.rb ITIS fs api_key https://data.biodivportal.gfbio.dev 
