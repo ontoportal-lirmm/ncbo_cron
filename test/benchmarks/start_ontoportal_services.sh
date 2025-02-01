@@ -1,8 +1,23 @@
 #!/usr/bin/env bash
 profile=$1
 acronym=$2
+from_apikey=$3
+import_from_api=$4
 set -e
 
+if [ -z "$import_from_api" ]; then
+  import_from_api=https://data.stageportal.lirmm.fr
+fi
+
+if [ -z "$from_apikey" ]; then
+  from_apikey="1de0a270-29c5-4dda-b043-7c3580628cd5"
+fi
+
+# Documentation:
+# The below script is used to start the OntoPortal services with a specific backend type.
+# The script takes two arguments: acronym and profile.
+# The acronym is the name of the ontology to be imported.
+# The profile is the type of backend to be used.
 
 if [ -z "$profile" ]; then
   echo "Usage: $0 <acronym> <profile>"
@@ -41,7 +56,7 @@ elif [ "$BACKEND_TYPE" == "gb" ]; then
   export GOO_PATH_DATA="/repositories/ontoportal/statements"
   export GOO_PATH_UPDATE="/repositories/ontoportal/statements"
 else
-  echo "Error: Unknown backend type. Please set BACKEND_TYPE to 'ag', 'fs', or 'vo'."
+  echo "Error: Unknown backend type $profile. Please set BACKEND_TYPE to 'ag', 'fs', or 'vo'."
 fi
 
 echo "###########################################################################"
@@ -82,4 +97,4 @@ bundle exec rake user:create[admin,admin@nodomain.org,password]
 bundle exec rake user:adminify[admin]
 echo "###########################################################################"
 echo "Create a new ontology $acronym and import it from a remote server"
-bin/ncbo_ontology_import --admin-user admin -o "$acronym" --from https://data.stageportal.lirmm.fr --from-apikey 82602563-4750-41be-9654-36f46056a0db
+bin/ncbo_ontology_import --admin-user admin -o "$acronym" --from "$import_from_api" --from-apikey "$from_apikey"
