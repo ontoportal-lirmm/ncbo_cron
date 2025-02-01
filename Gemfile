@@ -52,3 +52,5 @@ group :deployment do
 end
 
 gem "binding_of_caller", "~> 1.0"
+gem 'net-smtp'
+gem 'net-ftp'

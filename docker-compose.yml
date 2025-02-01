@@ -50,10 +50,10 @@ services:
     ports:
       - "9393:9393"
 
-#  mgrep-ut:
-#    image: ontoportal/mgrep-ncbo:0.1
-#    ports:
-#      - "55556:55555"
+  mgrep-ut:
+    image: ontoportal/mgrep-ncbo:0.1
+    ports:
+      - "55556:55555"
 
   redis-ut:
     image: redis
@@ -87,8 +87,7 @@ services:
     # volumes:
     #- solr_data:/var/solr/data
   agraph-ut:
-    image: franzinc/agraph:v8.1.0
-    platform: linux/amd64
+    image: franzinc/agraph:v8.3.0
     environment:
       - AGRAPH_SUPER_USER=test
       - AGRAPH_SUPER_PASSWORD=xyzzy
@@ -117,12 +116,12 @@ services:
       - ag
 
   virtuoso-ut:
-    image: tenforce/virtuoso:virtuoso7.2.5
-    platform: linux/amd64
+    image: openlink/virtuoso-opensource-7:latest
     environment:
-      - SPARQL_UPDATE=true
-      - VIRT_Parameters_NumberOfBuffers=2450000
-      - VIRT_Parameters_MaxDirtyBuffers=1837500
+      - DBA_PASSWORD= dba
+      - DAV_PASSWORD= dba
+      - VIRT_Parameters_NumberOfBuffers=680000
+      - VIRT_Parameters_MaxDirtyBuffers=500000
       - VIRT_Parameters_NumOfThreads=100
       - VIRT_Parameters_MaxMem=20000000000
       - VIRT_Parameters_LogEnable=2
@@ -132,10 +131,12 @@ services:
     profiles:
       - vo
     ports:
-      - 1111:1111
-      - 8890:8890
+      - "1111:1111"  # Standard Virtuoso port
+      - "8890:8890"  # HTTP port for SPARQL endpoint
+    volumes:
+      - ./test/data/initdb.d:/opt/virtuoso-opensource/initdb.d
     healthcheck:
-      test: [ "CMD-SHELL", "curl -sf  http://localhost:8890/sparql  || exit 1" ]
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8890/sparql || exit 1" ]
       start_period: 10s
       interval: 60s
       timeout: 5s
