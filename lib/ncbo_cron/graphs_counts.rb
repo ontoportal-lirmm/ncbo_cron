@@ -10,7 +10,7 @@ module NcboCron
     attr_reader :logger, :file_path
 
     def initialize(logger = nil, file_path = nil)
-      @file_path ||= DATA_SAVE
+      @file_path = file_path || DATA_SAVE
       @logger = logger || Logger.new(STDOUT)
     end
 
