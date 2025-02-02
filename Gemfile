@@ -23,7 +23,7 @@ gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
 gem 'ffi', '~> 1.16.3'
-gem 'activesupport', '~> 3.2'
+gem 'activesupport', '~> 3.2.22.5'
 
 # Monitoring
 gem 'cube-ruby', require: 'cube'
@@ -41,7 +41,7 @@ group :test do
   gem 'test-unit-minitest'
 end
 
-group :deployment do
+group :development do
   # bcrypt_pbkdf and ed35519 is required for capistrano deployments when using ed25519 keys; see https://github.com/miloserdow/capistrano-deploy/issues/42
   gem 'bcrypt_pbkdf', '>= 1.0', '< 2.0', require: false
   gem 'capistrano', '~> 3', require: false
