@@ -23,5 +23,5 @@ Gem::Specification.new do |gem|
   gem.add_dependency("ncbo_annotator")
   gem.add_dependency("ontologies_linked_data")
   gem.add_dependency("redis")
-  gem.add_dependency("rufus-scheduler", "~> 2.0.24")
+  gem.add_dependency("rufus-scheduler")
 end
