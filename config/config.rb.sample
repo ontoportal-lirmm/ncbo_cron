@@ -92,3 +92,4 @@ NcboCron.config do |config|
 end
 
 Goo.use_cache = true
+Goo.slice_loading_size = GOO_SLICES.to_i
