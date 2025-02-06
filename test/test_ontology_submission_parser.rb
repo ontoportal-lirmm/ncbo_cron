@@ -5,7 +5,7 @@ require 'redis'
 
 class TestOntologySubmissionParser < TestCase
 
-  def self.before_suite
+  def before_suite
     @@redis = Redis.new(:host => NcboCron.settings.redis_host, :port => NcboCron.settings.redis_port)
     db_size = @@redis.dbsize
 
@@ -25,7 +25,7 @@ class TestOntologySubmissionParser < TestCase
     @@ont_count, @@acronyms, @@ontologies = LinkedData::SampleData::Ontology.create_ontologies_and_submissions(ont_count: 2, submission_count: 2, process_submission: false)
   end
 
-  def self.after_suite
+  def after_suite
     @@redis.del NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER
     LinkedData::SampleData::Ontology.delete_ontologies_and_submissions
   end

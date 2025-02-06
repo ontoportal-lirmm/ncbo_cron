@@ -13,7 +13,6 @@ require 'ontologies_linked_data'
 PROCESSED_DIR = ARGV[0] || './processed_files'
 profile = ARGV[1]
 
-
 case profile
 when 'ag'
   # AllegroGraph backend
@@ -104,9 +103,10 @@ def compare_graphs_with_files(graph_triples)
       graph_filename = graphs_files[graph_uri]
 
       next csv << [graph_uri, triples_count, "Graph not found", "N/A"] unless graph_filename
-      
+
       # Construct the expected file name based on the graph URI
       file_name = "#{PROCESSED_DIR}/#{graph_filename}"
+
       # puts "count lines of the file #{file_name} for the graph #{graph_uri}"
       if File.exist?(file_name)
         file_lines_count = count_file_lines(file_name)

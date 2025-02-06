@@ -22,23 +22,27 @@ gem 'sys-proctable'
 gem 'request_store'
 gem 'parallel'
 gem 'json-ld'
-gem 'ffi', '~> 1.16.3'
-gem 'activesupport', '~> 3.2.22.5'
+gem 'ffi'
+gem 'activesupport', '~> 5.0'
+gem 'rackup'
 
-# Monitoring
-gem 'cube-ruby', require: 'cube'
 
-gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'development'
+gem 'goo', github: 'ontoportal-lirmm/goo', branch: 'feature/migrate-ruby-3.2'
+gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'feature/migrate-ruby-3.2'
 gem 'sparql-client', github: 'ontoportal-lirmm/sparql-client', branch: 'development'
-gem 'ontologies_linked_data', github: 'ontoportal-lirmm/ontologies_linked_data', branch: 'development'
 gem 'ncbo_annotator', github: 'ontoportal-lirmm/ncbo_annotator', branch: 'development'
+
 # Testing
 group :test do
   gem 'email_spec'
-  gem 'minitest', '< 5.0'
+  gem 'minitest'
   gem 'simplecov'
   gem 'simplecov-cobertura' # for codecov.io
-  gem 'test-unit-minitest'
+  # gem 'test-unit-minitest'
+  gem 'crack', '0.4.5'
+  gem 'webmock'
+  gem "minitest-hooks", "~> 1.5"
+  gem 'webrick'
 end
 
 group :development do
@@ -51,6 +55,8 @@ group :development do
   gem 'ed25519', '>= 1.2', '< 2.0', require: false
 end
 
+gem 'cube-ruby'
 gem "binding_of_caller", "~> 1.0"
+gem 'concurrent-ruby', '1.3.4'
 gem 'net-smtp'
 gem 'net-ftp'
