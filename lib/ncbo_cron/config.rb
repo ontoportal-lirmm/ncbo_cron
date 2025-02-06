@@ -97,12 +97,12 @@ module NcboCron
     @settings.cron_dictionary_generation_cron_job ||= "30 3 * * *"
 
     @settings.log_level ||= :info
-    unless (@settings.log_path && File.exists?(@settings.log_path))
+    unless (@settings.log_path && File.exist?(@settings.log_path))
       log_dir = File.expand_path("../../../logs", __FILE__)
       FileUtils.mkdir_p(log_dir)
       @settings.log_path = "#{log_dir}/scheduler.log"
     end
-    if File.exists?("/var/run/ncbo_cron")
+    if File.exist?("/var/run/ncbo_cron")
       pid_path = File.expand_path("/var/run/ncbo_cron/ncbo_cron.pid", __FILE__)
     else
       pid_path = File.expand_path("../../../ncbo_cron.pid", __FILE__)
