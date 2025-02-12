@@ -72,7 +72,7 @@ module NcboCron
           file.close
           new_submission
         else
-          raise self::RemoteFileException.new(last)
+          raise RemoteFileException.new(last)
         end
       end
 

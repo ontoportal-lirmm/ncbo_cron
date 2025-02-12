@@ -22,8 +22,6 @@ require_relative '../config/config'
 
 Goo.use_cache = false # Make sure tests don't cache
 
-require 'test/unit'
-
 # Check to make sure you want to run if not pointed at localhost
 safe_host = Regexp.new(/localhost|-ut/)
 unless LinkedData.settings.goo_host.match(safe_host) &&
@@ -43,10 +41,22 @@ unless LinkedData.settings.goo_host.match(safe_host) &&
   $stdout.flush
 end
 
-require 'minitest/unit'
-MiniTest::Unit.autorun
+require 'minitest/autorun'
+require 'minitest/hooks/test'
 
-class CronUnit < MiniTest::Unit
+class CronUnit < Minitest::Test
+  include Minitest::Hooks
+
+  def before_all
+    super
+    before_suite
+  end
+
+  def after_all
+    after_suite
+    super
+  end
+
   def count_pattern(pattern)
     q = "SELECT (count(DISTINCT ?s) as ?c) WHERE { #{pattern} }"
     rs = Goo.sparql_query_client.query(q)
@@ -82,17 +92,13 @@ class CronUnit < MiniTest::Unit
   def before_suites
     # code to run before the very first test
   end
+  alias before_suite before_suites
 
   def after_suites
     # code to run after the very last test
   end
+  alias after_suite after_suites
 
-  def _run_suites(suites, type)
-    before_suites
-    super(suites, type)
-  ensure
-    after_suites
-  end
 
   def _run_suite(suite, type)
     backend_triplestore_delete
@@ -108,9 +114,8 @@ class CronUnit < MiniTest::Unit
     suite.after_suite if suite.respond_to?(:after_suite)
   end
 end
-MiniTest::Unit.runner = CronUnit.new
 
 ##
 # Base test class. Put shared test methods or setup here.
-class TestCase < MiniTest::Unit::TestCase
+class TestCase < CronUnit
 end
