@@ -6,10 +6,10 @@ require 'email_spec'
 class TestOntologyPull < TestCase
   include EmailSpec::Helpers
 
-  def self.before_suite
+  def before_suite
     ont_path = File.expand_path("../data/ontology_files/BRO_v3.2.owl", __FILE__)
     file = File.new(ont_path)
-    @@port = Random.rand(55000..65535) # http://en.wikipedia.org/wiki/List_of_TCP_and_UDP_port_numbers#Dynamic.2C_private_or_ephemeral_ports
+    @@port = Random.rand(55000..65535)
     @@url = "http://localhost:#{@@port}/"
     @@thread = Thread.new do
       server = WEBrick::HTTPServer.new(Port: @@port)
@@ -36,7 +36,7 @@ class TestOntologyPull < TestCase
     @@redis.del NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER
   end
 
-  def self.after_suite
+  def after_suite
     Thread.kill(@@thread)
     @@redis.del NcboCron::Models::OntologySubmissionParser::QUEUE_HOLDER
   end

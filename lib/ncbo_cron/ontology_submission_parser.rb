@@ -156,7 +156,7 @@ module NcboCron
         if sub
           sub.bring_remaining
           sub.ontology.bring(:acronym)
-          FileUtils.mkdir_p(sub.data_folder) unless Dir.exists?(sub.data_folder)
+          FileUtils.mkdir_p(sub.data_folder) unless Dir.exist?(sub.data_folder)
           log_path = sub.parsing_log_path
           logger.info "Logging parsing output to #{log_path}"
           logger1 = Logger.new(log_path)

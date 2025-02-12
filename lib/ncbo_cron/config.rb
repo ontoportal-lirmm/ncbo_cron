@@ -34,6 +34,8 @@ module NcboCron
     @settings.enable_mapping_counts ||= true
     # enable ontology analytics
     @settings.enable_ontology_analytics ||= true
+    # enable graph count
+    @settings.enable_graphs_counts ||= true
     # enable ontologies report
     @settings.enable_ontologies_report ||= true
     # enable index synchronization
@@ -76,6 +78,10 @@ module NcboCron
     @settings.cron_ontologies_report ||= "30 1 * * *"
     # Ontologies Report file location
     @settings.ontology_report_path = "../../reports/ontologies_report.json"
+
+    # Ontologies Report file location
+    @settings.graph_counts_report_path = "../../reports/graph_counts.json"
+
     # Index synchronizer schedule
     # 30 3 */2 * * - run every 2 days at 3:30AM
     @settings.cron_index_synchronizer ||= "30 3 */2 * *"
@@ -91,12 +97,12 @@ module NcboCron
     @settings.cron_dictionary_generation_cron_job ||= "30 3 * * *"
 
     @settings.log_level ||= :info
-    unless (@settings.log_path && File.exists?(@settings.log_path))
+    unless (@settings.log_path && File.exist?(@settings.log_path))
       log_dir = File.expand_path("../../../logs", __FILE__)
       FileUtils.mkdir_p(log_dir)
       @settings.log_path = "#{log_dir}/scheduler.log"
     end
-    if File.exists?("/var/run/ncbo_cron")
+    if File.exist?("/var/run/ncbo_cron")
       pid_path = File.expand_path("/var/run/ncbo_cron/ncbo_cron.pid", __FILE__)
     else
       pid_path = File.expand_path("../../../ncbo_cron.pid", __FILE__)
