@@ -1,29 +1,48 @@
-ARG RUBY_VERSION
-ARG DISTRO_NAME=bullseye
+# syntax=docker/dockerfile:1
 
-FROM ruby:$RUBY_VERSION-$DISTRO_NAME
+# Build arguments with specific versions for better reproducibility
+ARG RUBY_VERSION=3.1
+ARG DISTRO_NAME=slim-bookworm
 
-RUN apt-get update -yqq && apt-get install -yqq --no-install-recommends \
-  openjdk-11-jre-headless \
-  raptor2-utils \
-  && rm -rf /var/lib/apt/lists/*
-
-RUN mkdir -p /srv/ontoportal/ncbo_cron
-RUN mkdir -p /srv/ontoportal/bundle
-COPY Gemfile* *.gemspec /srv/ontoportal/ncbo_cron/
+FROM ruby:${RUBY_VERSION}-${DISTRO_NAME}
 
 WORKDIR /srv/ontoportal/ncbo_cron
 
-# set rubygem and bundler to the last version supported by ruby 2.7
-# remove version after ruby v3 upgrade
-RUN gem update --system '3.4.22'
-RUN gem install bundler -v '2.4.22'
-RUN gem update --system
-RUN gem install bundler
-ENV BUNDLE_PATH=/srv/ontoportal/bundle
-RUN bundle install
+# Set environment variables
+ENV BUNDLE_PATH=/srv/ontoportal/bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=5 \
+    DEBIAN_FRONTEND=noninteractive
 
-COPY . /srv/ontoportal/ncbo_cron
+# Install system dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        file \
+        ca-certificates \
+        openjdk-17-jre-headless \
+        raptor2-utils \
+        wait-for-it \
+        libraptor2-dev \
+        build-essential \
+         libxml2 \
+         libxslt-dev \
+         libmariadb-dev \
+         git \
+         curl \
+         libffi-dev \
+     pkg-config && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN gem install bundler
+
+COPY Gemfile* *.gemspec ./
+
+# Install dependencies
+RUN bundle install --jobs ${BUNDLE_JOBS} --retry ${BUNDLE_RETRY}
+
+# Copy application code
+COPY . .
 RUN cp /srv/ontoportal/ncbo_cron/config/config.rb.sample /srv/ontoportal/ncbo_cron/config/config.rb
 
 CMD ["/bin/bash"]
