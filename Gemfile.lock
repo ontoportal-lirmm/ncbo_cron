@@ -124,7 +124,7 @@ GEM
       mail (~> 2.6)
     et-orbi (1.2.11)
       tzinfo
-    faraday (2.13.1)
+    faraday (2.13.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -173,10 +173,19 @@ GEM
     google-protobuf (4.30.2)
       bigdecimal
       rake (>= 13)
+    google-protobuf (4.30.2-aarch64-linux)
+      bigdecimal
+      rake (>= 13)
     google-protobuf (4.30.2-arm64-darwin)
       bigdecimal
       rake (>= 13)
+    google-protobuf (4.30.2-x86-linux)
+      bigdecimal
+      rake (>= 13)
     google-protobuf (4.30.2-x86_64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.30.2-x86_64-linux)
       bigdecimal
       rake (>= 13)
     googleapis-common-protos (1.8.0)
@@ -196,10 +205,19 @@ GEM
     grpc (1.73.0)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
+    grpc (1.73.0-aarch64-linux)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
     grpc (1.73.0-arm64-darwin)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
+    grpc (1.73.0-x86-linux)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
     grpc (1.73.0-x86_64-darwin)
+      google-protobuf (>= 3.25, < 5.0)
+      googleapis-common-protos-types (~> 1.0)
+    grpc (1.73.0-x86_64-linux)
       google-protobuf (>= 3.25, < 5.0)
       googleapis-common-protos-types (~> 1.0)
     hashdiff (1.2.0)
@@ -369,9 +387,12 @@ GEM
     webrick (1.9.1)
 
 PLATFORMS
+  aarch64-linux
   arm64-darwin
   ruby
+  x86-linux
   x86_64-darwin
+  x86_64-linux
 
 DEPENDENCIES
   activesupport (~> 5.0)
@@ -419,4 +440,4 @@ DEPENDENCIES
   webrick
 
 BUNDLED WITH
-   2.6.7
+   2.6.3
