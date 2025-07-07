@@ -1,7 +1,6 @@
 set :author, "ontoportal-lirmm"
 set :application, "ncbo_cron"
-# set :repo_url, "https://github.com/#{fetch(:author)}/#{fetch(:application)}.git"
-set :repo_url, "file:///home/bourouch/work/agroportal/ncbo_cron"
+set :repo_url, "https://github.com/#{fetch(:author)}/#{fetch(:application)}.git"
 
 set :deploy_via, :remote_cache
 
