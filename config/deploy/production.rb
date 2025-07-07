@@ -5,7 +5,7 @@
 # unless any hosts have the primary property set.
 # Don't declare `role :all`, it's a meta role
 role :app, %w[agroportal.eu]
-set :branch, ENV.include?('BRANCH') ? ENV['BRANCH'] : 'master'
+set :branch, ENV.include?('BRANCH') ? ENV['BRANCH'] : 'agroportal-new-deployment-configs'
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server
