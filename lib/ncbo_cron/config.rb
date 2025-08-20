@@ -77,7 +77,7 @@ module NcboCron
     # 30 1 * * * - run daily at 1:30AM
     @settings.cron_ontologies_report ||= "30 1 * * *"
     # Ontologies Report file location
-    @settings.ontology_report_path = "../../reports/ontologies_report.json"
+    @settings.ontology_report_path ||= "../../reports/ontologies_report.json"
 
     # Ontologies Report file location
     @settings.graph_counts_report_path = "../../reports/graph_counts.json"
