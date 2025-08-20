@@ -73,16 +73,16 @@ module NcboCron
 
         last.bring(:uploadFilePath) if last.bring?(:uploadFilePath)
 
-        if self.not_pull_submission(last, ont, isLong, enable_pull_umls, options)
-          raise StandardError, "Pull umls not enabled"
-        end
-
         if isLong && !options[:pull_long_ontologies].nil?
           return nil unless options[:pull_long_ontologies].include?(ont.acronym)
         else
           unless options[:pull_long_ontologies].nil?
             return nil if options[:pull_long_ontologies].include?(ont.acronym)
           end
+        end
+
+        if self.not_pull_submission(last, ont, isLong, enable_pull_umls, options)
+          raise StandardError, "Pull umls not enabled"
         end
 
         if last.hasOntologyLanguage.umls? && umls_download_url
@@ -157,7 +157,7 @@ module NcboCron
             logger.flush
           end
         else
-          logger.error("The new file for ontology #{ont.acronym}, submission id: #{submission_id} did not clear OWLAPI: #{e.class}: #{e.message}\n#{e.backtrace.join("\n\t")}")
+          logger.error("The new file for ontology #{ont.acronym}, submission id: #{submission_id} did not clear OWLAPI")
           logger.error("A new submission has NOT been created.")
           logger.flush
 
@@ -171,15 +171,7 @@ module NcboCron
       private
 
       def not_pull_submission(submission, ontology, isLong, enable_pull_umls, options)
-        if !enable_pull_umls && submission.hasOntologyLanguage.umls?
-          return true
-        end
-
-        if isLong && !options[:pull_long_ontologies].nil?
-          !options[:pull_long_ontologies].include?(ontology.acronym)
-        else
-          !options[:pull_long_ontologies].nil? && options[:pull_long_ontologies].include?(ontology.acronym)
-        end
+        return true if !enable_pull_umls && submission.hasOntologyLanguage.umls?
       end
 
       def new_file_exists?(file, last)
