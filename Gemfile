@@ -8,7 +8,7 @@ gemspec
 # The ability to pull this data from Google will cease on July 1, 2024
 gem "google-apis-analytics_v3"
 gem 'google-analytics-data', '0.6.0'
-gem "google-protobuf", "= 3.25.3"
+gem 'google-protobuf', '3.25.3'
 gem 'mail', '2.6.6'
 gem 'multi_json'
 gem 'oj'
