@@ -170,15 +170,9 @@ GEM
       faraday (>= 1.0, < 3.a)
     google-cloud-errors (1.5.0)
     google-logging-utils (0.2.0)
-    google-protobuf (4.30.2)
-      bigdecimal
-      rake (>= 13)
-    google-protobuf (4.30.2-arm64-darwin)
-      bigdecimal
-      rake (>= 13)
-    google-protobuf (4.30.2-x86_64-darwin)
-      bigdecimal
-      rake (>= 13)
+    google-protobuf (3.25.8)
+    google-protobuf (3.25.8-arm64-darwin)
+    google-protobuf (3.25.8-x86_64-darwin)
     googleapis-common-protos (1.8.0)
       google-protobuf (>= 3.18, < 5.a)
       googleapis-common-protos-types (~> 1.20)
@@ -390,7 +384,7 @@ DEPENDENCIES
   goo!
   google-analytics-data (= 0.6.0)
   google-apis-analytics_v3
-  google-protobuf (~> 4.30.0)
+  google-protobuf (~> 3.25.3)
   json-ld
   mail (= 2.6.6)
   minitest
