@@ -5,7 +5,7 @@
 # unless any hosts have the primary property set.
 # Don't declare `role :all`, it's a meta role
 role :app, %w{stageportal.lirmm.fr}
-set :branch, ENV.include?('BRANCH') ? ENV['BRANCH'] : 'stage'
+set :branch, ENV.include?('BRANCH') ? ENV['BRANCH'] : 'development'
 # Extended Server Syntax
 # ======================
 # This can be used to drop a more detailed server
