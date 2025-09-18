@@ -1,11 +1,11 @@
 # This file is designed to be used for unit testing with docker-compose
 
-GOO_BACKEND_NAME      = ENV.include?("GOO_BACKEND_NAME")      ? ENV["GOO_BACKEND_NAME"]      : "4store"
+GOO_BACKEND_NAME      = ENV.include?("GOO_BACKEND_NAME")      ? ENV["GOO_BACKEND_NAME"]      : "virtuoso"
 GOO_HOST              = ENV.include?("GOO_HOST")              ? ENV["GOO_HOST"]              : "localhost"
-GOO_PATH_DATA         = ENV.include?("GOO_PATH_DATA")         ? ENV["GOO_PATH_DATA"]         : "/data/"
+GOO_PATH_DATA         = ENV.include?("GOO_PATH_DATA")         ? ENV["GOO_PATH_DATA"]         : "/sparql/"
 GOO_PATH_QUERY        = ENV.include?("GOO_PATH_QUERY")        ? ENV["GOO_PATH_QUERY"]        : "/sparql/"
-GOO_PATH_UPDATE       = ENV.include?("GOO_PATH_UPDATE")       ? ENV["GOO_PATH_UPDATE"]       : "/update/"
-GOO_PORT              = ENV.include?("GOO_PORT")              ? ENV["GOO_PORT"]              : 9000
+GOO_PATH_UPDATE       = ENV.include?("GOO_PATH_UPDATE")       ? ENV["GOO_PATH_UPDATE"]       : "/sparql/"
+GOO_PORT              = ENV.include?("GOO_PORT")              ? ENV["GOO_PORT"]              : 8890
 MGREP_HOST            = ENV.include?("MGREP_HOST")            ? ENV["MGREP_HOST"]            : "localhost"
 MGREP_PORT            = ENV.include?("MGREP_PORT")            ? ENV["MGREP_PORT"]            : 55556
 MGREP_DICT_PATH       = ENV.include?("MGREP_DICT_PATH")       ? ENV["MGREP_DICT_PATH"]       : "./test/data/dictionary.txt"
@@ -89,6 +89,9 @@ NcboCron.config do |config|
   # you need to run Base64.decode64 on it before using it in your code
   # this is a workaround because Github does not allow storing access tokens in a repo
   config.git_repo_access_token = "YOUR GITHUB REPO PERSONAL ACCESS TOKEN, encoded using Base64"
+
+  config.pull_schedule_long ||= "00 12 1 * *"
+  config.pull_long_ontologies ||= ["AGROVOC"]
 end
 
 Goo.use_cache = true

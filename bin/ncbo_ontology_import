@@ -174,17 +174,21 @@ ONTOLOGIES_TO_IMPORT.each do |ont|
   # if the ontology is already created then it will return HTTPConflict, no consequences
   raise "The ontology #{ont} does not exist" if sub_info['ontology'].nil?
 
-  new_ontology = create_ontology(sub_info['ontology'])
-  errors = nil
-  if new_ontology.valid?
-    new_ontology.save
-  else
-    errors = new_ontology.errors
-    new_ontology = nil
-  end
-  result_log ont, errors
-
   new_ontology ||= LinkedData::Models::Ontology.where(acronym: ont).first
+
+  if new_ontology.nil?
+    puts "Creating ontology #{ont}"
+    new_ontology = create_ontology(sub_info['ontology'])
+    errors = nil
+    if new_ontology.valid?
+      new_ontology.save
+    else
+      errors = new_ontology.errors
+      new_ontology = nil
+    end
+    result_log ont, errors
+  end
+  
   new_submission = upload_submission(sub_info, new_ontology)
 
   if new_submission.valid?
