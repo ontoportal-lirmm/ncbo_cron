@@ -375,6 +375,7 @@ DEPENDENCIES
   google-analytics-data (= 0.6.0)
   google-apis-analytics_v3
   google-protobuf (= 3.25.3)
+  grpc (= 1.70.1)
   json-ld
   mail (= 2.6.6)
   minitest
