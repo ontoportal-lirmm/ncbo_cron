@@ -9,6 +9,7 @@ gemspec
 gem "google-apis-analytics_v3"
 gem 'google-analytics-data', '0.6.0'
 gem 'google-protobuf', '3.25.3'
+gem 'grpc', '1.70.1'
 gem 'mail', '2.6.6'
 gem 'multi_json'
 gem 'oj'
