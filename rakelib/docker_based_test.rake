@@ -65,7 +65,7 @@ namespace :test do
       ENV["GOO_PATH_QUERY"]="/sparql"
       ENV["GOO_PATH_DATA"]="/sparql"
       ENV["GOO_PATH_UPDATE"]="/sparql"
-      ENV["COMPOSE_PROFILES"]="vo"
+      ENV["COMPOSE_PROFILES"]="virtuoso"
       Rake::Task["test:docker:up"].invoke
       #
       unless system("curl -sf  http://localhost:8890/sparql  || exit 1")

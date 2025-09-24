@@ -133,6 +133,7 @@ services:
       - VIRT_SPARQL_MaxQueryCostEstimationTime=6000
     profiles:
       - vo
+      - virtuoso
     ports:
       - "1111:1111"  # Standard Virtuoso port
       - "8890:8890"  # HTTP port for SPARQL endpoint
